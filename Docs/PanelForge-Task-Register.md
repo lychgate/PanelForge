@@ -185,7 +185,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.6, S0.7; informs S1.2.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — migration format, writer mechanism, transaction helper shape, and exact concurrent-access test not specified. See D8–D9 (§7). **Correction:** Serialized writes are **[SPEC]** required; any async-mutex/writer-queue implementation is **[RECOMMENDATION]** and must be verified against the selected SQLite library (Drizzle ORM or equivalent per §14) before being treated as mandatory.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit recorded below). **Library decision (D8/Q3, decided during S0.8):** Node's built-in `node:sqlite` (DatabaseSync) — no new dependency, no native build. Drizzle may layer over it later.
 
 #### S0.9 Application Lifecycle Infrastructure [SPEC]
 - **Goal [SPEC]:** Provide reliable startup and shutdown behavior.
@@ -556,7 +556,7 @@ No blockers to starting S0.1. The following are decision requests, not implement
 |---|---|---|---|
 | Q1 | Approve/deny/modify D1–D10 in §7 (esp. D3 CSP grant list, D5 canonical store, D7 `/` canonical + external-ref deferral, D8 contingent writer mechanism)? Owner direction: approve progressively, at the relevant task. | S0.2–S0.4 (D1–D4), S1.1+ (D5–D7), S0.8 (D8–D9) — phased | Decision (approved approach) |
 | Q2 | **Approved — owner, 2026-11-05:** S0.2 must create the initial Electron window with secure defaults from its first launch. S0.3 remains responsible for verification, documentation, and security testing. | S0.2/S0.3 (no spec change) | Approved |
-| Q3 | **Deferred to S0.8 — owner, 2026-11-05:** Which SQLite library (Drizzle-equivalent choice) will §14 pin? This determines the D8 serialized-write mechanism. Not an S0.1 prerequisite or decision. | S0.8 | Deferred |
+| Q3 | **Decided during S0.8 (2026-11-05):** `node:sqlite` (Node built-in) — verified in plain Node and Electron's bundled Node; no new dependency. Drizzle optional later. | S0.8 | Decided |
 | Q4 | Approve splits S0.3a / S0.8a+b / S1.1a / S1.5a, or keep spec task blocks untouched? Owner direction: defer until the relevant task is close. | Sequencing only; no scope change | Deferred |
 | Q5 | Image/LLM baseline models that run on 1660 Ti 6GB. Owner direction: defer until Stage 3 planning. | Stage 3+ planning | Deferred |
 
@@ -630,6 +630,17 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.7 | Live launch probe ×3 (`timeout 12 electron .`, `PANELFORGE_USER_DATA_DIR=/tmp/opencode/pf-probe-logs`, `pgrep -x electron`) | Pass — main proc + zygote observed each launch; each launch appended `{"level":"info","message":"PanelForge starting"}` (88 → 176 → 264 bytes, mode `0600`); `pgrep -x electron` → "no stray electron (clean)" after each | Startup entry is recorded by the central log service with the level from the S0.6 config. GPU/MESA teardown errors are artifacts, not startup failures. |
 | 2026-11-05 | S0.7 | `grep` no hardcoded user paths in `src/core/logging/service.ts` | Pass — no `/home/wetlander` or `/Users/`; userData via `app.getPath("userData")` | Logs under userData, never a hardcoded machine-specific path. |
 | 2026-11-05 | S0.7 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.8 | `npm run typecheck` | Pass | Node + web clean (`src/database/**/*.ts` added to `tsconfig.node.json` include). |
+| 2026-11-05 | S0.8 | `npm run build` | Pass | `out/node/database/service.js` emitted. |
+| 2026-11-05 | S0.8 | `npm test` | Pass — 55 passed (1 baseline + 12 config + 12 logging + 10 database + 7 ipc + 13 security) | `tests/database.test.js` (10 tests, built service + fresh temp userData per test): pragmas WAL/FK/busy 5000, migrations recorded, persistence across reopen, 20 concurrent serialized writes → count 20, FK enforcement, transaction rollback, backup copy readable, query-before-init fails cleanly. |
+| 2026-11-05 | S0.8 | `npm run check` | Pass | Baseline + IPC guard green (ipcMain only in registry; ipcRenderer only in preload). |
+| 2026-11-05 | S0.8 | Live launch probe ×3 (`timeout 12 electron .`, `PANELFORGE_USER_DATA_DIR=/tmp/opencode/pf-probe-db`) | Pass — `database ready (journal=wal, migrations=001_initial)` logged each launch; `database/panelforge.db` + `-wal`/`-shm` present; `pgrep -x electron` → "no stray electron (clean)" after each | WAL mode active on disk. GPU/MESA teardown errors are artifacts. |
+| 2026-11-05 | S0.8 | Persistence/reopen probe | Pass — reopen returns `{"journalMode":"wal","foreignKeys":true,"busyTimeout":5000,"appliedMigrations":["001_initial"]}`; migrations not re-applied | Data + migration state persist across restarts. |
+| 2026-11-05 | S0.8 | Library verification | `node:sqlite` present in plain Node 22.23.1 and Electron's bundled Node 24.22.2 (`ELECTRON_RUN_AS_NODE=1` probe: `DatabaseSync` OK, WAL + FK pragmas OK) | Decision: Node built-in `node:sqlite` — no new dependency, no native build (resolves D8/Q3). |
+| 2026-11-05 | S0.8 | `grep` no hardcoded user paths in `src/database/service.ts` | Pass — no `/home/wetlander` or `/Users/`; userData via `app.getPath("userData")` | DB under userData, never a hardcoded machine-specific path. |
+| 2026-11-05 | S0.8 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+
+**S0.8 implemented files:** `src/database/service.ts` (New — `createDatabaseService`/`defaultDatabaseService`; `node:sqlite` DatabaseSync; `<userData>/database/panelforge.db`; pragmas WAL/FK/busy 5000 at open; in-code numbered migrations + `schema_migrations` tracking, auto-run on open; serialized write queue + `transaction()` with busy retry (max 3); `backupDatabase()` into `database/backups/`; `close()` on quit), `src/main/index.ts` (initializes DB on startup + logs `database ready …`, `logError` on failure without blocking launch, `before-quit` close), `tsconfig.node.json` (include `src/database/**/*.ts`), `tests/database.test.js` (New, 10 tests). Initial schema is intentionally minimal (`schema_migrations` + `kv_store` smoke table); project schema belongs to Stage 1. Automatic backup scheduling and corrupted-DB recovery dialog remain deferred (D10).
 
 **S0.7 implemented files:** `src/core/logging/service.ts` (New — `createLogService`/`defaultLogService`, JSON-line entries `{timestamp,level,message}` at `<userData>/logs/panelforge.log`, size-limited rotation `512 KiB` → `panelforge-1..3.log`, redaction + 1024-char cap, `logError` name+message without stacks, never-throws; fs/path + Electron only, no new deps), `src/main/index.ts` (sets the log minimum level from the S0.6 config, ensures the log location, records the `PanelForge starting` entry; config-failure path now routes through `logError` instead of `console.error`), `src/core/ipc/registry.ts` (handler errors recorded via `logError`; renderer envelope unchanged), `tests/logging.test.js` (New, 12 tests). Format/rotation/redaction choices are engineering judgment where the spec is silent (documented in service header).
 
@@ -683,11 +694,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.8 — SQLite Foundation [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.9 — Application Lifecycle Infrastructure [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.7 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.8 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.8 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.9 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Establish database infrastructure. **Deliverables [SPEC]:** SQLite connection service; Initial schema; Migration mechanism; WAL mode; Foreign key enforcement; Busy timeout; Serialized write service. **Acceptance [SPEC]:** Database initializes successfully; Migrations execute; Data persists across restarts; Basic concurrent access tests do not cause uncontrolled write failures. **Note:** SQLite library / writer mechanism is D8/Q3 — deferred to S0.8, not decided here.
+**Goal [SPEC]:** Provide reliable startup and shutdown behavior. **Deliverables [SPEC]:** Startup sequence; Shutdown sequence; Resource cleanup hooks; Basic application lifecycle events. **Acceptance [SPEC]:** Application starts and closes without leaving avoidable resources behind.
 
 ---
 
@@ -710,5 +721,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.5 complete. Acceptance verified (21 tests green; live diagnostic probe via preload bridge; no direct Node.js access). Stopped for owner review before S0.6. | [SPEC] | Crouton (S0.5 implementation) |
 | 2026-11-05 | S0.6 complete (impl commit 913d575). Acceptance verified (33 tests green incl. 12 config; 3× live launch + config-dir probe; no hardcoded paths). Stopped for owner review before S0.7. | [SPEC] | Crouton (S0.6 implementation) |
 | 2026-11-05 | S0.7 complete. Acceptance verified (45 tests green incl. 12 logging; 3× live launch with startup entries recorded; rotation + redaction proven). Stopped for owner review before S0.8. | [SPEC] | Crouton (S0.7 implementation) |
+| 2026-11-05 | S0.8 complete. Acceptance verified (55 tests green incl. 10 database; 3× live launch with `database ready (journal=wal, …)`; WAL + persistence + serialized writes proven). D8/Q3 decided: `node:sqlite`. Stopped for owner review before S0.9. | [SPEC] | Crouton (S0.8 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
