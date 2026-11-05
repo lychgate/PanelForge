@@ -7,6 +7,32 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.7 — Atomic Metadata Operations (2026-11-05) — [`a3d9141`](https://github.com/lychgate/PanelForge/commit/a3d9141699fd30b212aa3d07bee00685510bd1c8)
+
+**Added**
+
+- Atomic writes everywhere in project metadata: `withMetadataTransaction`
+  (serialized `BEGIN IMMEDIATE` batches — a throwing batch rolls back fully),
+  an fsync-backed `project.json` marker write (S1.1), and
+  `checkpointProjectDatabase` (WAL checkpoint = basic autosave; every write is
+  already a full commit, so there is no dirty state to lose).
+- Corruption recovery at open (D10): `PRAGMA integrity_check`; a corrupted
+  database is preserved as `<db>.bak-<timestamp>` and a fresh database starts,
+  with `recovered`/`backupPath` reported to the caller. A recovery dialog UI
+  remains a later task.
+- `tests/atomic-metadata.test.js` — 8 tests: transaction commit, interrupted-
+  write rollback (values untouched), serialized concurrency, corruption recovery
+  (original preserved, fresh DB usable), healthy-DB no-recovery, checkpoint,
+  fsync source check.
+
+**Changed**
+
+- Project DB open in `openProjectDatabase` now runs versioned migrations from a
+  table (`001_initial`, `002_asset_registry`) and performs the recovery check;
+  `database/project.db` callers receive the richer `{db, recovered, backupPath}` shape.
+- Register: S1.7 marked **Complete**; §11 next task is S1.8.
+- `Plan.md`: S1.7 checked off (2026-11-05).
+
 ### S1.6 — Asset Integrity Checking (2026-11-05) — [`9ec25bb`](https://github.com/lychgate/PanelForge/commit/9ec25bbc971092e56f5f5c9a628c828eccc3a426)
 
 **Added**
