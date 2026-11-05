@@ -30,11 +30,13 @@ type StatementLike = {
   all: (...params: unknown[]) => Record<string, unknown>[];
 };
 
-type DatabaseLike = {
+export type DatabaseLike = {
   exec: (sql: string) => void;
   prepare: (sql: string) => StatementLike;
   close: () => void;
 };
+
+export { StatementLike };
 
 export const PROJECT_METADATA_VERSION = 1;
 
@@ -55,22 +57,40 @@ export class ProjectMetadataError extends Error {
   }
 }
 
-const MIGRATION_STATEMENTS: readonly string[] = [
-  "CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TEXT NOT NULL)",
-  "CREATE TABLE IF NOT EXISTS projects (project_id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+type ProjectDbMigration = { version: number; name: string; statements: readonly string[] };
+
+const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
+  {
+    version: 1,
+    name: "001_initial",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TEXT NOT NULL)",
+      "CREATE TABLE IF NOT EXISTS projects (project_id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
+  // S1.5: asset registry. Columns are the S1.5 subset of the §7.4 metadata
+  // list (UID + relative path + type + dates + hash); version/approval/
+  // relationships/provenance arrive with later tasks.
+  {
+    version: 2,
+    name: "002_asset_registry",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS assets (asset_id TEXT PRIMARY KEY, relative_path TEXT NOT NULL UNIQUE, asset_type TEXT NOT NULL, file_hash TEXT NOT NULL, file_size INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
   return path.join(path.resolve(root), PROJECT_DATABASE_DIR, PROJECT_DATABASE_FILE);
 }
 
-function isBusyError(err: unknown): boolean {
+export function isBusyError(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
   const code = (err as { code?: string } | null)?.code;
   return code === "SQLITE_BUSY" || /database is locked|busy/i.test(msg);
 }
 
-async function runWithBusyRetry<T>(fn: () => T): Promise<T> {
+export async function runWithBusyRetry<T>(fn: () => T): Promise<T> {
   let attempt = 0;
   for (;;) {
     try {
@@ -84,7 +104,7 @@ async function runWithBusyRetry<T>(fn: () => T): Promise<T> {
 }
 
 let tail: Promise<unknown> = Promise.resolve();
-function enqueueWrite<T>(fn: () => Promise<T> | T): Promise<T> {
+export function enqueueWrite<T>(fn: () => Promise<T> | T): Promise<T> {
   const run = tail.then(fn, fn);
   tail = run.then(
     () => undefined,
@@ -94,7 +114,7 @@ function enqueueWrite<T>(fn: () => Promise<T> | T): Promise<T> {
 }
 
 /** Open (creating if needed) the project database and run migrations. */
-function openProjectDatabase(root: string): { db: DatabaseLike } {
+export function openProjectDatabase(root: string): { db: DatabaseLike } {
   const dbPath = projectDatabasePath(root);
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
   const db = new sqlite.DatabaseSync(dbPath);
@@ -108,12 +128,13 @@ function openProjectDatabase(root: string): { db: DatabaseLike } {
     const applied = new Set(
       db.prepare("SELECT version FROM schema_migrations").all().map((r) => Number(r.version))
     );
-    if (!applied.has(1)) {
+    for (const migration of PROJECT_DB_MIGRATIONS) {
+      if (applied.has(migration.version)) continue;
       db.exec("BEGIN IMMEDIATE");
       try {
-        for (const stmt of MIGRATION_STATEMENTS) db.exec(stmt);
+        for (const stmt of migration.statements) db.exec(stmt);
         db.prepare("INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)")
-          .run(1, "001_initial", new Date().toISOString());
+          .run(migration.version, migration.name, new Date().toISOString());
         db.exec("COMMIT");
       } catch (err) {
         try {
