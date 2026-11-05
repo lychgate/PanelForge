@@ -140,7 +140,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.2.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — test harness, CSP, `webSecurity`, `allowRunningInsecureContent`, devTools policy, `setWindowOpenHandler`, navigation handling not specified. See D2–D4 (§7).
-- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; commit 06de7bc)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; commit 4c8d10b)
 
 #### S0.4 IPC Foundation [SPEC]
 - **Goal [SPEC]:** Create a controlled communication channel.
