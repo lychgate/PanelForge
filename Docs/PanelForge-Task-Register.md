@@ -395,7 +395,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Each task's §11.2 fields are readable from records/events; no fabricated percentages.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.2, S2.3.
 - **Stop:** Telemetry-specific progress lands with providers (S2.9+).
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit f84e340)
 
 #### S2.8 Queue Persistence and Recovery [SPEC]
 - **Goal:** Survive restarts mid-queue.
@@ -891,6 +891,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S2.6 | `DISPLAY=:0 npm test` | Pass — 210 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 ipc + 13 security) | `tests/task-retry.test.js` (6 tests): flaky-then-ok succeeds within budget, permanent failure stops after N attempts, completed siblings untouched, non-failed retry rejected (INVALID_STATE), NOT_FOUND/INVALID_POLICY, no hardcoded paths. |
 | 2026-11-05 | S2.6 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S2.6 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.7 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.7 | `npm run build` | Pass | `out/node/engines/tasks/progress.js` emitted; app DB migration 003 (`003_task_progress`). |
+| 2026-11-05 | S2.7 | `DISPLAY=:0 npm test` | Pass — 219 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 9 ipc + 13 security) | `tests/task-progress.test.js` (9 tests): §11.2 fields, name/model/backend/profile passthrough, estimate null-unless-supplied (never fabricated), indeterminate while generating without estimate, queue positions, started/finished timestamps, describeAllTasks, NOT_FOUND, no hardcoded paths. Database migration test updated for 003. |
+| 2026-11-05 | S2.7 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.7 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.7 implemented files:** `src/engines/tasks/progress.ts` (New — `describeTask`/`describeAllTasks`: name/type/queue position/stage/status/elapsed/estimate(only when supplied)/model/backend/profile/indeterminate/errorMessage), `src/engines/tasks/store.ts` (started_at/finished_at/error_message columns + setState maintenance), `src/database/service.ts` (migration 003), `tests/task-progress.test.js` (New, 9 tests), `tests/database.test.js` (migration list updated). No invented percentages; telemetry progress lands with providers (S2.9+).
 
 **S2.6 implemented files:** `src/engines/tasks/retry.ts` (New — `retryTaskWithPolicy` with `{maxAttempts, backoffMs}`: only `failed` tasks retry; exponential backoff; guards via `TransitionError`), `src/engines/tasks/queue.ts` (`runTask(id)` single-task execution; `runNextInternal` refactored onto shared `executeOne`), `tests/task-retry.test.js` (New, 6 tests). Bounded in-memory attempt tracking (no schema change); auto-retry storms prevented structurally.
 
@@ -988,11 +995,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.7 — Progress Reporting [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.8 — Queue Persistence and Recovery [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S2.6 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.7 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S2.7 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.8 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Honest per-task status (§11.2: name, type, queue position, stage, elapsed, estimate, model/backend, resource profile, status, logs/errors — no invented percentages).
+**Goal [SPEC]:** Reload persisted tasks on startup; recover interrupted work to a resumable state; batch resumability where the backend supports checkpoints.
 
 ---
 
@@ -1037,5 +1044,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.4 complete. Acceptance verified (197 tests incl. 7 task-transitions; only legal transitions succeed; S2.3 green against the guards). Stopped for owner review before S2.5. | [SPEC] | Crouton (S2.4 implementation) |
 | 2026-11-05 | S2.5 complete. Acceptance verified (204 tests incl. 7 task-pause; in-flight pause/cancel with no resurrection; resume works; cancel stays cancelled). Stopped for owner review before S2.6. | [SPEC] | Crouton (S2.5 implementation) |
 | 2026-11-05 | S2.6 complete. Acceptance verified (210 tests incl. 6 task-retry; bounded retries; sibling isolation). Stopped for owner review before S2.7. | [SPEC] | Crouton (S2.6 implementation) |
+| 2026-11-05 | S2.7 complete. Acceptance verified (219 tests incl. 9 task-progress; §11.2 fields readable; no fabricated estimates). Stopped for owner review before S2.8. | [SPEC] | Crouton (S2.7 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

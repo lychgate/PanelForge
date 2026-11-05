@@ -7,6 +7,27 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.7 — Progress Reporting (2026-11-05) — [`f84e340`](https://github.com/lychgate/PanelForge/commit/f84e34097cb7ab2c2842b8dc9959eb93056dc9b1)
+
+**Added**
+
+- `src/engines/tasks/progress.ts` — `describeTask`/`describeAllTasks`: the §11.2
+  view (name, type, queue position, stage, elapsed, estimate, model, backend,
+  resource profile, status, errorMessage, indeterminate flag). Elapsed is always
+  timestamp-derived; `estimatedRemainingMs` is only reported when the caller
+  supplied a meaningful estimate (otherwise `null`, shown as indeterminate) —
+  percentages are never fabricated.
+- App DB migration 003 (`003_task_progress`): `started_at`/`finished_at`/
+  `error_message` on tasks; `setState` maintains started/finished timestamps.
+- `tests/task-progress.test.js` — 9 tests covering all §11.2 fields, estimate
+  honesty, queue order, timing, and NOT_FOUND.
+
+**Changed**
+
+- `tests/database.test.js`: migration list now asserts `003_task_progress`.
+- Register: S2.7 marked **Complete**; §11 next task is S2.8.
+- `Plan.md`: S2.7 checked off (2026-11-05).
+
 ### S2.6 — Retry Handling (2026-11-05) — [`1b8cbbe`](https://github.com/lychgate/PanelForge/commit/1b8cbbeb608c9dabee527869972ab19f21ba0350)
 
 **Added**

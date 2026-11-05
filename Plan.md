@@ -54,7 +54,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S2.4 Task State Transitions — completed 2026-11-05
 - [x] S2.5 Pause and Cancellation — completed 2026-11-05
 - [x] S2.6 Retry Handling — completed 2026-11-05
-- [ ] S2.7 Progress Reporting
+- [x] S2.7 Progress Reporting — completed 2026-11-05
 - [ ] S2.8 Queue Persistence and Recovery
 - [ ] S2.9 LM Studio Connection Adapter
 - [ ] S2.10 ComfyUI Connection Adapter

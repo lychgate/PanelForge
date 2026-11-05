@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (210 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry)
+npm test           # runs Vitest (219 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -153,7 +153,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S2.6 — Retry Handling:** complete (bounded retries with backoff, failed-only, siblings untouched).
 
-**Next (awaiting owner authorization): S2.7 — Progress Reporting**, the seventh of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
+- **S2.7 — Progress Reporting:** complete (§11.2 status view per task; estimates only when supplied, never fabricated).
+
+**Next (awaiting owner authorization): S2.8 — Queue Persistence and Recovery**, the eighth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
 
 ## Known limitations (end of Stage 0)
 
