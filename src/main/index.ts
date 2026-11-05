@@ -16,6 +16,7 @@ import path from "path";
 import { registerIpcHandlers } from "../core/ipc/registry";
 import { defaultConfigService } from "../core/config/service";
 import { defaultLogService, isLogLevel } from "../core/logging/service";
+import { defaultDatabaseService } from "../database/service";
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -75,6 +76,16 @@ void app.whenReady().then(() => {
   } catch (err) {
     defaultLogService.logError(err, "startup");
   }
+  // S0.8: initialize the SQLite foundation (WAL + FK + busy timeout,
+  // migrations). Failure is recorded but never blocks the window.
+  try {
+    const init = defaultDatabaseService.initialize();
+    defaultLogService.info(
+      `database ready (journal=${init.journalMode}, migrations=${init.appliedMigrations.join(",") || "none"})`
+    );
+  } catch (err) {
+    defaultLogService.logError(err, "database");
+  }
   createWindow();
 
   app.on("activate", () => {
@@ -88,5 +99,14 @@ app.on("window-all-closed", () => {
   // On macOS apps typically stay open until Cmd+Q; on Linux/Windows quit.
   if (process.platform !== "darwin") {
     app.quit();
+  }
+});
+
+// S0.8: close the database handle on quit (full lifecycle is S0.9).
+app.on("before-quit", () => {
+  try {
+    defaultDatabaseService.close();
+  } catch (err) {
+    defaultLogService.logError(err, "database close");
   }
 });

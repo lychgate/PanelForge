@@ -11,5 +11,5 @@
     "lib": ["ES2022"],
     "rootDir": "src"
   },
-  "include": ["src/main/**/*.ts", "src/preload/**/*.ts", "src/core/**/*.ts", "src/engines/**/*.ts", "src/modules/**/*.ts", "src/shared/**/*.ts"]
+  "include": ["src/main/**/*.ts", "src/preload/**/*.ts", "src/core/**/*.ts", "src/database/**/*.ts", "src/engines/**/*.ts", "src/modules/**/*.ts", "src/shared/**/*.ts"]
 }
