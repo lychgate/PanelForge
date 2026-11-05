@@ -21,10 +21,10 @@ Tasks are completed one at a time with owner review between tasks.
 - [x] S0.8 SQLite Foundation — completed 2026-11-05
 - [x] S0.9 Application Lifecycle Infrastructure — completed 2026-11-05
 - [x] S0.10 Keyboard Shortcuts and Navigation Foundation — completed 2026-11-05
-- [ ] S0.11 Initial Packaging — not started
+- [x] S0.11 Initial Packaging — completed 2026-11-05
 - [ ] S0.12 Stage 0 Verification — not started
 
-Stage 0 completion: **pending** (S0.11–S0.12 remaining).
+Stage 0 completion: **pending** (S0.12 remaining).
 
 ## Stage 1 — Project Management and Portable Storage
 

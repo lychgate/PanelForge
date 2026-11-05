@@ -212,7 +212,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.2–S0.9.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — packaging format not specified; §14 names Electron Forge [SPEC].
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 23b7897)
 
 #### S0.12 Stage 0 Verification [SPEC]
 - **Goal [SPEC]:** Verify the complete foundation.
@@ -652,6 +652,15 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.10 | `npm run check` | Pass | Baseline + IPC guard green (ipcMain only in registry; ipcRenderer only in preload). |
 | 2026-11-05 | S0.10 | Live launch probe ×3 | Pass — `startup complete` each launch; `pgrep -x electron` → "no stray electron (clean)" after each | App menu + new renderer do not break launch/close. |
 | 2026-11-05 | S0.10 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.11 | `npm run check` | Pass | Baseline + IPC guard green (Forge devDeps allowed; no DB/AI deps added). |
+| 2026-11-05 | S0.11 | `npm test` | Pass — 82 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 7 ipc + 13 security) | New `vitest.config.js` excludes `forge-out/**` (packaged copies were being collected as tests); 5 new packaging tests (deb maker, outDir collision guard, scripts, no native add-ons, forge-out gitignored). |
+| 2026-11-05 | S0.11 | `npx electron-forge package` | Pass — `forge-out/panelforge-linux-x64/` (packager `ignore` regexes + deterministic `packageAfterCopy` cleanup: src/tests/docs removed) | Packaged app checked with 0 `*.test.js`/`probe*.js` files. |
+| 2026-11-05 | S0.11 | `npx electron-forge make` | Pass — `forge-out/make/deb/x64/panelforge_0.1.0_amd64.deb` + zip fallback | `dpkg-deb --contents` confirms an installable package (no src/tests/docs entries). |
+| 2026-11-05 | S0.11 | Packaged binary launch (`forge-out/.../panelforge`, `DISPLAY=:0`, `PANELFORGE_USER_DATA_DIR=…`) | Pass — full lifecycle logged (`starting → database ready → startup complete → shutting down → shutdown complete`); clean-close, no strays | Proves launch **independent of the development environment** (own Electron runtime + resources). |
+| 2026-11-05 | S0.11 | .deb extract + launch (`dpkg-deb -x` to temp, run `usr/lib/panelforge/panelforge`) | Pass — same lifecycle log; no strays | Installable artifact verified without installing. |
+| 2026-11-05 | S0.11 | `git status` | Clean (commit recorded below) | `out/` + `forge-out/` gitignored. |
+
+**S0.11 implemented files:** `forge.config.js` (New — `outDir: "forge-out"` separating Forge output from the compiled `out/` app, `.deb` maker + zip fallback, ignore list + `packageAfterCopy` cleanup hook), `package.json` (`package`/`make` scripts; `@electron-forge/cli`, `maker-deb`, `maker-zip` devDeps), `.gitignore` (`forge-out/`), `vitest.config.js` (New — excludes `forge-out/**` and `out/**` from test collection), `tests/packaging.test.js` (New, 5 tests). No native modules are used (`node:sqlite` is built-in), so the package is self-contained with no rebuild step.
 
 **S0.10 implemented files:** `src/renderer/shortcuts.ts` (New — DOM-free shortcut registry: normalized combos, exact match, duplicate rejection), `src/renderer/navigation.ts` (New — DOM-free view manager: list/current/go with unknown-view rejection), `src/renderer/index.ts` (real focusable nav buttons, `keydown` handling for Alt+1/Alt+2, Diagnostics + About views rendered from the S0.5 payload; `.js`-suffixed ESM imports), `src/renderer/index.html` (labelled `<nav>`, `<main>`, `:focus-visible` outline), `src/main/index.ts` (application menu: File Quit `CmdOrCtrl+Q`, View Reload `CmdOrCtrl+R`), `Docs/PanelForge-Shortcuts.md` (New — shortcut documentation), `tests/shortcuts.test.js` (New, 12 tests). Views are minimal but real (both render the diagnostics payload); Settings/Character UI remain later tasks.
 
@@ -711,11 +720,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.11 — Initial Packaging [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.12 — Stage 0 Verification [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.10 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.11 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.11 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.12 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Produce an installable or runnable Linux build. **Deliverables [SPEC]:** Linux packaging configuration; Development build; Initial packaged build. **Acceptance [SPEC]:** Packaged application launches independently of the development environment.
+**Goal [SPEC]:** Verify Stage 0 end-to-end (smoke tests, updated README, known limitations, Stage 0 completion report).
 
 ---
 
@@ -741,5 +750,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.8 complete. Acceptance verified (55 tests green incl. 10 database; 3× live launch with `database ready (journal=wal, …)`; WAL + persistence + serialized writes proven). D8/Q3 decided: `node:sqlite`. Stopped for owner review before S0.9. | [SPEC] | Crouton (S0.8 implementation) |
 | 2026-11-05 | S0.9 complete. Acceptance verified (65 tests green incl. 10 lifecycle; 3× live launch `startup complete`; shutdown `PanelForge shutting down` → `shutdown complete`; no strays). Stopped for owner review before S0.10. | [SPEC] | Crouton (S0.9 implementation) |
 | 2026-11-05 | S0.10 complete. Acceptance verified (77 tests green incl. 12 shortcuts + live Alt+2/Alt+1 probe; 3× clean launch). Stopped for owner review before S0.11. | [SPEC] | Crouton (S0.10 implementation) |
+| 2026-11-05 | S0.11 complete. Acceptance verified (82 tests green incl. 5 packaging; `package` + `make` produce runnable dir + .deb; packaged binary and extracted .deb both launched with full lifecycle independently of the dev environment). Stopped for owner review before S0.12. | [SPEC] | Crouton (S0.11 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

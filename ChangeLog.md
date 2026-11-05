@@ -7,6 +7,34 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S0.11 — Initial Packaging (2026-11-05) — [`23b7897`](https://github.com/lychgate/PanelForge/commit/23b78973c7492166c2e84cdf4a22ab66d19318b4)
+
+**Added**
+
+- `forge.config.js` — Electron Forge packaging configuration (spec §14): `outDir:
+  "forge-out"` (kept separate from the compiled `out/` app, which the packager
+  would otherwise exclude), `.deb` maker, zip fallback, `ignore` list plus a
+  `packageAfterCopy` cleanup hook that deterministically removes sources, tests,
+  docs and probe scripts so the package ships only what the runtime needs.
+- `.gitignore`: `forge-out/`.
+- `vitest.config.js` — excludes `forge-out/**` and `out/**` from test collection
+  (packaged copies of the app otherwise get collected as tests).
+- `tests/packaging.test.js` — 5 tests (deb maker, outDir collision guard, scripts,
+  no native add-ons, forge-out gitignored).
+
+**Changed**
+
+- `package.json`: `package` and `make` scripts; `@electron-forge/cli`,
+  `@electron-forge/maker-deb`, `@electron-forge/maker-zip` devDependencies.
+  (Two issues found during packaging and fixed: Forge's default `out/` output
+  dir would have excluded the compiled app; the packager `ignore` regexes are
+  best-effort here, hence the `packageAfterCopy` cleanup.)
+- Verified: runnable package + `.deb`/`.zip` built; packaged binary and the
+  extracted `.deb` both launched with the full lifecycle independently of the
+  development environment (no native modules — `node:sqlite` is built-in).
+- Register: S0.11 marked **Complete**; §11 next task is S0.12.
+- `Plan.md`: S0.11 checked off (2026-11-05).
+
 ### S0.10 — Keyboard Shortcuts and Navigation Foundation (2026-11-05) — [`70c53e3`](https://github.com/lychgate/PanelForge/commit/70c53e37a475a44d2256a63052c44f849ccb1bb6)
 
 **Added**

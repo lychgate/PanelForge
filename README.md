@@ -27,9 +27,22 @@ npm run typecheck  # TypeScript check for node + web projects
 npm test           # runs Vitest (77 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
+npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
+npm run make       # Electron Forge make → forge-out/make/ (.deb + .zip)
 ```
 
 Launch flow: `npm run build` → `npm start`. `npm start` is launch-only (`electron .`); it does not rebuild. `npm run dev` remains typecheck + baseline check only.
+
+## Packaging (S0.11)
+
+Linux packaging uses Electron Forge (`forge.config.js`). Run `npm run build` first — Forge packages the project as-is. The Forge output dir is `forge-out/` (not the compiled `out/`), and packaged artifacts are gitignored:
+
+```bash
+npm run package    # dev build: forge-out/panelforge-linux-x64/panelforge
+npm run make       # packaged builds: .deb (installable) + .zip fallback
+```
+
+The packaged application is self-contained (no native modules — `node:sqlite` is built into Node) and launches independently of the development environment. Both the packaged directory and the extracted `.deb` were launch-verified with the full startup/shutdown lifecycle in S0.11.
 
 ## Project layout (per §21 of the spec)
 
@@ -94,9 +107,10 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 - **S0.8 — SQLite Foundation:** complete (`node:sqlite` service; WAL/FK/busy timeout, migrations, serialized writes, backups).
 - **S0.9 — Application Lifecycle Infrastructure:** complete (ordered startup steps + cleanup hooks + lifecycle events via `src/core/lifecycle/`).
 - **S0.10 — Keyboard Shortcuts and Navigation Foundation:** complete (shortcut registry, Diagnostics/About navigation, application menu; see [`Docs/PanelForge-Shortcuts.md`](Docs/PanelForge-Shortcuts.md)).
-- **S0.11 — Initial Packaging:** **next, awaiting owner authorization** (Linux packaging config + initial packaged build).
+- **S0.11 — Initial Packaging:** complete (Electron Forge config; runnable package + installable `.deb`/`.zip`; packaged binary launch-verified).
+- **S0.12 — Stage 0 Verification:** **next, awaiting owner authorization** (smoke tests, updated README, known limitations, completion report).
 
-Remaining Stage 0 work after S0.10: S0.11–S0.12 (Linux packaging, verification/release prep). Stage 1 follows only after Stage 0 completes.
+Remaining Stage 0 work after S0.11: S0.12 only. Stage 1 follows only after Stage 0 completes.
 
 ## Design principles (per §2, summary)
 
