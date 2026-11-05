@@ -167,7 +167,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.1; informs S0.7/S0.8.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — config format/versioning not specified.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S0.7 Logging and Error Handling [SPEC]
 - **Goal [SPEC]:** Establish useful diagnostics.
