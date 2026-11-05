@@ -1,11 +1,11 @@
-// PanelForge — Electron main process (S0.2).
+// PanelForge — Electron main process (S0.3).
 //
-// Creates the initial BrowserWindow with secure defaults from its first
-// launch (Q2, owner-approved 2026-11-05), loads the initial renderer page,
+// Creates the BrowserWindow with secure defaults (verified + documented in
+// S0.3; originally applied in S0.2 per Q2), loads the initial renderer page,
 // and handles basic app lifecycle (launch / close / quit).
 //
-// Boundary: S0.2 is launch only. Security *verification* and documentation
-// belong to S0.3; IPC allowlist belongs to S0.4; logging/config/lifecycle
+// Boundary: S0.3 owns the security baseline (webPreferences, preload bridge,
+// navigation). IPC allowlist belongs to S0.4; logging/config/lifecycle
 // infrastructure belong to S0.6–S0.9. This file must not reach into those.
 
 import { app, BrowserWindow, shell } from "electron";
@@ -16,15 +16,16 @@ function createWindow(): BrowserWindow {
     width: 1280,
     height: 800,
     webPreferences: {
-      // Secure defaults from the first launch (Q2). S0.3 verifies and
-      // documents these; S0.2 applies them so no temporary insecure
-      // window is ever created.
+      // Secure defaults (S0.3 baseline; see Docs/PanelForge-Security-Baseline.md).
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
       webSecurity: true,
       allowRunningInsecureContent: false,
       preload: path.join(__dirname, "../preload/index.js"),
+      // S0.3 documents the devTools policy: DevTools enabled in dev builds
+      // (needed for verification), disabled in packaged builds (S0.11).
+      devTools: !app.isPackaged,
     },
   });
 
@@ -45,7 +46,7 @@ function createWindow(): BrowserWindow {
     }
   });
 
-  // No webviews in S0.2.
+  // No webviews in S0.3.
   win.webContents.on("will-attach-webview", (event) => {
     event.preventDefault();
   });

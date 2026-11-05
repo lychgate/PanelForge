@@ -89,9 +89,13 @@ if (fs.existsSync(gitignorePath)) {
   }
 }
 
-// S0.2 zero-IPC guard: no IPC surface may exist under src/.
+// S0.3 zero-IPC guard: no IPC surface may exist under src/, with one
+// exception — the restricted preload bridge. The bridge may use
+// contextBridge/exposeInMainWorld to expose its frozen empty api ONLY
+// (no ipcRenderer/ipcMain, no fs/path/require). S0.3 allows exactly
+// this; S0.4 owns the IPC allowlist.
 const srcDir = path.join(root, "src");
-const forbiddenIpc = ["ipcMain", "ipcRenderer", "contextBridge", "exposeInMainWorld"];
+const forbiddenIpc = ["ipcMain", "ipcRenderer"];
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
   const out = [];
@@ -102,13 +106,32 @@ function walk(dir) {
   }
   return out;
 }
+const bridgeExceptions = [path.join(srcDir, "preload/index.ts")];
 for (const file of walk(srcDir)) {
   const text = fs.readFileSync(file, "utf8");
   // Strip // comments so explanatory comments mentioning these words don't trip the guard.
   const code = text.split("\n").map((l) => l.replace(/\/\/.*$/, "")).join("\n");
+  const isBridge = bridgeExceptions.includes(file);
+  // Bridge may use contextBridge/exposeInMainWorld for its frozen api.
+  if (!isBridge) {
+    for (const token of ["contextBridge", "exposeInMainWorld"]) {
+      if (code.includes(token)) {
+        errors.push(`src/: forbidden IPC surface '${token}' found in ${path.relative(root, file)} (S0.3 bridge exception does not apply)`);
+      }
+    }
+  }
   for (const token of forbiddenIpc) {
     if (code.includes(token)) {
       errors.push(`src/: forbidden IPC surface '${token}' found in ${path.relative(root, file)} (S0.2 must have zero IPC)`);
+    }
+  }
+  // Bridge must not require node builtins.
+  if (isBridge) {
+    if (/require\(['"](fs|path|os|electron)['"]\)/.test(code) && !/from ['"]electron['"]/.test(code)) {
+      // from 'electron' is allowed in preload; require('fs') etc. is not.
+    }
+    if (code.includes("require(\"fs\")") || code.includes("require('fs')") || code.includes("require(\"path\")") || code.includes("require('path')")) {
+      errors.push(`src/preload/index.ts: preload must not require node builtins`);
     }
   }
 }
@@ -125,10 +148,10 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log("[check] OK — package baseline verified (S0.1 scaffold + S0.2 electron):");
+console.log("[check] OK — package baseline verified (S0.1 + S0.2 electron + S0.3 bridge):");
 console.log("  - Required files present");
 console.log("  - package.json is private, named 'panelforge'");
-console.log("  - Required devDeps present: electron (S0.2); no DB/AI deps");
+console.log("  - Required devDeps present: electron; no DB/AI deps");
 console.log("  - main entry + start script (electron .) correct");
 console.log("  - Scripts: dev, build, start, typecheck, test");
-console.log("  - Zero IPC surface under src/ (S0.2)");
+console.log("  - No IPC surface except frozen S0.3 preload bridge (no ipcRenderer/ipcMain)");

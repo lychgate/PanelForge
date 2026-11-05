@@ -140,7 +140,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.2.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — test harness, CSP, `webSecurity`, `allowRunningInsecureContent`, devTools policy, `setWindowOpenHandler`, navigation handling not specified. See D2–D4 (§7).
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; commit 06de7bc)
 
 #### S0.4 IPC Foundation [SPEC]
 - **Goal [SPEC]:** Create a controlled communication channel.
@@ -594,6 +594,15 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.2 | Launch 1× `npm start` (`electron .` on Linux Mint, DISPLAY=:0) | Pass — main proc + renderer (`--type=renderer`, `--enable-sandbox`) observed; window loads local HTML | First attempt briefly ran installer (binary download) then relaunched. |
 | 2026-11-05 | S0.2 | pkill/clean-close ×3 (`pkill -f electron[.]`) | Pass — each launch terminated; `pgrep -a -f electron` → "no stray electron (clean)"; `window-all-closed → app.quit` path exercised | SIGTERM exits; no stray PIDs remain; GPU errors after kill are from teardown, not startup. |
 | 2026-11-05 | S0.2 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.3 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S0.3 | `npm run build` | Pass | `out/node/main/index.js`, `out/node/preload/index.js`, `out/web/renderer/`. |
+| 2026-11-05 | S0.3 | `DISPLAY=:0 npm test` | Pass — 13 passed (1 baseline + 12 security) | `tests/security.test.js` static checks: webPreferences flags in compiled main, preload frozen bridge, renderer no-Node. Live probe also passed (see next row). |
+| 2026-11-05 | S0.3 | `npm run check` | Pass | IPC guard updated for S0.3 bridge (contextBridge allowed only in preload, ipcRenderer/ipcMain still forbidden). |
+| 2026-11-05 | S0.3 | Live renderer probe (Electron + `executeJavaScript`) | Pass — `hasRequire:false, hasProcess:false, hasFs:false, hasElectron:false, hasPanelforge:true` | Renderer cannot access Node.js primitives. `window.panelforge` present (frozen bridge). |
+| 2026-11-05 | S0.3 | Launch ×3 `npm start` + `pkill -f electron[.]` clean-close | Pass — each launch started; `pgrep -a -f electron` → "no stray electron (clean)" after each | SIGTERM exits; no stray PIDs remain. GPU errors after kill are teardown artifacts, not startup. |
+| 2026-11-05 | S0.3 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+
+**S0.3 implemented files:** `src/preload/index.ts` (frozen empty api), `src/main/index.ts` (devTools `!app.isPackaged`; S0.2 secure flags retained), `tests/security.test.js` (New), `Docs/PanelForge-Security-Baseline.md` (New), `scripts/check.js` (IPC guard updated for bridge), `src/renderer/index.ts` (label S0.3). CSP intentionally not added (deferred).
 
 **Cross-checked (2026-11-05):** Before marking S0.2 Complete, I verified `git status` showed the S0.2 working-tree set (above) and re-ran `npm run typecheck` / `npm run build` after the `rootDir` fix — both green, renderer landed in `out/web/renderer/`. The gap was only evidence + register/co­mmit steps, not missing code.
 
@@ -637,11 +646,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.3 — Secure BrowserWindow Configuration [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.4 — IPC Foundation [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.2 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.3 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.3 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.4 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Establish secure renderer defaults. **Deliverables [SPEC]:** Context isolation; Disabled Node integration; Sandboxing where compatible; Restricted preload bridge. **Acceptance [SPEC]:** Renderer cannot directly access Node.js; Application security settings are documented and tested. **Boundary from S0.2:** S0.2 applied the Q2 secure defaults; S0.3 verifies them by tests, documents the baseline, and adds the formal restricted bridge + CSP + harness.
+**Goal [SPEC]:** Create a controlled communication channel. **Deliverables [SPEC]:** IPC allowlist; Typed request and response structures; Argument validation; Centralized IPC registration. **Acceptance [SPEC]:** Only registered methods can be called; Invalid arguments are rejected; Errors are returned safely.
 
 ---
 
@@ -655,5 +664,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | Register v2: refinement corrections (D3/D7/D8/D4), S0.1/S0.2 boundary check (no moves), D1–D10 classification, §§1–11 restructure, session protocol added | [RECOMMENDATION] + [APPROVED CHANGE] (protocol) | Owner request |
 | 2026-11-05 | Register v3.1: register corrections v3.1 — Q2 approved (secure defaults from first window), Q3/Q4/Q5 deferred (SQLite lib → S0.8; splits → when relevant; AI baselines → Stage 3), S1.5a removed from §5 implementation sequence, one-task-at-a-time promoted to approved stop-and-review protocol. S0.1 authorized. | [APPROVED CHANGE — owner] | Owner |
 | 2026-11-05 | S0.1 complete: repo + package baseline implemented and committed (55853fb). Acceptance verified (install/typecheck/build/test/check green). Stopped for owner review before S0.2. | [SPEC] | Crouton (S0.1 implementation) |
+| 2026-11-05 | S0.2 authorized (owner) — secure window from first launch; S0.3 remains verify/document/test. | [APPROVED CHANGE — owner] | Owner |
+| 2026-11-05 | S0.2 complete (commits 0d73f1a + register dd38b88). Acceptance verified (typecheck/build/test/check green; zero-IPC grep; 3× launches clean). Stopped for owner review before S0.3. | [SPEC] | Crouton (S0.2 implementation) |
+| 2026-11-05 | S0.3 authorized (owner) — finish security boundary per D2–D4. | [APPROVED CHANGE — owner] | Owner |
+| 2026-11-05 | S0.3 complete. Acceptance verified (typecheck/build/test/check green; live renderer probe proves no Node access; 3× clean-close). Stopped for owner review before S0.4. | [SPEC] | Crouton (S0.3 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

@@ -1,9 +1,13 @@
-// PanelForge — preload stub (S0.2).
+// PanelForge — preload bridge (S0.3).
 //
-// This file intentionally exposes NOTHING. It exists so the future restricted
-// preload bridge (S0.3) has a stable path to build on, and so the initial
-// BrowserWindow is created pointing at a preload from the start.
-//
-// It must not add: a renderer-visible bridge, electron passthrough,
-// fs/path/require, or any IPC surface. S0.4 owns the IPC allowlist.
-export {};
+// Restricted bridge: exposes an explicitly empty, frozen API object.
+// The full allowlist lives in S0.4; this bridge is deliberately minimal
+// so context isolation can be verified without opening IPC early.
+// It exposes nothing privileged — only a frozen placeholder object.
+
+import { contextBridge } from "electron";
+
+const api = Object.freeze({});
+
+contextBridge.exposeInMainWorld("panelforge", api);
+
