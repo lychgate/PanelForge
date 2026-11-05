@@ -18,6 +18,8 @@ import { defaultConfigService } from "../core/config/service";
 import { defaultLogService, isLogLevel } from "../core/logging/service";
 import { defaultDatabaseService } from "../database/service";
 import { defaultLifecycleService } from "../core/lifecycle/service";
+import { defaultTaskStore } from "../engines/tasks/store";
+import { recoverQueue } from "../engines/tasks/recovery";
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -140,6 +142,23 @@ void app.whenReady().then(() => {
           } catch (err) {
             defaultLogService.logError(err, "database");
           }
+        },
+      },
+      {
+        // S2.8: reload persisted tasks and recover interrupted work.
+        // Runs after the database is ready; failures are recorded and
+        // never block the window.
+        name: "queue-recovery",
+        run: () => {
+          return recoverQueue(defaultTaskStore)
+            .then((summary) => {
+              defaultLogService.info(
+                `queue recovered (total=${summary.total}, resumed=${summary.resumed}, queued=${summary.queued})`
+              );
+            })
+            .catch((err: unknown) => {
+              defaultLogService.logError(err, "queue recovery");
+            });
         },
       },
     ])
