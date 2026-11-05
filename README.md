@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (77 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts)
+npm test           # runs Vitest (93 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -113,7 +113,11 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 **Stage 0 is complete.** Its completion report is [`Docs/PanelForge-Stage0-Completion.md`](Docs/PanelForge-Stage0-Completion.md).
 
-**Next (awaiting owner authorization): S1.1 — Project Folder Format**, the first task of Stage 1 (Project Management and Portable Storage). Stage 1 proceeds only after S0.12 is accepted.
+**Stage 1 in progress:**
+
+- **S1.1 — Project Folder Format:** complete (full §7.1 folder tree, `project.json` version marker + minimal metadata, `identifyProject`/version-check; see [`Docs/PanelForge-Project-Format.md`](Docs/PanelForge-Project-Format.md)).
+
+**Next (awaiting owner authorization): S1.2 — Project Metadata Schema**, the second task of Stage 1 (rows D5: SQLite is the authoritative store).
 
 ## Known limitations (end of Stage 0)
 

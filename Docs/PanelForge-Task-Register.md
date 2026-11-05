@@ -237,7 +237,7 @@ All tasks: Status **Not Started**.
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.6, S0.8.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — §7.1 tree is exemplary but version-marker format and version-check behavior unspecified; canonical-store contradiction (see D5) blocks implementation.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 3a6d599). **D5 decided (owner-approved 2026-11-05):** SQLite authoritative; `project.json` = version/ID marker; JSON mirrors regenerate from DB.
 
 #### S1.2 Project Metadata Schema [SPEC]
 - **Deliverables [SPEC]:** Project database tables; Project identifier; Name and description fields; Creation and modification timestamps.
@@ -665,6 +665,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.12 | `DISPLAY=:0 npm run smoke` | Pass — `[smoke] PASS — startup, artifacts, shutdown, no strays` | New `scripts/smoke-test.js`: isolated userData, clean startup/shutdown lifecycle in the app log, artifacts present, no strays. |
 | 2026-11-05 | S0.12 | Clean rebuild + packaged launch (`rm -rf forge-out && electron-forge make`, run packaged binary) | Pass — deb + zip rebuilt; packaged `panelforge` full lifecycle; no strays | Linux build is repeatable; packaged app independent of dev env. |
 | 2026-11-05 | S0.12 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S1.1 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S1.1 | `npm run build` | Pass | `out/node/core/project/service.js` emitted. |
+| 2026-11-05 | S1.1 | `DISPLAY=:0 npm test` | Pass — 93 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 7 ipc + 13 security) | `tests/project.test.js` (11 tests): marker content, full §7.1 tree, D5 store paths, identify/positive/not-a-project/corrupt/newer-version, traversal + absolute-path rejection, atomic marker write, no hardcoded paths. |
+| 2026-11-05 | S1.1 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S1.1 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S1.1 implemented files:** `src/core/project/service.ts` (New — `PROJECT_FORMAT_VERSION=1`, full §7.1 `PROJECT_DIRECTORIES`, `ProjectMetadata` `{formatVersion, projectId, createdAt}`, `createProject` (tree + atomic marker), `identifyProject` (identification + version check with typed codes), `resolveProjectPath` (D7 relative-path enforcement)), `Docs/PanelForge-Project-Format.md` (New — folder specification), `tests/project.test.js` (New, 11 tests). Owner adopted D5 (SQLite authoritative; `project.json` = version/ID marker; JSON = regenerable mirrors) — recorded as decision + [APPROVED CHANGE — owner].
 
 **S0.12 implemented files:** `scripts/smoke-test.js` (New — repeatable end-to-end launch check: isolated userData, lifecycle log assertions, artifact checks, no-strays; skips when headless), `package.json` (`smoke` script), `Docs/PanelForge-Stage0-Completion.md` (New — Stage 0 completion report: acceptance checklist, delivered table, known limitations, Stage 1 entry notes), `README.md` (S0.12/Stage-0-complete status, smoke command, Known limitations section).
 
@@ -728,11 +735,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S1.1 — Project Folder Format [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S1.2 — Project Metadata Schema [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.12 Complete (2026-11-05, acceptance verified; see §10). **Stage 0 is complete.** **Do not begin S1.1 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S1.1 Complete (2026-11-05, acceptance verified; see §10; D5 decided). **Do not begin S1.2 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Define the project folder format, version marker, and initial project metadata structure (S1.1; blocked by D5 canonical-store decision — see §4C/§7).
+**Goal [SPEC]:** Define the project database tables (project ID, name/description fields, creation + modification timestamps). Project metadata persists in `database/project.db` (D5: SQLite authoritative).
 
 ---
 
@@ -760,5 +767,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.10 complete. Acceptance verified (77 tests green incl. 12 shortcuts + live Alt+2/Alt+1 probe; 3× clean launch). Stopped for owner review before S0.11. | [SPEC] | Crouton (S0.10 implementation) |
 | 2026-11-05 | S0.11 complete. Acceptance verified (82 tests green incl. 5 packaging; `package` + `make` produce runnable dir + .deb; packaged binary and extracted .deb both launched with full lifecycle independently of the dev environment). Stopped for owner review before S0.12. | [SPEC] | Crouton (S0.11 implementation) |
 | 2026-11-05 | S0.12 complete. Acceptance verified (82 tests green; smoke test PASS; clean rebuild + packaged launch with full lifecycle). **Stage 0 is complete.** Stopped for owner review before S1.1. | [SPEC] | Crouton (S0.12 implementation) |
+| 2026-11-05 | S1.1 complete (D5 owner-approved). Acceptance verified (93 tests green incl. 11 project; full §7.1 tree + marker + identify/version-check). Stopped for owner review before S1.2. | [SPEC] | Crouton (S1.1 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

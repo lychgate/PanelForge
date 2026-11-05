@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.1 — Project Folder Format (2026-11-05) — [`3a6d599`](https://github.com/lychgate/PanelForge/commit/3a6d5993c20d3157a0955b8f12dc6385438da63f)
+
+**Added**
+
+- `src/core/project/service.ts` — project folder format (`PROJECT_FORMAT_VERSION=1`,
+  full §7.1 tree, `ProjectMetadata` `{formatVersion, projectId, createdAt}`,
+  `createProject` (tree + atomic marker), `identifyProject` (identification +
+  version-check with typed codes), `resolveProjectPath` (D7 relative-path
+  enforcement)).
+- `Docs/PanelForge-Project-Format.md` — the folder specification (layout,
+  marker fields, version-check rules, D5 canonical-store statement, path rules).
+- `tests/project.test.js` — 11 tests: marker content, complete tree, D5 paths,
+  identify positive/negative/corrupt/newer-version, traversal rejection, atomicity.
+
+**Changed**
+
+- Owner adopted the D5 proposal (recorded as [APPROVED CHANGE — owner]):
+  `database/project.db` is the authoritative operational store; `project.json`
+  is the version/ID marker + minimal manifest; JSON files inside the project
+  are regenerable mirrors (database wins on conflict).
+- Register: S1.1 marked **Complete**; §11 next task is S1.2.
+- `Plan.md`: S1.1 checked off (2026-11-05).
+
 ### S0.12 — Stage 0 Verification (2026-11-05) — [`a548284`](https://github.com/lychgate/PanelForge/commit/a548284dda33b1016d43a63d35bb8e508d35cf8a)
 
 **Added**
