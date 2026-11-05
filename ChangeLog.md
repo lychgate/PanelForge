@@ -7,6 +7,30 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S0.12 — Stage 0 Verification (2026-11-05) — [`a548284`](https://github.com/lychgate/PanelForge/commit/a548284dda33b1016d43a63d35bb8e508d35cf8a)
+
+**Added**
+
+- `scripts/smoke-test.js` — repeatable end-to-end launch check (`npm run smoke`):
+  isolated userData dir, asserts the full lifecycle (`PanelForge starting →
+  database ready (journal=wal) → startup complete → shutting down →
+  shutdown complete`), config/logs/database artifacts present, no stray
+  processes. Skips (exit 0) when headless.
+- `Docs/PanelForge-Stage0-Completion.md` — Stage 0 completion report: acceptance
+  checklist, delivered-components table, known limitations, Stage 1 entry notes.
+
+**Changed**
+
+- `README.md`: ops section gains `npm run smoke`; a Known limitations section
+  (CSP deferred, no icon, devTools-in-dev, experimental upstream `node:sqlite`,
+  rotation/backup limits, deferred recovery dialog, audit notes) and Stage 0
+  marked complete with S1.1 named as next (awaiting authorization).
+- Verified on the final tree: typecheck + build + `npm run check` + 82 tests green;
+  clean `rm -rf forge-out && electron-forge make` rebuild; packaged binary
+  launched with the full lifecycle, no strays.
+- Register: S0.12 marked **Complete**; **Stage 0 is complete**; §11 next task is S1.1.
+- `Plan.md`: S0.12 checked off (2026-11-05); Stage 0 marked complete.
+
 ### S0.11 — Initial Packaging (2026-11-05) — [`23b7897`](https://github.com/lychgate/PanelForge/commit/23b78973c7492166c2e84cdf4a22ab66d19318b4)
 
 **Added**

@@ -29,6 +29,7 @@ npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in re
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
 npm run make       # Electron Forge make → forge-out/make/ (.deb + .zip)
+npm run smoke      # end-to-end launch smoke test (requires DISPLAY; run npm run build first)
 ```
 
 Launch flow: `npm run build` → `npm start`. `npm start` is launch-only (`electron .`); it does not rebuild. `npm run dev` remains typecheck + baseline check only.
@@ -108,9 +109,23 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 - **S0.9 — Application Lifecycle Infrastructure:** complete (ordered startup steps + cleanup hooks + lifecycle events via `src/core/lifecycle/`).
 - **S0.10 — Keyboard Shortcuts and Navigation Foundation:** complete (shortcut registry, Diagnostics/About navigation, application menu; see [`Docs/PanelForge-Shortcuts.md`](Docs/PanelForge-Shortcuts.md)).
 - **S0.11 — Initial Packaging:** complete (Electron Forge config; runnable package + installable `.deb`/`.zip`; packaged binary launch-verified).
-- **S0.12 — Stage 0 Verification:** **next, awaiting owner authorization** (smoke tests, updated README, known limitations, completion report).
+- **S0.12 — Stage 0 Verification:** complete (smoke test, repeatable Linux build, full suite + packaged launch re-verified).
 
-Remaining Stage 0 work after S0.11: S0.12 only. Stage 1 follows only after Stage 0 completes.
+**Stage 0 is complete.** Its completion report is [`Docs/PanelForge-Stage0-Completion.md`](Docs/PanelForge-Stage0-Completion.md).
+
+**Next (awaiting owner authorization): S1.1 — Project Folder Format**, the first task of Stage 1 (Project Management and Portable Storage). Stage 1 proceeds only after S0.12 is accepted.
+
+## Known limitations (end of Stage 0)
+
+- **CSP is deferred.** The S0.3 baseline relies on context isolation + sandbox + allowlisted preload; the Content Security Policy will be finalized with the UI framework choice (see `Docs/PanelForge-Security-Baseline.md` and D3 in the task register).
+- **No application icon yet** (`.deb`/packaged builds ship without an icon).
+- **DevTools are enabled in dev builds** (`!app.isPackaged`) and disabled in packaged builds — normal Electron dev behavior, not a vulnerability.
+- **`node:sqlite` is flagged experimental by Node** (may change upstream); PanelForge uses it as its SQLite access layer, recorded in `ChangeLog.md` under S0.8.
+- **Log rotation caps at 512 KiB per file + 3 rotated backups.** There is no scheduled backup policy yet; the database service exposes on-demand `backupDatabase()` only.
+- **Corrupted-database recovery dialog is deferred** to S1.7 (D10) — a corrupted database currently surfaces a logged startup error (the window still opens).
+- **UI is the app shell only:** Diagnostics and About views; Settings, Character Studio and ComfyUI integration are later tasks. `npm audit` reports 5 vulnerabilities in the dev-only `vitest → vite` dependency chain (esbuild/tinypool/vite-node); fixing requires a breaking `vitest` upgrade and is deferred.
+
+Full Stage 0 status: [`Docs/PanelForge-Stage0-Completion.md`](Docs/PanelForge-Stage0-Completion.md).
 
 ## Design principles (per §2, summary)
 
