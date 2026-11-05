@@ -194,7 +194,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.2–S0.8.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — "avoidable resources" not enumerated.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit aa2d0b1)
 
 #### S0.10 Keyboard Shortcuts and Navigation Foundation [SPEC]
 - **Goal [SPEC]:** Establish basic keyboard accessibility.
@@ -639,6 +639,15 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.8 | Library verification | `node:sqlite` present in plain Node 22.23.1 and Electron's bundled Node 24.22.2 (`ELECTRON_RUN_AS_NODE=1` probe: `DatabaseSync` OK, WAL + FK pragmas OK) | Decision: Node built-in `node:sqlite` — no new dependency, no native build (resolves D8/Q3). |
 | 2026-11-05 | S0.8 | `grep` no hardcoded user paths in `src/database/service.ts` | Pass — no `/home/wetlander` or `/Users/`; userData via `app.getPath("userData")` | DB under userData, never a hardcoded machine-specific path. |
 | 2026-11-05 | S0.8 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.9 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S0.9 | `npm run build` | Pass | `out/node/core/lifecycle/service.js` emitted. |
+| 2026-11-05 | S0.9 | `npm test` | Pass — 65 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 7 ipc + 13 security) | `tests/lifecycle.test.js` (10 tests): ordered steps, async steps, failing-step isolation, state machine idle→starting→ready→closed, events broadcast, reverse-order cleanup, failing-hook isolation, shutdown idempotent, main wiring. |
+| 2026-11-05 | S0.9 | `npm run check` | Pass | Baseline + IPC guard green (ipcMain only in registry; ipcRenderer only in preload). |
+| 2026-11-05 | S0.9 | Live launch probe ×3 (`PANELFORGE_USER_DATA_DIR=/tmp/opencode/pf-probe-life`) | Pass — `PanelForge starting` → `database ready (journal=wal, …)` → `startup complete` each launch; `pgrep -x electron` → "no stray electron (clean)" after each | Startup sequence runs through the lifecycle service with failure isolation. |
+| 2026-11-05 | S0.9 | Shutdown probe (re-probe after adding sync shutdown trace) | Pass — `PanelForge shutting down` → `shutdown complete` recorded; DB close hook ran (no strays) | Before-quit log entry written synchronously so the trace survives exit timing. |
+| 2026-11-05 | S0.9 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+
+**S0.9 implemented files:** `src/core/lifecycle/service.ts` (New — `createLifecycleService`/`defaultLifecycleService`: ordered failure-isolated startup steps with summaries, reverse-order failure-isolated cleanup hooks, idempotent `shutdown()`, state machine idle→starting→ready→shutting-down→closed, `startup:step|complete` + `shutdown:step|complete` events; dependency-free callbacks), `src/main/index.ts` (startup rewired through lifecycle steps `ipc → config+logging → database`; `registerCleanup("database")`; `before-quit` triggers `shutdown()`; `window-all-closed`/`activate` retained), `tests/lifecycle.test.js` (New, 10 tests). Shutdown summary is best-effort (the synchronous `PanelForge shutting down` entry is the guaranteed trace).
 
 **S0.8 implemented files:** `src/database/service.ts` (New — `createDatabaseService`/`defaultDatabaseService`; `node:sqlite` DatabaseSync; `<userData>/database/panelforge.db`; pragmas WAL/FK/busy 5000 at open; in-code numbered migrations + `schema_migrations` tracking, auto-run on open; serialized write queue + `transaction()` with busy retry (max 3); `backupDatabase()` into `database/backups/`; `close()` on quit), `src/main/index.ts` (initializes DB on startup + logs `database ready …`, `logError` on failure without blocking launch, `before-quit` close), `tsconfig.node.json` (include `src/database/**/*.ts`), `tests/database.test.js` (New, 10 tests). Initial schema is intentionally minimal (`schema_migrations` + `kv_store` smoke table); project schema belongs to Stage 1. Automatic backup scheduling and corrupted-DB recovery dialog remain deferred (D10).
 
@@ -694,11 +703,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.9 — Application Lifecycle Infrastructure [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.10 — Keyboard Shortcuts and Navigation Foundation [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.8 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.9 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.9 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.10 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Provide reliable startup and shutdown behavior. **Deliverables [SPEC]:** Startup sequence; Shutdown sequence; Resource cleanup hooks; Basic application lifecycle events. **Acceptance [SPEC]:** Application starts and closes without leaving avoidable resources behind.
+**Goal [SPEC]:** Establish basic keyboard accessibility. **Deliverables [SPEC]:** Shortcut registration; Basic navigation structure; Shortcut documentation. **Acceptance [SPEC]:** Core navigation can be used without relying exclusively on mouse interaction.
 
 ---
 
@@ -722,5 +731,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.6 complete (impl commit 913d575). Acceptance verified (33 tests green incl. 12 config; 3× live launch + config-dir probe; no hardcoded paths). Stopped for owner review before S0.7. | [SPEC] | Crouton (S0.6 implementation) |
 | 2026-11-05 | S0.7 complete. Acceptance verified (45 tests green incl. 12 logging; 3× live launch with startup entries recorded; rotation + redaction proven). Stopped for owner review before S0.8. | [SPEC] | Crouton (S0.7 implementation) |
 | 2026-11-05 | S0.8 complete. Acceptance verified (55 tests green incl. 10 database; 3× live launch with `database ready (journal=wal, …)`; WAL + persistence + serialized writes proven). D8/Q3 decided: `node:sqlite`. Stopped for owner review before S0.9. | [SPEC] | Crouton (S0.8 implementation) |
+| 2026-11-05 | S0.9 complete. Acceptance verified (65 tests green incl. 10 lifecycle; 3× live launch `startup complete`; shutdown `PanelForge shutting down` → `shutdown complete`; no strays). Stopped for owner review before S0.10. | [SPEC] | Crouton (S0.9 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

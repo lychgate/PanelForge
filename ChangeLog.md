@@ -7,6 +7,32 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S0.9 — Application Lifecycle Infrastructure (2026-11-05) — [`aa2d0b1`](https://github.com/lychgate/PanelForge/commit/aa2d0b117f9c6f9b9936cb7b584a2588e59927e0)
+
+**Added**
+
+- `src/core/lifecycle/service.ts` — application lifecycle service
+  (`createLifecycleService` / `defaultLifecycleService`): ordered, failure-isolated
+  startup steps with summaries; reverse-order, failure-isolated cleanup hooks;
+  idempotent `shutdown()`; state machine
+  `idle → starting → ready → shutting-down → closed`; broadcast
+  `startup:step`/`startup:complete`/`shutdown:step`/`shutdown:complete` events.
+  Dependency-free (steps/hooks are callbacks), so it unit-tests in plain Node.
+- `tests/lifecycle.test.js` — 10 tests: step order, async steps, failing-step
+  isolation, state transitions, event broadcast, reverse-order cleanup,
+  failing-hook isolation, idempotent shutdown, main wiring.
+
+**Changed**
+
+- Main: startup rewired through lifecycle steps
+  (`ipc → config+logging → database`); `registerCleanup("database")`;
+  `before-quit` triggers `shutdown()`; a synchronous
+  `PanelForge shutting down` entry is written first so the trace survives exit
+  timing, followed by the best-effort `shutdown complete` summary. Window
+  creation still happens unconditionally after startup completes (in the
+  `whenReady` callback — unchanged behavior).
+- Register: S0.9 marked **Complete**; §11 next task is S0.10.
+
 ### S0.8 — SQLite Foundation (2026-11-05) — [`c7bbc8c`](https://github.com/lychgate/PanelForge/commit/c7bbc8c689e124ab41149b2c413b5ab2d2aa1f2d)
 
 **Added**

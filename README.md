@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (55 tests across baseline/security/ipc/config/logging/database)
+npm test           # runs Vitest (65 tests across baseline/security/ipc/config/logging/database/lifecycle)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 ```
@@ -41,6 +41,7 @@ src/
   core/
     config/    Centralized configuration service (settings location, atomic writes)
     logging/   Central logging service (rotating logs, redaction, error recording)
+    lifecycle/ Application lifecycle service (ordered startup, cleanup hooks, events)
     ipc/       Centralized IPC allowlist + validation + dispatch (registry)
   engines/     LLM, image, analysis, export (Stage 2+, not started)
   modules/     manuscripts, characters, locations, objects, styles, storyboards, artwork, continuity, publishing
@@ -91,9 +92,10 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 - **S0.6 — Configuration and User Paths:** complete (central `config/config.json` service; no hardcoded paths).
 - **S0.7 — Logging and Error Handling:** complete (central log service; rotation, redaction, error recording).
 - **S0.8 — SQLite Foundation:** complete (`node:sqlite` service; WAL/FK/busy timeout, migrations, serialized writes, backups).
-- **S0.9 — Application Lifecycle Infrastructure:** **next, awaiting owner authorization** (startup/shutdown sequences, cleanup hooks).
+- **S0.9 — Application Lifecycle Infrastructure:** complete (ordered startup steps + cleanup hooks + lifecycle events via `src/core/lifecycle/`).
+- **S0.10 — Keyboard Shortcuts and Navigation Foundation:** **next, awaiting owner authorization** (shortcut registration, basic navigation structure, shortcut docs).
 
-Remaining Stage 0 work after S0.8: S0.9–S0.12 (lifecycle, keyboard/navigation foundation, Linux packaging, verification/release prep). Stage 1 follows only after Stage 0 completes.
+Remaining Stage 0 work after S0.9: S0.10–S0.12 (keyboard/navigation foundation, Linux packaging, verification/release prep). Stage 1 follows only after Stage 0 completes.
 
 ## Design principles (per §2, summary)
 
