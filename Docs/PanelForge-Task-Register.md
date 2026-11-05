@@ -341,7 +341,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** An adapter can implement the contract without renderer/UI dependencies.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.7, S1.8.
 - **Stop:** Do not begin S2.2 until the interface is reviewed (it shapes all later adapters).
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit c44c989)
 
 #### S2.2 Persistent Task Records [SPEC]
 - **Goal:** Persist generation tasks with their §11.1 states.
@@ -861,6 +861,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S1.11 | `DISPLAY=:0 npm test` | Pass — 167 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 9 ipc + 13 security) | `tests/stage1-fixture.test.js` (2 tests): the full lifecycle — create → identify → list/metadata → import asset → integrity → byte-level COPY → reopen at new path → snapshot → restore (integrity ok) → rename → archive. |
 | 2026-11-05 | S1.11 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S1.11 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.1 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.1 | `npm run build` | Pass | `out/node/engines/provider/types.js` emitted. |
+| 2026-11-05 | S2.1 | `DISPLAY=:0 npm test` | Pass — 174 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 9 ipc + 13 security) | `tests/provider-contract.test.js` (7 tests): fake adapter conformance, progress validation (indeterminate honest; NaN/out-of-range rejected), health/result taxonomy, error codes, no renderer/UI/network imports. |
+| 2026-11-05 | S2.1 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.1 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.1 implemented files:** `src/engines/provider/types.ts` (New — `ProviderAdapter` contract execute/interrupt/health, `TaskType` (`text`/`image`), `ProviderStage`, `ProviderProgress` (percent only when measured), `ProviderErrorCode` (7), health statuses, validators, `listTaskTypes`), `tests/provider-contract.test.js` (New, 7 tests). Types + validators only; no real provider code; zero renderer/UI/Electron/network imports.
 
 **S1.11 implemented files:** `tests/stage1-fixture.test.js` (New, 2 tests — the fixture itself; no production code changed), `Docs/PanelForge-Project-Format.md` (fixture section). **Stage 1 is complete.**
 
@@ -946,11 +953,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.1 — Provider Interface Definitions [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.2 — Persistent Task Records [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S1.11 Complete (2026-11-05, acceptance verified; see §10). **Stage 1 is complete.** **Do not begin S2.1 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S2.1 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.2 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Define the contract every AI provider adapter implements (execute, interrupt, progress, health) — no real provider code.
+**Goal [SPEC]:** Persist generation tasks with their §11.1 states (12 states: Queued, Preparing, Loading Model, Generating, Post-processing, Saving, Complete, Failed, Paused, Cancelled, Waiting for Resources, Cooling Down).
 
 ---
 
@@ -989,5 +996,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S1.9 complete. Acceptance verified (158 tests green incl. 5 portability; copy/move proof; no absolute paths stored). Stopped for owner review before S1.10. | [SPEC] | Crouton (S1.9 implementation) |
 | 2026-11-05 | S1.10 complete. Acceptance verified (165 tests green incl. 5 project-interface + live Alt+3 probe; full project CRUD through IPC/preload). Stopped for owner review before S1.11. | [SPEC] | Crouton (S1.10 implementation) |
 | 2026-11-05 | S1.11 complete. Acceptance verified (167 tests incl. 2 stage1-fixture; full lifecycle create/copy/reopen/backup/restore/verify). **Stage 1 is complete.** Stopped for owner review before S2.1. | [SPEC] | Crouton (S1.11 implementation) |
+| 2026-11-05 | S2.1 complete. Acceptance verified (174 tests incl. 7 provider-contract; adapter contract without renderer/UI deps). Stopped for owner review before S2.2. | [SPEC] | Crouton (S2.1 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

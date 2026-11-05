@@ -48,7 +48,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > (LM Studio before ComfyUI), then resources. Infra only — no generation UI.
 > See `Docs/PanelForge-Task-Register.md` §4D for the full task definitions.
 
-- [ ] S2.1 Provider Interface Definitions
+- [x] S2.1 Provider Interface Definitions — completed 2026-11-05
 - [ ] S2.2 Persistent Task Records
 - [ ] S2.3 Task Queue
 - [ ] S2.4 Task State Transitions

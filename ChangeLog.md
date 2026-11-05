@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.1 — Provider Interface Definitions (2026-11-05) — [`c44c989`](https://github.com/lychgate/PanelForge/commit/c44c9894ebed259b109eebf15e091ce39fdac816)
+
+**Added**
+
+- `src/engines/provider/types.ts` — the adapter contract: `ProviderAdapter`
+  (execute/interrupt/health), task types (`text`/`image`), progress stages,
+  `ProviderErrorCode` (7 codes), health statuses
+  (`ready`/`unavailable`/`unknown`), runtime validators, `listTaskTypes`.
+  Progress percentages are only valid when measured (finite 0–100); the
+  contract rejects invented values. No real provider code; zero
+  renderer/UI/Electron/network imports.
+- `tests/provider-contract.test.js` — 7 tests: fake-adapter conformance,
+  progress/health/result validation, code taxonomy, dependency-free source.
+
+**Changed**
+
+- Register: S2.1 marked **Complete**; §11 next task is S2.2.
+- `Plan.md`: S2.1 checked off (2026-11-05).
+
 ### S1.11 — Stage 1 Test Fixture (2026-11-05) — [`682d753`](https://github.com/lychgate/PanelForge/commit/682d753311c66ac23bed1290a4a38ed198038a03)
 
 **Added**
