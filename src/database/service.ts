@@ -57,6 +57,15 @@ const MIGRATIONS: Migration[] = [
       "CREATE TABLE IF NOT EXISTS kv_store (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S2.2: persistent generation-task records (12 §11.1 states stored as
+  // machine strings; params as JSON). Queue/transition logic is S2.3+.
+  {
+    version: 2,
+    name: "002_tasks",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS tasks (task_id TEXT PRIMARY KEY, task_type TEXT NOT NULL, state TEXT NOT NULL, params TEXT NOT NULL, project_id TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export type DatabaseInitInfo = {
