@@ -32,7 +32,7 @@ Stage 0 completion: **complete** (2026-11-05 — see `Docs/PanelForge-Stage0-Com
 - [x] S1.2 Project Metadata Schema — completed 2026-11-05
 - [x] S1.3 Basic Project Operations — completed 2026-11-05
 - [x] S1.4 Relative Asset Path Service — completed 2026-11-05
-- [ ] S1.5 Asset Registry
+- [x] S1.5 Asset Registry — completed 2026-11-05
 - [ ] S1.6 Asset Integrity Checking
 - [ ] S1.7 Atomic Metadata Operations
 - [ ] S1.8 Backup and Snapshot System

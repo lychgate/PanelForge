@@ -7,6 +7,30 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.5 — Asset Registry (2026-11-05) — [`96b28fd`](https://github.com/lychgate/PanelForge/commit/96b28fd3abd53bc60dffe4a1ba7e864b32bcf4d7)
+
+**Added**
+
+- `src/core/project/registry.ts` — asset registry in `database/project.db`
+  (migration 002 `assets` table): `importAsset` (external copy-in, SHA-256 hash,
+  UID row — identity is the ID, never the path, per D6), `copyAsset` (mints a
+  new identity; the original is unchanged), `getAsset`, `listAssets`.
+  `relative_path` is unique per project (duplicate destinations rejected);
+  destinations resolve through the S1.4 path service.
+- `tests/asset-registry.test.js` — 9 tests: import copy+hash+row, get/list
+  retrieval, copy new-identity behavior, duplicate-path rejection (import and
+  copy), source/ID errors, traversal rejection, persistence.
+
+**Changed**
+
+- Project metadata migrations are now a versioned list (002 adds the registry;
+  pre-existing v1 databases migrate forward), and the open/queue/busy-retry
+  helpers are shared with the registry.
+- S1.5 records the §7.4 subset (UID + relative path + type + dates + hash);
+  version/approval/relationships/provenance remain later tasks.
+- Register: S1.5 marked **Complete**; §11 next task is S1.6.
+- `Plan.md`: S1.5 checked off (2026-11-05).
+
 ### S1.4 — Relative Asset Path Service (2026-11-05) — [`89214ff`](https://github.com/lychgate/PanelForge/commit/89214ff122cbba87235ab5f391d6ab3b609ef422)
 
 **Added**

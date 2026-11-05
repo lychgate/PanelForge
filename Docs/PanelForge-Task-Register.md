@@ -272,7 +272,7 @@ All tasks: Status **Not Started**.
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S1.2, S1.4.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — §7.4 metadata list exists (UID, type, relative path, dates, hash, version, approval, relationships, provenance). Hash algorithm, orphan-file and rename/move semantics unspecified. See D6.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 96b28fd)
 
 #### S1.6 Asset Integrity Checking [SPEC]
 - **Deliverables [SPEC]:** Missing asset detection; Hash verification; Integrity report.
@@ -684,6 +684,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S1.4 | `DISPLAY=:0 npm test` | Pass — 120 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 7 ipc + 13 security) | `tests/project-paths.test.js` (10 tests): canonical resolution, normalization (`//`, `.`, internal `..`), traversal/absolute/backslash rejection, **symlink escape rejected + internal symlink accepted**, parent-based resolution for non-existent files, storage inverse, no hardcoded paths. |
 | 2026-11-05 | S1.4 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S1.4 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S1.5 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S1.5 | `npm run build` | Pass | `out/node/core/project/registry.js` emitted. |
+| 2026-11-05 | S1.5 | `DISPLAY=:0 npm test` | Pass — 129 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 ipc + 13 security) | `tests/asset-registry.test.js` (9 tests): import copy+hash+row, get by ID, list, copy mints new identity (hash equal), duplicate-path rejection (import + copy), SOURCE_NOT_FOUND/NOT_FOUND/INVALID_ARGUMENTS, traversal rejection, persistence, no hardcoded paths. |
+| 2026-11-05 | S1.5 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S1.5 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S1.5 implemented files:** `src/core/project/registry.ts` (New — `importAsset` (external copy-in + SHA-256 + row), `copyAsset` (new identity), `getAsset`, `listAssets`, `AssetError` typed codes; UID identity per D6; path uniqueness enforced), `src/core/project/metadata.ts` (migration 002 `assets` table + shared open/queue helpers exported), `tests/asset-registry.test.js` (New, 9 tests). S1.5 subset of §7.4: version/approval/relationships/provenance remain later tasks.
 
 **S1.4 implemented files:** `src/core/project/paths.ts` (New — `normalizeRelative` (lexical canonicalization), `resolveInProject` (canonicalize + join + symlink-resolved boundary check), `toStoragePath` (inverse), `PathError` typed codes), `tests/project-paths.test.js` (New, 10 tests). Translation to native separators happens only in the resolution step; tests cover the external-review symlink clarification.
 
@@ -755,11 +762,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S1.5 — Asset Registry [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S1.6 — Asset Integrity Checking [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S1.4 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.5 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S1.5 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.6 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Asset records with type metadata, file hashes, and import/copy operations (D6 asset-identity model applies here).
+**Goal [SPEC]:** Missing-asset detection, hash verification, and integrity reports (missing or modified assets reported accurately).
 
 ---
 
@@ -791,5 +798,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S1.2 complete. Acceptance verified (101 tests green incl. 8 project-metadata; projects table persists across reopen). Stopped for owner review before S1.3. | [SPEC] | Crouton (S1.2 implementation) |
 | 2026-11-05 | S1.3 complete. Acceptance verified (110 tests green incl. 9 project-operations; all six operations independent; typed errors). Stopped for owner review before S1.4. | [SPEC] | Crouton (S1.3 implementation) |
 | 2026-11-05 | S1.4 complete. Acceptance verified (120 tests green incl. 10 project-paths; canonical resolution + traversal/symlink rejection). Stopped for owner review before S1.5. | [SPEC] | Crouton (S1.4 implementation) |
+| 2026-11-05 | S1.5 complete. Acceptance verified (129 tests green incl. 9 asset-registry; import/copy + SHA-256 hashes + UID identity). Stopped for owner review before S1.6. | [SPEC] | Crouton (S1.5 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
