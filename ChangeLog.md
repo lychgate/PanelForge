@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.4 — Task State Transitions (2026-11-05) — [`ba43acf`](https://github.com/lychgate/PanelForge/commit/ba43acf59440da15ce857fd84f2861b695d0c3ac)
+
+**Added**
+
+- `src/engines/tasks/transitions.ts` — the allowed transition graph over the 12
+  states, `canTransition`/`allowedNextStates`, and the guarded
+  `transitionTask()` (`TransitionError` with `INVALID_TRANSITION`/`NOT_FOUND`;
+  complete/cancelled terminal; running states may crash-resume to queued).
+- `tests/task-transitions.test.js` — 7 tests: happy-path walk, illegal-edge
+  rejection, retry/cancel semantics, unknown-state/task codes, graph queries.
+
+**Changed**
+
+- The queue now drives state changes through `transitionTask()` (S2.3 stays green
+  against the guards); the progress→generating transition is awaited before the
+  final transition (fixed a fire-and-forget race it had).
+- Register: S2.4 marked **Complete**; §11 next task is S2.5.
+- `Plan.md`: S2.4 checked off (2026-11-05).
+
 ### S2.3 — Task Queue (2026-11-05) — [`c745a09`](https://github.com/lychgate/PanelForge/commit/c745a090c40cd866a4cbc13fe12a28efe4c3e5fd)
 
 **Added**
