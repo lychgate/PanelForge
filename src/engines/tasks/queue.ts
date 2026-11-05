@@ -40,6 +40,7 @@ export type InterruptorMap = Partial<Record<TaskType, (taskId: string) => void>>
 export type TaskQueue = {
   enqueue: (taskType: TaskType, params?: Record<string, unknown>, projectId?: string | null) => Promise<{ taskId: string }>;
   runNext: () => Promise<{ taskId: string; state: string } | null>;
+  runTask: (taskId: string) => Promise<{ taskId: string; state: string }>;
   runUntilIdle: () => Promise<{ taskId: string; state: string }[]>;
   pauseTask: (taskId: string) => Promise<TaskRecord>;
   cancelTask: (taskId: string) => Promise<TaskRecord>;
@@ -87,10 +88,20 @@ export function createTaskQueue(
     }
   }
 
-  async function runNextInternal(): Promise<{ taskId: string; state: string } | null> {
-    const queued = (await store.listTasks()).filter((t) => t.state === "queued");
-    if (queued.length === 0) return null;
-    const task = queued[0];
+  async function runTaskById(taskId: string): Promise<{ taskId: string; state: string }> {
+    const task = await store.getTask(taskId);
+    if (!task) {
+      const err = new TransitionError("NOT_FOUND", `No task with id: ${taskId}`);
+      throw err;
+    }
+    if (task.state !== "queued") {
+      throw new TransitionError("INVALID_TRANSITION", `Only queued tasks can run (current: ${task.state})`);
+    }
+    return executeOne(task);
+  }
+
+  /** Execute one specific (already retrieved) queued task. */
+  async function executeOne(task: Awaited<ReturnType<TaskStore["getTask"]>> & object): Promise<{ taskId: string; state: string }> {
     const executor = executors[task.taskType as TaskType];
     if (!executor) {
       await transitionTask(store, task.taskId, "failed");
@@ -122,8 +133,18 @@ export function createTaskQueue(
     return settle(task.taskId, result);
   }
 
+  async function runNextInternal(): Promise<{ taskId: string; state: string } | null> {
+    const queued = (await store.listTasks()).filter((t) => t.state === "queued");
+    if (queued.length === 0) return null;
+    return executeOne(queued[0]);
+  }
+
   async function runNext(): Promise<{ taskId: string; state: string } | null> {
     return runNextInternal();
+  }
+
+  async function runTask(taskId: string): Promise<{ taskId: string; state: string }> {
+    return runTaskById(taskId);
   }
 
   async function runUntilIdle(): Promise<{ taskId: string; state: string }[]> {
@@ -182,7 +203,7 @@ export function createTaskQueue(
     return resumed;
   }
 
-  return { enqueue, runNext, runUntilIdle, pauseTask, cancelTask, resumeTask, resumeInterrupted };
+  return { enqueue, runNext, runTask, runUntilIdle, pauseTask, cancelTask, resumeTask, resumeInterrupted };
 }
 
 export function createDefaultTaskQueue(
