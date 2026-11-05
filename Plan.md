@@ -57,7 +57,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S2.7 Progress Reporting — completed 2026-11-05
 - [x] S2.8 Queue Persistence and Recovery — completed 2026-11-05
 - [x] S2.9 LM Studio Connection Adapter — completed 2026-11-05
-- [ ] S2.10 ComfyUI Connection Adapter
+- [x] S2.10 ComfyUI Connection Adapter — completed 2026-11-05
 - [ ] S2.11 Provider Health Checks
 - [ ] S2.12 Mock Provider Testing
 - [ ] S2.13 Resource Profiles

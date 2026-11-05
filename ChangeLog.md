@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.10 — ComfyUI Connection Adapter (2026-11-05) — [`b59591f`](https://github.com/lychgate/PanelForge/commit/b59591f2643aef4eec08a3c761ff4b1be644276f)
+
+**Added**
+
+- `src/engines/provider/comfyui.ts` — the image provider (S2.1 contract):
+  `system_stats` health, `prompt` submission with node-error detection,
+  `history` polling, per-output image fetch (base64), per-task
+  AbortControllers + best-effort `/interrupt`, typed
+  `UNAVAILABLE`/`TIMEOUT`/`FAILED`/`INTERRUPTED` results. Built-in `fetch`
+  only; presence optional (§6.6).
+- `tests/comfyui.test.js` — 5 tests against a real local-HTTP mock server:
+  health-ready execute (images match), fail-closed workflow validation,
+  closed-port graceful absence, node-error typing, interrupt during polling.
+
+**Changed**
+
+- Register: S2.10 marked **Complete**; §11 next task is S2.11.
+- `Plan.md`: S2.10 checked off (2026-11-05).
+
 ### S2.9 — LM Studio Connection Adapter (2026-11-05) — [`acdf4c0`](https://github.com/lychgate/PanelForge/commit/acdf4c027fb1878d8e40635c84ee699b7b3a354e)
 
 **Added**
