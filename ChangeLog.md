@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.10 — Basic Project Interface (2026-11-05) — [`31aa931`](https://github.com/lychgate/PanelForge/commit/31aa931bb348284b19341ed2c96ff604f09f4d79)
+
+**Added**
+
+- Six project IPC channels (`panelforge:project.{create,list,open,close,rename,archive}`):
+  validated args, S1.3 operations under the Core-owned manager, and preserved
+  typed envelope codes. Optional `parentDir` (defaults to main-resolved
+  `<userData>/projects`, so the renderer never deals in absolute paths).
+- Preload frozen `project.*` bridge + Projects view (create form, list,
+  open/close/rename/archive, `Alt+3`) with `aria-current` focus management.
+- `tests/ipc.test.js` now 9 tests (8-channel allowlist, full round-trip through
+  the envelope, typed codes) and `tests/project-interface.test.js` (5 tests,
+  including a live renderer probe driving `Alt+3`).
+
+**Changed**
+
+- `SafeErrorCode` extended with project operation codes.
+- Register: S1.10 marked **Complete**; §11 next task is S1.11.
+- `Plan.md`: S1.10 checked off (2026-11-05).
+
 ### S1.9 — Project Portability Test (2026-11-05) — [`78e1949`](https://github.com/lychgate/PanelForge/commit/78e1949c0ab19cc835b28c3d5ec3b285003ceb62)
 
 **Added**
