@@ -18,7 +18,7 @@ The approved specification remains the authoritative source of product requireme
 - **Next eligible task:** S0.2 (see §11) — **awaiting owner authorization after S0.1 review**. Do not begin S0.2 without it.
 - **Open decisions:** D1–D10 detail choices (§7) are **not approved** — owner direction is to approve progressively at their respective tasks (principles first; implementation details such as Zod or exact CSP directives left to the implementation task). Guardrails (§2), session protocol including one-task-at-a-time stop-and-review (§3), and Q2 (secure defaults from first window) are owner-approved. External-review recommendations in §7.1 are also **not approved** except where explicitly recorded as approved below.
 - **S0.1 precondition (corrected 2026-11-05, v3.1):** S0.1 can begin **without** approving D1–D10. Those decisions are resolved when their respective tasks require them. SQLite library selection is **deferred to S0.8** (Q3/D8) — it is not an S0.1 prerequisite or decision, and S0.1 must not install a database dependency. S0.1 is authorized (owner, 2026-11-05); see §11.
-- **Spec gaps blocking later work:** Stage 2–11 lack per-task Goal/Deliverables/Acceptance/Dependencies/Stop per §16.2. They are flagged Needs Clarification and must be expanded before implementation.
+- **Spec gaps blocking later work:** Stages 3–11 still lack per-task Goal/Deliverables/Acceptance/Dependencies/Stop per §16.2 (flagged Needs Clarification, must be expanded before implementation). **Stage 2 is expanded — S2.1–S2.18** (owner, 2026-11-05; 18 micro-tasks, spine-first, LM Studio before ComfyUI, infra only).
 
 ### 1.1 Source distinctions used throughout
 
@@ -325,30 +325,176 @@ All tasks: Status **Not Started**.
 ### 4D. Stage 2 — AI Orchestration and Resource Management [SPEC §15]
 
 **Goal [SPEC]:** Establish the infrastructure for AI providers and background tasks.  
-**Spec note [SPEC]:** Must be divided into small tasks before implementation. Per §16.2 every task requires identifier/goal/scope/deliverable/dependencies/acceptance/stop. None exist yet.
+**Spec note [SPEC]:** Must be divided into small tasks before implementation. Per §16.2 every task requires identifier/goal/scope/deliverable/dependencies/acceptance/stop.
 
-All groups below: **Completeness Incomplete; Status Needs Clarification.**
+**Breakdown (owner, 2026-11-05):** 18 micro-tasks (one per spec group), sequenced
+**spine-first** (records + queue + transitions + pause/retry/progress + recovery),
+**then providers** (LM Studio before ComfyUI, health checks, mock testing),
+**then resources** (profiles, detection, telemetry, cooling, Small GPU Mode).
+Stage 2 is **infra only**: no generation/queue UI (lands with later stages, per
+S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 
-| Group [SPEC] | Goal / Deliverables / Acceptance / Deps / Stop | Notes |
-|---|---|---|
-| Provider interface definitions | Not stated | Needs expansion |
-| LM Studio connection adapter | Not stated | Model/quant/context unspecified |
-| ComfyUI connection adapter | Not stated | Install/version strategy unspecified |
-| Provider health checks | Not stated | Needs expansion |
-| Persistent task records | Not stated | §11 lists 12 states; transition table absent |
-| Task queue | Not stated | Needs expansion |
-| Task state transitions | Not stated | Needs expansion |
-| Pause and cancellation | Not stated | Needs expansion |
-| Retry handling | Not stated | Needs expansion |
-| Progress reporting | Not stated | §2.6/§11 constrain: no invented percentages |
-| Resource profiles | Not stated | §10.2 defines Safe/Balanced/Performance/Custom |
-| Hardware detection | Not stated | §10.1 defines Detected/Unavailable/Unknown |
-| Telemetry adapter interface | Not stated | §10.4 graceful failure |
-| Graceful telemetry failure | Not stated | Show Unknown, never 0, never invent |
-| Cooling Down state | Not stated | §10.5 distinct from Paused/Failed/Waiting/Complete |
-| Queue persistence and recovery | Not stated | Depends on S0.8 persistence shape |
-| Small GPU Mode | Not stated | §10.3 first-class; GTX 1660 Ti target (§3.1) |
-| Mock provider testing | Not stated | Needs expansion |
+#### S2.1 Provider Interface Definitions [SPEC]
+- **Goal:** Define the contract every AI provider adapter implements.
+- **Scope:** Interface (execute, interrupt, progress, health), task-type enumeration, error taxonomy; no real provider code.
+- **Deliverables [SPEC]:** Provider interface definitions.
+- **Acceptance:** An adapter can implement the contract without renderer/UI dependencies.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.7, S1.8.
+- **Stop:** Do not begin S2.2 until the interface is reviewed (it shapes all later adapters).
+- **Status:** Not Started
+
+#### S2.2 Persistent Task Records [SPEC]
+- **Goal:** Persist generation tasks with their §11.1 states.
+- **Scope:** Task table in the app DB (12 states: Queued, Preparing, Loading Model, Generating, Post-processing, Saving, Complete, Failed, Paused, Cancelled, Waiting for Resources, Cooling Down).
+- **Deliverables [SPEC]:** Persistent task records.
+- **Acceptance:** A task (incl. its state, params, timestamps) persists across restarts.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S0.8, S2.1.
+- **Stop:** State transitions land in S2.4.
+- **Status:** Not Started
+
+#### S2.3 Task Queue [SPEC]
+- **Goal:** Create and execute tasks in order.
+- **Scope:** Queue data structure + executor dispatch; no real provider yet (mock executor from S2.1 contract).
+- **Deliverables [SPEC]:** Task queue.
+- **Acceptance:** Tasks can be created, persisted, and executed (mock executor); interrupted tasks can be resumed where supported.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1, S2.2.
+- **Stop:** Do not add real providers here (S2.9–S2.10).
+- **Status:** Not Started
+
+#### S2.4 Task State Transitions [SPEC]
+- **Goal:** Enforce ownership of state changes.
+- **Scope:** Allowed transition graph + guards over the 12 states; invalid transitions rejected.
+- **Deliverables [SPEC]:** Task state transitions.
+- **Acceptance:** Only legal transitions succeed; illegal ones fail with typed errors.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.2, S2.3.
+- **Stop:** Pause/cancel/retry semantics land in S2.5–S2.6.
+- **Status:** Not Started
+
+#### S2.5 Pause and Cancellation [SPEC]
+- **Goal:** Let users stop work safely mid-flight.
+- **Scope:** Pause (abort/pause between safe checkpoints where the backend permits) and cancel; resumption where supported.
+- **Deliverables [SPEC]:** Pause and cancellation.
+- **Acceptance:** A running task can be paused and cancelled; cancelled tasks stay cancelled (no resurrection).
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1, S2.3, S2.4.
+- **Stop:** Retry behavior lands in S2.6.
+- **Status:** Not Started
+
+#### S2.6 Retry Handling [SPEC]
+- **Goal:** Bounded, explicit retries.
+- **Scope:** Retry policy (attempts/backoff), failed-task retry (siblings exact — §11.4 failure isolation preserved).
+- **Deliverables [SPEC]:** Retry handling.
+- **Acceptance:** A failed task can be retried without disturbing completed siblings.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.4, S2.5.
+- **Stop:** No auto-retry storms; no invented progress.
+- **Status:** Not Started
+
+#### S2.7 Progress Reporting [SPEC]
+- **Goal:** Honest, complete status per task.
+- **Scope:** Task name, type, queue position, current stage, elapsed, estimated remaining (when meaningful), model/backend, resource profile, status, logs/errors; indeterminate indicator where the provider can't report (no invented percentages, §2.6/§11).
+- **Deliverables [SPEC]:** Progress reporting.
+- **Acceptance:** Each task's §11.2 fields are readable from records/events; no fabricated percentages.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.2, S2.3.
+- **Stop:** Telemetry-specific progress lands with providers (S2.9+).
+- **Status:** Not Started
+
+#### S2.8 Queue Persistence and Recovery [SPEC]
+- **Goal:** Survive restarts mid-queue.
+- **Scope:** Reload persisted tasks on startup; recover interrupted work to a resumable state; batch resumability where the backend supports checkpoints.
+- **Deliverables [SPEC]:** Queue persistence and recovery.
+- **Acceptance:** After a restart, the queue is intact and interrupted tasks resume (or fail cleanly) — no lost or double-run work.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S0.8, S2.2–S2.7.
+- **Stop:** No generation blobs in the queue yet (work arrives with providers' task types).
+- **Status:** Not Started
+
+#### S2.9 LM Studio Connection Adapter [SPEC]
+- **Goal:** First real provider (smaller local API, faster baseline).
+- **Scope:** LM Studio adapter (local connection, health, model listing, completion) implementing S2.1; graceful "provider unavailable" (absence never blocks opening projects, §6.6).
+- **Deliverables [SPEC]:** LM Studio connection adapter.
+- **Acceptance:** Adapter executes tasks against a real or mock LM Studio endpoint; absence is handled gracefully.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1, S2.11.
+- **Stop:** Model/quant choices are spikes here, not prerequisites (Q5 defers baselines to Stage 3).
+- **Status:** Not Started
+
+#### S2.10 ComfyUI Connection Adapter [SPEC]
+- **Goal:** Second real provider (image generation).
+- **Scope:** ComfyUI adapter (local connection, workflow submission/staging, prompt/negative/reference conditioning) implementing S2.1.
+- **Deliverables [SPEC]:** ComfyUI connection adapter.
+- **Acceptance:** Adapter executes image tasks against a real or mock ComfyUI endpoint; gracefully unavailable when absent.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.9, S2.11.
+- **Stop:** Install/version strategy stays a spike within this task.
+- **Status:** Not Started
+
+#### S2.11 Provider Health Checks [SPEC]
+- **Goal:** Know whether a provider is usable before dispatching to it.
+- **Scope:** Health probe per adapter (reachable, model present, queue workable); health cached with timestamps.
+- **Deliverables [SPEC]:** Provider health checks.
+- **Acceptance:** Unreachable/missing-model providers report unhealthy; healthy ones report ready; no dispatch to unhealthy providers.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.9, S2.10.
+- **Stop:** Scheduling policy that consumes health lands with resources (S2.13+).
+- **Status:** Not Started
+
+#### S2.12 Mock Provider Testing [SPEC]
+- **Goal:** Test generation independently of real providers and UI.
+- **Scope:** Scripted mock adapters (success/failure/slow/varied progress) implementing S2.1, usable by tests and the queue.
+- **Deliverables [SPEC]:** Mock provider testing.
+- **Acceptance:** The whole Stage-2 stage acceptance (create→persist→execute→interrupt→resume→recover) passes against mocks.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1–S2.11.
+- **Stop:** Mocks never ship as production behavior.
+- **Status:** Not Started
+
+#### S2.13 Resource Profiles [SPEC]
+- **Goal:** Conservative, user-visible resource policy.
+- **Scope:** Safe / Balanced / Performance / Custom profiles (§10.2: memory, queue concurrency, generation size, cooling intervals); never overclock, no unsafe fan assumptions.
+- **Deliverables [SPEC]:** Resource profiles.
+- **Acceptance:** Selecting a profile constrains queue concurrency + memory behavior; Custom exposes configurable limits.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.3, S2.14.
+- **Stop:** Profile enforcement consumes detection/telemetry (S2.14–S2.16) — policy lands here, inputs there.
+- **Status:** Not Started
+
+#### S2.14 Hardware Detection [SPEC]
+- **Goal:** Know the machine's capability.
+- **Scope:** At startup attempt GPU model, VRAM, RAM, CPU, image backends, model services, monitoring capabilities; every signal typed Detected / Unavailable / Unknown (never 0, never fabricated).
+- **Deliverables [SPEC]:** Hardware detection.
+- **Acceptance:** Each signal reports exactly one of Detected/Unavailable/Unknown; absence is never shown as zero.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.13.
+- **Stop:** Stays detection only — scheduling decisions land in S2.13/S2.17.
+- **Status:** Not Started
+
+#### S2.15 Telemetry Adapter Interface [SPEC]
+- **Goal:** A stable boundary for optional hardware metrics.
+- **Scope:** Adapter interface (temperature, VRAM, etc.) with optional, platform-dependent implementations; metrics typed Detected/Unavailable/Unknown per S2.14.
+- **Deliverables [SPEC]:** Telemetry adapter interface.
+- **Acceptance:** Adapters can be added per-platform without touching the Resource Manager.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.14.
+- **Stop:** Failure semantics land in S2.16; thresholds land with S2.17.
+- **Status:** Not Started
+
+#### S2.16 Graceful Telemetry Failure [SPEC]
+- **Goal:** Telemetry can fail without failing the app.
+- **Scope:** Missing/unobtainable metrics display as Unknown (never 0, no estimate); conservative scheduling defaults; user-configurable cooldown intervals; clear unavailability indication; app stays fully usable without telemetry (§10.4).
+- **Deliverables [SPEC]:** Graceful telemetry failure.
+- **Acceptance:** Killing telemetry yields Unknown everywhere, conservative scheduling, and an explicit unavailable indicator.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.14, S2.15.
+- **Stop:** Pausing on thresholds lands in S2.17.
+- **Status:** Not Started
+
+#### S2.17 Cooling Down State [SPEC]
+- **Goal:** An explicit, distinguishable thermal pause (§10.5).
+- **Scope:** Cooling Down as queue + task state; soft/hard thresholds (user-configurable), pausing new generation tasks, safe handling of active jobs, user notifications, resume per policy once cooled.
+- **Deliverables [SPEC]:** Cooling Down state.
+- **Acceptance:** Cooling is distinguishable from Paused/Failed/Waiting/Complete, explains why, and resumes correctly.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.4, S2.16.
+- **Stop:** PanelForge never claims to control temperature/fans/power (§10.4).
+- **Status:** Not Started
+
+#### S2.18 Small GPU Mode [SPEC]
+- **Goal:** First-class low-VRAM operation (GTX 1660 Ti-class target).
+- **Scope:** One panel/task at a time, sequential model loading, lower-resolution drafts, optional upscaling/tiling, releasing resources, CPU fallback, lower-resource retries after OOM — never auto-overwriting or auto-downgrading approved images.
+- **Deliverables [SPEC]:** Small GPU Mode.
+- **Acceptance:** A small-GPU profile runs the queue within its memory budget; approved art is never silently replaced.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.13, S2.14, S2.17.
+- **Stop:** Target is practical compatibility, not a guarantee for every model/workflow (§10.3).
+- **Status:** Not Started
 
 **Stage acceptance [SPEC]:** Tasks can be created, persisted, executed, interrupted, resumed where supported, and recovered after restart. Real generation remains independently testable from UI.
 

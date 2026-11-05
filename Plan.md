@@ -6,8 +6,8 @@ Stage 0 and Stage 1 must complete before Character Studio or real ComfyUI integr
 Tasks are completed one at a time with owner review between tasks.
 
 > Check off a task and fill in its completion date when its acceptance is verified.
-> Stages 2–11 are currently recorded as task groups only (the spec does not define
-> per-task breakdowns for them yet) — they remain single stage-level entries until expanded.
+> Stage 2 is broken into S2.1–S2.18 (owner-approved); Stages 3–11 are still
+> recorded as task groups only until expanded the same way.
 
 ## Stage 0 — Application Foundation
 
@@ -44,11 +44,28 @@ Stage 1 completion: **pending**.
 
 ## Stage 2 — AI Orchestration and Resource Management
 
-> Groups only (provider adapters for LM Studio/ComfyUI, persistent task records,
-> task queue, pause/cancel/retry, resource profiles, hardware detection,
-> telemetry, Small GPU Mode, mock-provider testing). Task breakdown pending.
+> 18 tasks, one per spec group: spine first (records + queue), then providers
+> (LM Studio before ComfyUI), then resources. Infra only — no generation UI.
+> See `Docs/PanelForge-Task-Register.md` §4D for the full task definitions.
 
-- [ ] Stage 2 — not started
+- [ ] S2.1 Provider Interface Definitions
+- [ ] S2.2 Persistent Task Records
+- [ ] S2.3 Task Queue
+- [ ] S2.4 Task State Transitions
+- [ ] S2.5 Pause and Cancellation
+- [ ] S2.6 Retry Handling
+- [ ] S2.7 Progress Reporting
+- [ ] S2.8 Queue Persistence and Recovery
+- [ ] S2.9 LM Studio Connection Adapter
+- [ ] S2.10 ComfyUI Connection Adapter
+- [ ] S2.11 Provider Health Checks
+- [ ] S2.12 Mock Provider Testing
+- [ ] S2.13 Resource Profiles
+- [ ] S2.14 Hardware Detection
+- [ ] S2.15 Telemetry Adapter Interface
+- [ ] S2.16 Graceful Telemetry Failure
+- [ ] S2.17 Cooling Down State
+- [ ] S2.18 Small GPU Mode
 
 ## Stage 3 — Manuscript Analysis and Art Style Profiles
 
