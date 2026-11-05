@@ -149,7 +149,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.3.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — contract format, validation library, and error envelope not specified. See D1.
-- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; commit recorded below)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; commit 8026da3)
 
 #### S0.5 Safe Diagnostic Operation [SPEC]
 - **Goal [SPEC]:** Verify the renderer-to-main communication path.
