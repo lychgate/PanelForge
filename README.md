@@ -6,13 +6,13 @@ Local-first desktop application for creating illustrated stories, comics, graphi
 >
 > **Operational record:** [`Docs/PanelForge-Task-Register.md`](Docs/PanelForge-Task-Register.md) — task register, decision log, and progress tracker. The spec remains the authoritative source of requirements; the register records how work proceeds against it.
 >
-> **Change history:** [`ChangeLog.md`](ChangeLog.md) — detailed changes per task (S0.1–S0.8 and onward).
+> **Change history:** [`ChangeLog.md`](ChangeLog.md) — full task-by-task change history, updated as each task completes.
 
 **Positioning:** A local-first comic studio built for creators, not just people with flagship GPUs. Generation may take longer on modest systems, but the process stays manageable through sequential processing, visible progress, resource-aware scheduling, and independently saved results. Primary hardware target: NVIDIA GTX 1660 Ti class systems (~6 GB VRAM). Initial platform: Linux Mint.
 
 ## Prerequisites
 
-- Node.js >= 22, npm >= 10
+- Node.js >= 22.13 (required for built-in `node:sqlite`, unflagged in 22.13), npm >= 10
 - Linux Mint (initial development platform)
 - Git
 
@@ -61,7 +61,7 @@ All application data lives under the Electron `userData` directory (resolved via
 | Content | Location (relative to userData) | Since |
 |---|---|---|
 | Application settings | `config/config.json` (atomic tmp+rename, `0600`; defaults + corrupt-file backup + migration) | S0.6 |
-| Application logs | `logs/panelforge.log` (JSON lines, 512 KiB rotation → `panelforge-1..3.log`, redacted) | S0.7 |
+| Application logs | `logs/panelforge.log` (JSON lines, redacted; per-file limit 512 KiB — when full, the active log rotates into `panelforge-1.log`, up to 3 rotated files are kept alongside the active log) | S0.7 |
 | SQLite database | `database/panelforge.db` (WAL mode; backups to `database/backups/`) | S0.8 |
 
 ## IPC

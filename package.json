@@ -6,7 +6,7 @@
   "type": "commonjs",
   "main": "out/node/main/index.js",
   "engines": {
-    "node": ">=22",
+    "node": ">=22.13",
     "npm": ">=10"
   },
   "scripts": {

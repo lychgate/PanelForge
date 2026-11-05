@@ -7,7 +7,7 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
-### S0.8 — SQLite Foundation (2026-11-05) — commit `c7bbc8c`
+### S0.8 — SQLite Foundation (2026-11-05) — [`c7bbc8c`](https://github.com/lychgate/PanelForge/commit/c7bbc8c689e124ab41149b2c413b5ab2d2aa1f2d)
 
 **Added**
 
@@ -40,7 +40,7 @@ remains the authoritative progress record; this file summarizes what each task c
 - Register: S0.8 marked **Complete**; Q3 (SQLite library) marked Decided
   (`node:sqlite`); §11 next task is S0.9.
 
-### S0.7 — Logging and Error Handling (2026-11-05) — commit `38015a1`
+### S0.7 — Logging and Error Handling (2026-11-05) — [`38015a1`](https://github.com/lychgate/PanelForge/commit/38015a159ab3e028976473247ee5effe81b899f5)
 
 **Added**
 
@@ -51,9 +51,10 @@ remains the authoritative progress record; this file summarizes what each task c
   set from the S0.6 config `logLevel` at startup).
 - Size-limited rotation: 512 KiB active log rotates into
   `panelforge-1.log` … `panelforge-3.log`; the oldest backup is deleted.
-- Redaction: token/password/secret values, the home directory, and over-long
-  payloads (1024-char cap) are stripped so sensitive data is not unnecessarily
-  logged.
+- Redaction as implemented: `token=`/`password=`/secret-like `key=value` patterns are
+  replaced with `[REDACTED]`, the home directory path is replaced with `<home>`,
+  and entries longer than 1024 characters are truncated. Message content not
+  matching these patterns is logged as-is.
 - `logError()` records Error name + message in the same entry shape (no stacks).
   Logging never throws.
 - `tests/logging.test.js` — 12 tests: entry shape/location, min-level filtering,
@@ -68,7 +69,7 @@ remains the authoritative progress record; this file summarizes what each task c
   envelope is unchanged (`HANDLER_ERROR`, no sensitive detail).
 - Register: S0.7 marked **Complete**; §11 next task is S0.8.
 
-### S0.6 — Configuration and User Paths (2026-11-05) — commit `913d575`
+### S0.6 — Configuration and User Paths (2026-11-05) — [`913d575`](https://github.com/lychgate/PanelForge/commit/913d575b5a94c7dcccd1eb055cd591372ea518cd)
 
 **Added**
 
@@ -95,7 +96,7 @@ remains the authoritative progress record; this file summarizes what each task c
   (try/catch; failures never block the window).
 - Register: S0.6 marked **Complete**; §11 next task is S0.7.
 
-### S0.5 — Safe Diagnostic Operation (2026-11-05) — commit `95da22b`
+### S0.5 — Safe Diagnostic Operation (2026-11-05) — [`95da22b`](https://github.com/lychgate/PanelForge/commit/95da22be0e0da5e791a1ea633558a1000f6dae1e)
 
 **Added**
 
@@ -111,7 +112,7 @@ remains the authoritative progress record; this file summarizes what each task c
 - `tests/ipc.test.js` extended with diagnostics.get cases (7 tests);
   `tests/security.test.js` verifies the bridge diagnostic call.
 
-### S0.4 — IPC Foundation (2026-11-05) — commit `8026da3`
+### S0.4 — IPC Foundation (2026-11-05) — [`8026da3`](https://github.com/lychgate/PanelForge/commit/8026da3416f7619a638faddfd0969c35f8e38de8)
 
 **Added**
 
@@ -127,7 +128,7 @@ remains the authoritative progress record; this file summarizes what each task c
 - Main calls `registerIpcHandlers()` at startup; no direct `ipcMain.handle` in main.
 - `scripts/check.js` IPC guard: `ipcMain` only in the registry.
 
-### S0.3 — Secure BrowserWindow Configuration (2026-11-05) — commit `4c8d10b`
+### S0.3 — Secure BrowserWindow Configuration (2026-11-05) — [`4c8d10b`](https://github.com/lychgate/PanelForge/commit/4c8d10b5582e67b9317fb1ce2e4e279208d7520e)
 
 **Added**
 
@@ -143,7 +144,7 @@ remains the authoritative progress record; this file summarizes what each task c
 - `scripts/check.js` guard updated for the bridge (comments stripped before grep).
 - CSP intentionally deferred (decided with the UI framework choice).
 
-### S0.2 — Electron Application Launch (2026-11-05) — commit `0d73f1a`
+### S0.2 — Electron Application Launch (2026-11-05) — [`0d73f1a`](https://github.com/lychgate/PanelForge/commit/0d73f1aff014129b089f04b7972e182f501a9e47)
 
 **Added**
 
@@ -163,9 +164,9 @@ remains the authoritative progress record; this file summarizes what each task c
   `npm run dev` remains typecheck + baseline check only, `start` launch-only.
 - `tsconfig` `rootDir: src` fixed the renderer output path to
   `out/web/renderer/`.
-- Register: S0.2 marked **Complete** (register commit `dd38b88`).
+- Register: S0.2 marked **Complete** (register [`dd38b88`](https://github.com/lychgate/PanelForge/commit/dd38b8878f2964058caff275f6b42b2137c5179f)).
 
-### S0.1 — Repository and Package Baseline (2026-11-05) — commit `55853fb`
+### S0.1 — Repository and Package Baseline (2026-11-05) — [`55853fb`](https://github.com/lychgate/PanelForge/commit/55853fb7de4f7f02a5ea4c725a9f4eb5f9ee25bf)
 
 **Added**
 
@@ -180,6 +181,6 @@ remains the authoritative progress record; this file summarizes what each task c
 
 **Changed**
 
-- Register: S0.1 marked **Complete** (register commit `e1e14e8`); register v3.1
+- Register: S0.1 marked **Complete** (register [`e1e14e8`](https://github.com/lychgate/PanelForge/commit/e1e14e86b48442a9fdd4331ce2aac40f53c5d59d)); register v3.1
   corrections recorded (Q2 approved, Q3/Q4/Q5 deferred, S1.5a removed from the
   implementation sequence, one-task-at-a-time promoted to approved protocol).
