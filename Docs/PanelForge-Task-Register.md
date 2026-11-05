@@ -359,7 +359,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Tasks can be created, persisted, and executed (mock executor); interrupted tasks can be resumed where supported.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1, S2.2.
 - **Stop:** Do not add real providers here (S2.9–S2.10).
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit c745a09)
 
 #### S2.4 Task State Transitions [SPEC]
 - **Goal:** Enforce ownership of state changes.
@@ -871,6 +871,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S2.2 | `DISPLAY=:0 npm test` | Pass — 181 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 ipc + 13 security) | `tests/task-records.test.js` (7 tests): create/get roundtrip, restart persistence (new store, same DB), state updates, all 12 states, typed errors, list order, no hardcoded paths. Database migration test updated for 002_tasks. |
 | 2026-11-05 | S2.2 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S2.2 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.3 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.3 | `npm run build` | Pass | `out/node/engines/tasks/queue.js` emitted. |
+| 2026-11-05 | S2.3 | `DISPLAY=:0 npm test` | Pass — 190 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 9 ipc + 13 security) | `tests/task-queue.test.js` (9 tests): FIFO one-at-a-time execution, empty queue, failure isolation, ok:false → failed, unregistered-executor fail-closed, progress, `resumeInterrupted` + drain, persisted-restart execution. |
+| 2026-11-05 | S2.3 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.3 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.3 implemented files:** `src/engines/tasks/queue.ts` (New — `createTaskQueue(store, executors)`: `enqueue`, `runNext`, `runUntilIdle`, `resumeInterrupted`; FIFO rowid order; `queued → preparing → generating → complete/failed` driving; failure isolation), `src/engines/tasks/store.ts` (list ordered by rowid for deterministic FIFO), `tests/task-queue.test.js` (New, 9 tests). No real providers; pause/cancel (S2.5) and transition ownership (S2.4) remain later.
 
 **S2.2 implemented files:** `src/engines/tasks/store.ts` (New — `TaskStore` over the app DB: `createTask`/`getTask`/`listTasks`/`setState`, 12 §11.1 machine states, JSON params, optional project link, UUID identity; `defaultTaskStore` singleton), `src/database/service.ts` (migration 002 `tasks`), `tests/task-records.test.js` (New, 7 tests), `tests/database.test.js` (migration list updated). Records layer only — no queueing (S2.3), no transition ownership (S2.4).
 
@@ -960,11 +967,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.3 — Task Queue [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.4 — Task State Transitions [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S2.2 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.3 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S2.3 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.4 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Task queue (create + execute in order; mock executor until real providers land in S2.9–S2.10).
+**Goal [SPEC]:** Allowed transition graph + guards over the 12 states; invalid transitions rejected with typed errors.
 
 ---
 
@@ -1005,5 +1012,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S1.11 complete. Acceptance verified (167 tests incl. 2 stage1-fixture; full lifecycle create/copy/reopen/backup/restore/verify). **Stage 1 is complete.** Stopped for owner review before S2.1. | [SPEC] | Crouton (S1.11 implementation) |
 | 2026-11-05 | S2.1 complete. Acceptance verified (174 tests incl. 7 provider-contract; adapter contract without renderer/UI deps). Stopped for owner review before S2.2. | [SPEC] | Crouton (S2.1 implementation) |
 | 2026-11-05 | S2.2 complete. Acceptance verified (181 tests incl. 7 task-records; rows persist across restarts; all 12 states). Stopped for owner review before S2.3. | [SPEC] | Crouton (S2.2 implementation) |
+| 2026-11-05 | S2.3 complete. Acceptance verified (190 tests incl. 9 task-queue; FIFO execution; failure isolation; resume to queued). Stopped for owner review before S2.4. | [SPEC] | Crouton (S2.3 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

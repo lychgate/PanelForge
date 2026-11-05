@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.3 — Task Queue (2026-11-05) — [`c745a09`](https://github.com/lychgate/PanelForge/commit/c745a090c40cd866a4cbc13fe12a28efe4c3e5fd)
+
+**Added**
+
+- `src/engines/tasks/queue.ts` — sequential executor dispatch
+  (`createTaskQueue(store, executors)`): `enqueue`, `runNext`, `runUntilIdle`,
+  `resumeInterrupted` (running states reset to queued). Drives
+  `queued → preparing → generating → complete/failed`; a failed task never
+  aborts the queue (failure isolation, §11.4); tasks without a registered
+  executor fail closed.
+- `tests/task-queue.test.js` — 9 tests: FIFO order and completion, empty
+  queue, failure isolation, `ok:false` handling, fail-closed, progress
+  callbacks, resume-to-queued, persisted-restart execution, no hardcoded paths.
+
+**Changed**
+
+- `src/engines/tasks/store.ts`: task listing is ordered by insertion (rowid)
+  so FIFO order is deterministic even within the same millisecond.
+- No real providers yet (S2.9–S2.10); pause/cancel/retry and transition
+  ownership land in S2.5/S2.6/S2.4.
+- Register: S2.3 marked **Complete**; §11 next task is S2.4.
+- `Plan.md`: S2.3 checked off (2026-11-05).
+
 ### S2.2 — Persistent Task Records (2026-11-05) — [`ca9b34c`](https://github.com/lychgate/PanelForge/commit/ca9b34c9d1e95fc8232ea5077314b3be46067e2f)
 
 **Added**

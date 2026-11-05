@@ -50,7 +50,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 - [x] S2.1 Provider Interface Definitions — completed 2026-11-05
 - [x] S2.2 Persistent Task Records — completed 2026-11-05
-- [ ] S2.3 Task Queue
+- [x] S2.3 Task Queue — completed 2026-11-05
 - [ ] S2.4 Task State Transitions
 - [ ] S2.5 Pause and Cancellation
 - [ ] S2.6 Retry Handling
