@@ -99,10 +99,15 @@ export function createProject(root: string, opts: { projectId?: string } = {}): 
 function writeMarker(root: string, metadata: ProjectMetadata): void {
   const markerPath = markerPathFor(root);
   const tmpPath = `${markerPath}.tmp-${process.pid}-${Date.now()}`;
-  fs.writeFileSync(tmpPath, JSON.stringify(metadata, null, 2) + "\n", {
-    encoding: "utf8",
-    mode: 0o600,
-  });
+  // S1.7 safe writes: temp file + fsync + atomic rename, so an interrupted
+  // write can never leave a half-written marker behind.
+  const fd = fs.openSync(tmpPath, "w", 0o600);
+  try {
+    fs.writeSync(fd, JSON.stringify(metadata, null, 2) + "\n", null, "utf8");
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
   fs.renameSync(tmpPath, markerPath);
 }
 

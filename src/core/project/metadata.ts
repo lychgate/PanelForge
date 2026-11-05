@@ -113,47 +113,137 @@ export function enqueueWrite<T>(fn: () => Promise<T> | T): Promise<T> {
   return run;
 }
 
-/** Open (creating if needed) the project database and run migrations. */
-export function openProjectDatabase(root: string): { db: DatabaseLike } {
+export type OpenProjectDatabaseResult = {
+  db: DatabaseLike;
+  /** True when the previous database was corrupted and preserved aside. */
+  recovered: boolean;
+  /** Location of the preserved original when recovered is true. */
+  backupPath: string | null;
+};
+
+/**
+ * Open (creating if needed) the project database and run migrations.
+ *
+ * S1.7 recovery from interrupted/corrupted writes (D10): the database is
+ * checked with `PRAGMA integrity_check` at open. A corrupted database is
+ * never silently overwritten — the original file is preserved as
+ * `<db>.bak-<timestamp>` and a fresh database is started; the caller can
+ * surface `recovered`/`backupPath` (a recovery dialog is a later UI task,
+ * not part of S1.7).
+ */
+export function openProjectDatabase(root: string): OpenProjectDatabaseResult {
   const dbPath = projectDatabasePath(root);
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-  const db = new sqlite.DatabaseSync(dbPath);
-  try {
+  const tryOpen = (): { db: DatabaseLike } => {
+    const db = new sqlite.DatabaseSync(dbPath);
     db.exec("PRAGMA journal_mode=WAL");
     db.exec("PRAGMA foreign_keys=ON");
     db.exec("PRAGMA busy_timeout=5000");
-    db.exec(
-      "CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TEXT NOT NULL)"
-    );
-    const applied = new Set(
-      db.prepare("SELECT version FROM schema_migrations").all().map((r) => Number(r.version))
-    );
-    for (const migration of PROJECT_DB_MIGRATIONS) {
-      if (applied.has(migration.version)) continue;
-      db.exec("BEGIN IMMEDIATE");
+    const integrity = db.prepare("PRAGMA integrity_check").get();
+    if (!integrity || Object.values(integrity)[0] !== "ok") {
       try {
-        for (const stmt of migration.statements) db.exec(stmt);
-        db.prepare("INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)")
-          .run(migration.version, migration.name, new Date().toISOString());
-        db.exec("COMMIT");
-      } catch (err) {
-        try {
-          db.exec("ROLLBACK");
-        } catch {
-          // Surface the original error.
-        }
-        throw err;
+        db.close();
+      } catch {
+        // Best effort cleanup before recovery.
       }
+      throw new Error("integrity_check failed");
     }
     return { db };
-  } catch (err) {
+  };
+  try {
+    const { db } = tryOpen();
+    applyMigrations(db);
+    return { db, recovered: false, backupPath: null };
+  } catch (firstErr) {
+    if (!fs.existsSync(dbPath)) throw firstErr;
+    // Preserve the corrupted original before starting fresh.
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const backupPath = `${dbPath}.bak-${stamp}`;
     try {
-      db.close();
+      fs.copyFileSync(dbPath, backupPath);
+      fs.rmSync(dbPath, { force: true });
+      fs.rmSync(`${dbPath}-wal`, { force: true });
+      fs.rmSync(`${dbPath}-shm`, { force: true });
+      const { db } = tryOpen();
+      applyMigrations(db);
+      return { db, recovered: true, backupPath };
     } catch {
-      // Best effort cleanup.
+      throw firstErr;
     }
-    throw err;
   }
+}
+
+function applyMigrations(db: DatabaseLike): void {
+  db.exec(
+    "CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, name TEXT NOT NULL, applied_at TEXT NOT NULL)"
+  );
+  const applied = new Set(
+    db.prepare("SELECT version FROM schema_migrations").all().map((r) => Number(r.version))
+  );
+  for (const migration of PROJECT_DB_MIGRATIONS) {
+    if (applied.has(migration.version)) continue;
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      for (const stmt of migration.statements) db.exec(stmt);
+      db.prepare("INSERT INTO schema_migrations (version, name, applied_at) VALUES (?, ?, ?)")
+        .run(migration.version, migration.name, new Date().toISOString());
+      db.exec("COMMIT");
+    } catch (err) {
+      try {
+        db.exec("ROLLBACK");
+      } catch {
+        // Surface the original error.
+      }
+      throw err;
+    }
+  }
+}
+
+/**
+ * Safe metadata write (S1.7): run fn inside one serialized transaction.
+ * If fn throws (e.g. an interrupted edit), the whole transaction rolls
+ * back — project metadata is never partially corrupted.
+ */
+export function withMetadataTransaction<T>(root: string, fn: (db: DatabaseLike) => T): Promise<T> {
+  return enqueueWrite(async () => {
+    const { db } = openProjectDatabase(root);
+    try {
+      return await runWithBusyRetry<T>(() => {
+        db.exec("BEGIN IMMEDIATE");
+        try {
+          const result = fn(db);
+          db.exec("COMMIT");
+          return result;
+        } catch (err) {
+          try {
+            db.exec("ROLLBACK");
+          } catch {
+            // Surface the original error.
+          }
+          throw err;
+        }
+      });
+    } finally {
+      db.close();
+    }
+  });
+}
+
+/**
+ * Basic autosave (S1.7): every metadata write is already a full committed
+ * transaction, so there is no dirty in-memory state to lose. This folds
+ * WAL pages into the main database file on demand (also runs on close).
+ */
+export function checkpointProjectDatabase(root: string): Promise<number> {
+  return enqueueWrite(async () => {
+    const { db } = openProjectDatabase(root);
+    try {
+      const row = db.prepare("PRAGMA wal_checkpoint(TRUNCATE)").get();
+      return Number((row as unknown as Record<string, unknown>)?.busy ?? 0);
+    } finally {
+      db.close();
+    }
+  });
 }
 
 function toRecord(row: Record<string, unknown>): ProjectMetadataRecord {
