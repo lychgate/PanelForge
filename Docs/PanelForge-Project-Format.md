@@ -76,3 +76,11 @@ the identity; this row is its description). `project_id`, `created_at`, and
 unchanged. Writes go through the serialized queue (WAL + foreign keys + busy
 timeout 5000, like the app database), and migrations are tracked in the
 project database's own `schema_migrations` table.
+
+## Stage 1 fixture (S1.11)
+
+The end-to-end gate exercise (`tests/stage1-fixture.test.js`): a sample
+project is created, copied, reopened, backed up, restored, and verified —
+proving project creation, storage, asset tracking, portability, and backups
+are reliable together. If any subsystem regresses (identify, metadata,
+operations, paths, registry, integrity, backup), the fixture fails.
