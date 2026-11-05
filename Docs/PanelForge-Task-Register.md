@@ -4,7 +4,7 @@
 **Authoritative source:** `Docs/PanelForge.pdf` — Product & Technical Design Specification, v1.2 Consolidated Development Baseline, Status: Approved for Development, Initial Platform: Linux Mint, Primary Hardware Target: NVIDIA GTX 1660 Ti (6GB VRAM), Technology: Electron, TypeScript, Node.js, SQLite, local AI providers  
 **This file:** `Docs/PanelForge-Task-Register.md`  
 **Created:** 2026-11-05 — spec extraction only, no implementation  
-**Last updated:** 2026-11-05 — v3.1: S0.1 precondition/Q3 contradiction resolved (SQLite decision deferred to S0.8; S0.1 installs no database dependency); S1.5a removed from implementation sequence (kept as unapproved proposal); one-task-at-a-time promoted to owner-approved stop-and-review protocol; Q2 approved (secure defaults from first window). S0.1 authorized.
+**Last updated:** 2026-11-05 — v3.1 + S0.1 complete: register corrections applied (SQLite decision deferred to S0.8; S1.5a removed from sequence; one-task-at-a-time approved; Q2 approved — secure first window); S0.1 implemented and committed (55853fb). Stopping for owner review before S0.2.
 
 The approved specification remains the authoritative source of product requirements. This register is the operational record. It does not amend the specification. Nothing in this file may be treated as an approved change unless explicitly marked **[APPROVED CHANGE — owner]**.
 
@@ -12,10 +12,10 @@ The approved specification remains the authoritative source of product requireme
 
 ## 1. Current Project Status
 
-- **Code:** None. Repo contains only `Docs/` (spec PDF + this register). No `package.json`, no `src/`, no git repo initialization for source yet.
-- **Stage 0:** Not Started. No task begun.
+- **Code:** S0.1 scaffold only (TS/Electron-ready baseline, no window/DB/AI). Git root commit 55853fb on `master`. See §10 for file list.
+- **Stage 0:** S0.1 **Complete** (acceptance verified 2026-11-05 — see §10 test results). S0.2+ Not Started.
 - **Stage 1–11:** Not Started. Stages 2–11 are recorded as task groups only (see §4).
-- **Next eligible task:** S0.1 (see §11). If S0.1 is blocked, next is still S0.1.
+- **Next eligible task:** S0.2 (see §11) — **awaiting owner authorization after S0.1 review**. Do not begin S0.2 without it.
 - **Open decisions:** D1–D10 detail choices (§7) are **not approved** — owner direction is to approve progressively at their respective tasks (principles first; implementation details such as Zod or exact CSP directives left to the implementation task). Guardrails (§2), session protocol including one-task-at-a-time stop-and-review (§3), and Q2 (secure defaults from first window) are owner-approved. External-review recommendations in §7.1 are also **not approved** except where explicitly recorded as approved below.
 - **S0.1 precondition (corrected 2026-11-05, v3.1):** S0.1 can begin **without** approving D1–D10. Those decisions are resolved when their respective tasks require them. SQLite library selection is **deferred to S0.8** (Q3/D8) — it is not an S0.1 prerequisite or decision, and S0.1 must not install a database dependency. S0.1 is authorized (owner, 2026-11-05); see §11.
 - **Spec gaps blocking later work:** Stage 2–11 lack per-task Goal/Deliverables/Acceptance/Dependencies/Stop per §16.2. They are flagged Needs Clarification and must be expanded before implementation.
@@ -118,8 +118,9 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] None — first task.
 - **Stop condition [SPEC]:** None stated beyond acceptance.
 - **Completeness:** Complete in spec.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; commit 55853fb)
 - **Task-boundary note [RECOMMENDATION — no spec change]:** S0.1 does **not** include Electron launch or window creation. Those belong to S0.2 [SPEC]. No deliverables moved between S0.1 and S0.2 in this register.
+- **Implementation notes (2026-11-05):** Implemented S0.1 only. Files created: `package.json`, `package-lock.json`, `tsconfig.json`, `tsconfig.node.json`, `tsconfig.web.json`, `.gitignore`, `README.md`, `src/{main,preload,renderer,core,engines,modules,database,shared/{types,interfaces}}/index.ts` placeholders, `scripts/check.js`, `scripts/dev-check.js`, `tests/baseline.test.js`. Dependencies: `typescript` + `vitest` + `eslint` only (devDependencies). **No Electron, no SQLite/Drizzle, no Sharp/PDF, no AI — deliberately boring.** Test results: see §10. Git: root commit 55853fb on `master`; working tree clean; `node_modules/` and `out/` gitignored.
 
 #### S0.2 Electron Application Launch [SPEC]
 - **Goal [SPEC]:** Create the initial desktop application.
@@ -571,9 +572,19 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | External review received and corrections applied (register v3) | [RECOMMENDATION] → register corrections; decisions **not** approved | GPT review (9/10) with 5 corrections: (1) S0.1 precondition contradiction removed; (2) statuses reconciled with §16.3; (3) CSP directives deferred, frame-ancestors/`file:` noted; (4) D6 Character/Version/Asset model clarified; (5) S1.4 symlink tests added. External decision table recorded in §7.1 as recommendations. No implementation; spec PDF untouched. |
 | 2026-11-05 | Register v3.1 corrections + S0.1 authorized | [APPROVED CHANGE — owner] | Owner approved: Q2 secure defaults from first window; Q3 SQLite library deferred to S0.8 (removed from S0.1); Q4 splits deferred; Q5 AI baselines deferred; S1.5a removed from §5 implementation order (kept as proposal); one-task-at-a-time promoted to approved stop-and-review protocol. S0.1 authorized. No source files created yet. |
 
-**Test results log:** None — no code exists.
+**Test results log:**
 
-**File changes log:** `Docs/PanelForge-Task-Register.md` created and refined through v3.1 (this file only). No source files created; spec PDF untouched.
+| Date | Task | Command / Check | Result | Notes |
+|---|---|---|---|---|
+| 2026-11-05 | S0.1 | `npm install` (node v22.23.1, npm 12.0.1) | Pass — 166 packages, 0 errors (5 vulns noted, non-blocking for S0.1) | No DB/Electron packages installed (by design). |
+| 2026-11-05 | S0.1 | `npm run typecheck` | Pass | Node + web projects typecheck clean. |
+| 2026-11-05 | S0.1 | `npm run build` | Pass | Outputs to `out/node`, `out/web` (gitignored). |
+| 2026-11-05 | S0.1 | `npm test` | Pass | `tests/baseline.test.js` — 1 passed. (Fixed: initial CJS `require("vitest")` fails; uses `await import("vitest")`.) |
+| 2026-11-05 | S0.1 | `npm run check` (`scripts/check.js`) | Pass | Required files present; private package; no premature deps; scripts present. |
+| 2026-11-05 | S0.1 | `npm run dev` | Pass | Typecheck + baseline check green. |
+| 2026-11-05 | S0.1 | `git status` | Clean | Root commit `55853fb` on `master`; `node_modules/`/`out/` untracked-ignored. |
+
+**File changes log:** S0.1 created the files listed in §4B S0.1 implementation notes (plus `package-lock.json`). `Docs/PanelForge-Task-Register.md` refined through v3.1 (this file only). Spec PDF untouched. **No Electron window, DB, AI, or UI-framework code created.**
 
 > Append a row for every session: status changes, files created/modified, test commands + results, decisions, discoveries, next task.
 
@@ -581,9 +592,11 @@ No blockers to starting S0.1. The following are decision requests, not implement
 
 ## 11. Recommended Next Task
 
-### Recommended: S0.1 — Repository and Package Baseline [SPEC §15]
+### Recommended: S0.1 — Repository and Package Baseline [SPEC §15] — **Complete (awaiting owner review)**
 
-**Why this task:** First in the mandatory sequence; no dependencies; unblocks S0.2. The SQLite library decision (D8/Q3) does **not** affect S0.1 — it is deferred to S0.8 and no database dependency is installed here. This is the only task that can begin without resolving D1–D10 (they are needed later, at their respective stages).
+**Status:** **Complete** (2026-11-05, commit 55853fb). Acceptance verified (see §10). **Do not begin S0.2 without explicit owner authorization.**
+
+**Why this task was correct:** First in the mandatory sequence; no dependencies; unblocks S0.2. The SQLite library decision (D8/Q3) did **not** affect S0.1 — deferred to S0.8, no database dependency installed here.
 
 **Goal [SPEC]:** Create the project repository and initial package configuration.
 
@@ -608,7 +621,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-**Precondition (corrected):** No D1–D10 approval is required to begin S0.1. D1–D10 are resolved at their respective tasks (D1–D4 by S0.3/S0.4; D8–D9 by S0.8; D5–D7 by S1.1/S1.4/S1.5; D10 by S1.7).
+### Next task (awaiting authorization): S0.2 — Electron Application Launch [SPEC §15]
+
+**Next eligible:** S0.2, once the owner has reviewed S0.1 (repository, dependencies, scripts, Git setup) and explicitly authorized it. Per one-task-at-a-time (approved), this review point is a stop.
+
+**Goal [SPEC]:** Create the initial desktop application. **Deliverables [SPEC]:** Electron main process; Basic BrowserWindow; Initial renderer page. **Acceptance [SPEC]:** Application launches on Linux Mint; Window opens reliably; Application closes cleanly. **Approved implementation direction [APPROVED CHANGE — owner, Q2]:** Create the initial Electron window with secure defaults from its first launch. S0.3 remains responsible for verification, documentation, and security testing. Dependencies: S0.1 satisfied.
+
+Do not begin S0.2 without explicit owner authorization.
 
 ---
 
@@ -621,5 +640,6 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | D1–D10 drafted | [RECOMMENDATION] | Awaiting owner decision |
 | 2026-11-05 | Register v2: refinement corrections (D3/D7/D8/D4), S0.1/S0.2 boundary check (no moves), D1–D10 classification, §§1–11 restructure, session protocol added | [RECOMMENDATION] + [APPROVED CHANGE] (protocol) | Owner request |
 | 2026-11-05 | Register v3.1: register corrections v3.1 — Q2 approved (secure defaults from first window), Q3/Q4/Q5 deferred (SQLite lib → S0.8; splits → when relevant; AI baselines → Stage 3), S1.5a removed from §5 implementation sequence, one-task-at-a-time promoted to approved stop-and-review protocol. S0.1 authorized. | [APPROVED CHANGE — owner] | Owner |
+| 2026-11-05 | S0.1 complete: repo + package baseline implemented and committed (55853fb). Acceptance verified (install/typecheck/build/test/check green). Stopped for owner review before S0.2. | [SPEC] | Crouton (S0.1 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
