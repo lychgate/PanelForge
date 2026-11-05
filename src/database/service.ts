@@ -66,6 +66,18 @@ const MIGRATIONS: Migration[] = [
       "CREATE TABLE IF NOT EXISTS tasks (task_id TEXT PRIMARY KEY, task_type TEXT NOT NULL, state TEXT NOT NULL, params TEXT NOT NULL, project_id TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S2.7: timing/error fields for progress reporting (§11.2 elapsed,
+  // status, logs/errors). started_at: first non-queued state; finished_at:
+  // terminal states; error_message: last failure reason (nullable).
+  {
+    version: 3,
+    name: "003_task_progress",
+    statements: [
+      "ALTER TABLE tasks ADD COLUMN started_at TEXT",
+      "ALTER TABLE tasks ADD COLUMN finished_at TEXT",
+      "ALTER TABLE tasks ADD COLUMN error_message TEXT",
+    ],
+  },
 ];
 
 export type DatabaseInitInfo = {

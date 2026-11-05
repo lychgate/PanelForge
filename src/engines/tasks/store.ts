@@ -41,6 +41,10 @@ export type TaskRecord = {
   projectId: string | null;
   createdAt: string;
   updatedAt: string;
+  // S2.7 progress fields (migration 003; null until the states occur).
+  startedAt: string | null;
+  finishedAt: string | null;
+  errorMessage: string | null;
 };
 
 export type TaskErrorCode = "INVALID_ARGUMENTS" | "NOT_FOUND" | "INVALID_STATE";
@@ -73,6 +77,9 @@ function toRecord(row: Record<string, unknown>): TaskRecord {
     projectId: row.project_id == null ? null : String(row.project_id),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
+    startedAt: row.started_at == null ? null : String(row.started_at),
+    finishedAt: row.finished_at == null ? null : String(row.finished_at),
+    errorMessage: row.error_message == null ? null : String(row.error_message),
   };
 }
 
@@ -107,6 +114,9 @@ export function createTaskStore(database: DatabaseService): TaskStore {
       projectId: input.projectId ?? null,
       createdAt: now,
       updatedAt: now,
+      startedAt: null,
+      finishedAt: null,
+      errorMessage: null,
     };
     await database.write(
       "INSERT INTO tasks (task_id, task_type, state, params, project_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -134,12 +144,17 @@ export function createTaskStore(database: DatabaseService): TaskStore {
     }
     const current = await getTask(taskId);
     if (!current) throw new TaskError("NOT_FOUND", `No task with id: ${taskId}`);
-    await database.write("UPDATE tasks SET state = ?, updated_at = ? WHERE task_id = ?", [
-      state,
-      new Date().toISOString(),
-      taskId,
-    ]);
-    return { ...current, state, updatedAt: new Date().toISOString() };
+    // S2.7 progress fields: started on first non-queued state, finished on
+    // terminal states (complete/failed/cancelled).
+    const now = new Date().toISOString();
+    const terminal = ["complete", "failed", "cancelled"].includes(state);
+    const startedAt = current.startedAt ?? (state === "queued" ? null : now);
+    const finishedAt = terminal ? now : current.finishedAt;
+    await database.write(
+      "UPDATE tasks SET state = ?, updated_at = ?, started_at = ?, finished_at = ? WHERE task_id = ?",
+      [state, now, startedAt, finishedAt, taskId]
+    );
+    return { ...current, state, startedAt, finishedAt, updatedAt: now };
   }
 
   return { createTask, getTask, listTasks, setState };

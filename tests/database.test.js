@@ -60,13 +60,13 @@ describe("S0.8 database service", () => {
 
   it("records migrations in schema_migrations and does not re-apply on reopen", () => {
     svc.initialize();
-    expect(svc.getAppliedMigrations()).toEqual(["001_initial", "002_tasks"]);
+    expect(svc.getAppliedMigrations()).toEqual(["001_initial", "002_tasks", "003_task_progress"]);
     svc.close();
     // Reopen with a fresh service handle on the same userData dir.
     const svc2 = createDatabaseService(tmpBase);
     const info = svc2.initialize();
-    expect(info.appliedMigrations).toEqual(["001_initial", "002_tasks"]);
-    expect(svc2.getAppliedMigrations()).toEqual(["001_initial", "002_tasks"]);
+    expect(info.appliedMigrations).toEqual(["001_initial", "002_tasks", "003_task_progress"]);
+    expect(svc2.getAppliedMigrations()).toEqual(["001_initial", "002_tasks", "003_task_progress"]);
     svc2.close();
   });
 
