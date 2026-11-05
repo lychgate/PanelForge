@@ -304,7 +304,7 @@ All tasks: Status **Not Started**.
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S1.4–S1.8.
 - **Stop condition [SPEC]:** None stated (this acceptance is the empirical guardrail gate).
 - **Completeness:** Complete in spec as a test.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 78e1949)
 
 #### S1.10 Basic Project Interface [SPEC]
 - **Deliverables [SPEC]:** Project list; Create project interface; Open project interface; Basic project information.
@@ -704,6 +704,11 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S1.8 | `DISPLAY=:0 npm test` | Pass — 153 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 7 ipc + 13 security) | `tests/backup-snapshot.test.js` (9 tests): snapshot manifest/files/db, verify clean, tamper detection (missing+modified), restore-then-integrity + original undamaged, tampered/occupied/self restore refusal, external backup copy, prune retention (newest kept), NOT_FOUND, no hardcoded paths. |
 | 2026-11-05 | S1.8 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S1.8 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S1.9 | `DISPLAY=:0 npm test` | Pass — 158 passed (153 + 5 portability) | `tests/portability.test.js` (5 tests): copy to a different directory path opens (identify+metadata+list+integrity ok), move + original gone still opens, no absolute paths in marker/db rows, list works at the new location, identity/metadata unchanged. |
+| 2026-11-05 | S1.9 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S1.9 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S1.9 implemented files:** `tests/portability.test.js` (New, 5 tests — the portability proof itself; no production code changed). The copied project is opened through the normal APIs (identify, metadata, operations list, registry, integrity) at the new location.
 
 **S1.8 implemented files:** `src/core/project/backup.ts` (New — `createSnapshot` (in-project `backups/snapshots/<id>/` with `manifest.json` SHA-256 map), `listSnapshots`, `verifySnapshot` (manifest byte-hash check), `createBackup` (external copy), `restoreSnapshot` (fresh-target restore + identify/integrity verification, original never written), `pruneSnapshots` (explicit retention)), `tests/backup-snapshot.test.js` (New, 9 tests). Semantics for unspecified format/retention/restore: snapshot contains marker+db+files (symlinks dereferenced, `backups/` excluded), backups copy a snapshot out of the project, restores only into fresh targets. Dedup remains future work.
 
@@ -783,11 +788,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S1.9 — Project Portability Test [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S1.10 — Basic Project Interface [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S1.8 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.9 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S1.9 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.10 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Project copy/move test, path verification, and asset integrity verification (a copied project opens elsewhere without relying on the original machine's absolute paths).
+**Goal [SPEC]:** Project list, create-project interface, open-project interface, and basic project information (users manage projects without direct database interaction).
 
 ---
 
@@ -823,5 +828,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S1.6 complete. Acceptance verified (136 tests green incl. 7 asset-integrity; missing/modified reported accurately). Stopped for owner review before S1.7. | [SPEC] | Crouton (S1.6 implementation) |
 | 2026-11-05 | S1.7 complete. Acceptance verified (144 tests green incl. 8 atomic-metadata; interrupted transactions roll back; corruption preserved + fresh start). Stopped for owner review before S1.8. | [SPEC] | Crouton (S1.7 implementation) |
 | 2026-11-05 | S1.8 complete. Acceptance verified (153 tests green incl. 9 backup-snapshot; snapshot/backup/restore/verify; tampered + unsafe restores refused; original undamaged). Stopped for owner review before S1.9. | [SPEC] | Crouton (S1.8 implementation) |
+| 2026-11-05 | S1.9 complete. Acceptance verified (158 tests green incl. 5 portability; copy/move proof; no absolute paths stored). Stopped for owner review before S1.10. | [SPEC] | Crouton (S1.9 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

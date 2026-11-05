@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (153 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup)
+npm test           # runs Vitest (158 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -131,7 +131,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S1.8 — Backup and Snapshot System:** complete (in-project snapshots with hash manifests, external backups, verified restore into fresh targets, retention pruning).
 
-**Next (awaiting owner authorization): S1.9 — Project Portability Test** (copy/move test, path verification, integrity verification).
+- **S1.9 — Project Portability Test:** complete (automated portability proof: copy/move to new paths, path + integrity verification, no absolute paths stored).
+
+**Next (awaiting owner authorization): S1.10 — Basic Project Interface** (project list, create/open project interface, basic project information).
 
 ## Known limitations (end of Stage 0)
 

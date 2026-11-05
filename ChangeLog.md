@@ -7,6 +7,23 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.9 — Project Portability Test (2026-11-05) — [`78e1949`](https://github.com/lychgate/PanelForge/commit/78e1949c0ab19cc835b28c3d5ec3b285003ceb62)
+
+**Added**
+
+- `tests/portability.test.js` — 5 tests proving the portability proof: a project
+  copied to a different directory path (different nesting depth) opens normally
+  (identify + metadata + list + asset integrity, all via the standard APIs);
+  a moved project still opens after the original is deleted; the marker and
+  database rows contain no machine-specific absolute paths; the operations list
+  works at the new location; identity and metadata survive the move unchanged.
+
+**Changed**
+
+- No production code changed — S1.9 is the test itself.
+- Register: S1.9 marked **Complete**; §11 next task is S1.10.
+- `Plan.md`: S1.9 checked off (2026-11-05).
+
 ### S1.8 — Backup and Snapshot System (2026-11-05) — [`24246a5`](https://github.com/lychgate/PanelForge/commit/24246a56eb172c9c9b0716a8d81d10a5955addbb)
 
 **Added**
