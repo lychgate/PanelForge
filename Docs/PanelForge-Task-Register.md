@@ -176,7 +176,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.6; S0.4 (IPC errors).
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — format, rotation values, redaction rules not specified.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit recorded below)
 
 #### S0.8 SQLite Foundation [SPEC]
 - **Goal [SPEC]:** Establish database infrastructure.
@@ -623,6 +623,15 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.6 | Config round-trip probe (built service, isolated probe userData) | Pass — `PATH /tmp/opencode/pf-probe-userdata/config/config.json`; `UPDATE {"version":1,"theme":"dark","logLevel":"debug",...}`; `RELOAD` identical; `RESET` back to defaults | Proves read/update/reset against the real settings location with no hardcoded paths. |
 | 2026-11-05 | S0.6 | `grep -rn "/home/wetlander" src/core/config/service.ts src/main/index.ts` | Pass — no matches | Acceptance: no hardcoded machine-specific paths. Service resolves userData via `app.getPath("userData")` (env override and `~/.config/panelforge` fallback only for tests). |
 | 2026-11-05 | S0.6 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.7 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S0.7 | `npm run build` | Pass | `out/node/core/logging/service.js` emitted. |
+| 2026-11-05 | S0.7 | `npm test` | Pass — 45 passed (1 baseline + 12 config + 12 logging + 7 ipc + 13 security) | `tests/logging.test.js` (12 tests, built service + fresh temp userData per test): JSON-line entries at `userData/logs/panelforge.log`, min-level filtering, `logError` records name+message (no stack), rotation into numbered backups within the size limit (max 2 backups in test), redaction (token/password values, home dir), 1024-char cap, never-throws. |
+| 2026-11-05 | S0.7 | `npm run check` | Pass | Baseline + IPC guard green (ipcMain only in registry; ipcRenderer only in preload). |
+| 2026-11-05 | S0.7 | Live launch probe ×3 (`timeout 12 electron .`, `PANELFORGE_USER_DATA_DIR=/tmp/opencode/pf-probe-logs`, `pgrep -x electron`) | Pass — main proc + zygote observed each launch; each launch appended `{"level":"info","message":"PanelForge starting"}` (88 → 176 → 264 bytes, mode `0600`); `pgrep -x electron` → "no stray electron (clean)" after each | Startup entry is recorded by the central log service with the level from the S0.6 config. GPU/MESA teardown errors are artifacts, not startup failures. |
+| 2026-11-05 | S0.7 | `grep` no hardcoded user paths in `src/core/logging/service.ts` | Pass — no `/home/wetlander` or `/Users/`; userData via `app.getPath("userData")` | Logs under userData, never a hardcoded machine-specific path. |
+| 2026-11-05 | S0.7 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+
+**S0.7 implemented files:** `src/core/logging/service.ts` (New — `createLogService`/`defaultLogService`, JSON-line entries `{timestamp,level,message}` at `<userData>/logs/panelforge.log`, size-limited rotation `512 KiB` → `panelforge-1..3.log`, redaction + 1024-char cap, `logError` name+message without stacks, never-throws; fs/path + Electron only, no new deps), `src/main/index.ts` (sets the log minimum level from the S0.6 config, ensures the log location, records the `PanelForge starting` entry; config-failure path now routes through `logError` instead of `console.error`), `src/core/ipc/registry.ts` (handler errors recorded via `logError`; renderer envelope unchanged), `tests/logging.test.js` (New, 12 tests). Format/rotation/redaction choices are engineering judgment where the spec is silent (documented in service header).
 
 **S0.6 implemented files:** `src/core/config/service.ts` (New — `createConfigService`/`defaultConfigService`, `CONFIG_VERSION=1`, defaults `{theme:"system", logLevel:"info", launchAtStartup:false, diagnosticsEnabled:true}`, settings at `<userData>/config/config.json`, atomic tmp+rename `0o600` writes, defensive load with corrupt backup + migration, traversal guard in `getUserDataSubPath`; fs/path + Electron only, no new deps), `src/main/index.ts` (calls `defaultConfigService.ensureConfigDir()` + `loadConfig()` in `app.whenReady`, try/catch), `tests/config.test.js` (New, 12 tests). Config format/versioning choices are engineering judgment where the spec is silent (documented in service header).
 
@@ -674,11 +683,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.7 — Logging and Error Handling [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.8 — SQLite Foundation [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.6 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.7 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.7 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.8 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Establish useful diagnostics. **Deliverables [SPEC]:** Central logging service; Error handling; Size-limited or rotating logs; Consistent error reporting. **Acceptance [SPEC]:** Errors are recorded; Logs remain within configured size limits; Sensitive information is not unnecessarily logged.
+**Goal [SPEC]:** Establish database infrastructure. **Deliverables [SPEC]:** SQLite connection service; Initial schema; Migration mechanism; WAL mode; Foreign key enforcement; Busy timeout; Serialized write service. **Acceptance [SPEC]:** Database initializes successfully; Migrations execute; Data persists across restarts; Basic concurrent access tests do not cause uncontrolled write failures. **Note:** SQLite library / writer mechanism is D8/Q3 — deferred to S0.8, not decided here.
 
 ---
 
@@ -700,5 +709,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.4 complete. Acceptance verified (19 tests green; allowlist/INVALID_ARGUMENTS/safe-envelope proven; live probe confirms no raw renderer IPC). Stopped for owner review before S0.5. | [SPEC] | Crouton (S0.4 implementation) |
 | 2026-11-05 | S0.5 complete. Acceptance verified (21 tests green; live diagnostic probe via preload bridge; no direct Node.js access). Stopped for owner review before S0.6. | [SPEC] | Crouton (S0.5 implementation) |
 | 2026-11-05 | S0.6 complete (impl commit 913d575). Acceptance verified (33 tests green incl. 12 config; 3× live launch + config-dir probe; no hardcoded paths). Stopped for owner review before S0.7. | [SPEC] | Crouton (S0.6 implementation) |
+| 2026-11-05 | S0.7 complete. Acceptance verified (45 tests green incl. 12 logging; 3× live launch with startup entries recorded; rotation + redaction proven). Stopped for owner review before S0.8. | [SPEC] | Crouton (S0.7 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
