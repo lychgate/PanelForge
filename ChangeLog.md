@@ -1,0 +1,185 @@
+# ChangeLog
+
+All notable changes to PanelForge are documented here.
+Format follows Keep a Changelog (task sections under `## [Unreleased]` once a release is cut).
+The operational task register [`Docs/PanelForge-Task-Register.md`](Docs/PanelForge-Task-Register.md)
+remains the authoritative progress record; this file summarizes what each task changed.
+
+## [Unreleased]
+
+### S0.8 — SQLite Foundation (2026-11-05) — commit `c7bbc8c`
+
+**Added**
+
+- `src/database/service.ts` — centralized SQLite service (`createDatabaseService` /
+  `defaultDatabaseService`) using Node's built-in `node:sqlite` (`DatabaseSync`).
+  Database at `<userData>/database/panelforge.db`; no new dependency, no native build;
+  D8/Q3 library decision recorded. Verified available in plain Node 22.23.1 and
+  Electron 45's bundled Node 24.22.2.
+- Required pragmas applied at open: `journal_mode=WAL`, `foreign_keys=ON`,
+  `busy_timeout=5000`.
+- Migration mechanism: in-code numbered migrations (forward-only) tracked in the
+  `schema_migrations` table and auto-run on open; initial migration `001_initial`
+  creates `schema_migrations` + a minimal `kv_store` smoke table.
+- Serialized writes: Core-Engine-owned write queue (arrival order, one writer at a
+  time), `transaction()` with `BEGIN IMMEDIATE`/`COMMIT`/`ROLLBACK`, and busy/locking
+  retries (max 3).
+- `backupDatabase()` producing a standalone copy under `database/backups/`
+  (consistent snapshot; automatic scheduling deferred).
+- `tests/database.test.js` — 10 tests: pragmas, migration recording + no re-apply,
+  persistence across restarts, 20 concurrent writes → count 20, FK enforcement,
+  transaction rollback, readable backup, query-before-init failure, no hardcoded
+  paths, main wiring.
+- Main: database initialization on startup (ready entry logged) and close on
+  `before-quit`. `tsconfig.node.json` include extended to `src/database/**/*.ts`.
+
+**Changed**
+
+- Startup failure handling: a failed database initialization is recorded via
+  `logError` and never blocks the window from opening.
+- Register: S0.8 marked **Complete**; Q3 (SQLite library) marked Decided
+  (`node:sqlite`); §11 next task is S0.9.
+
+### S0.7 — Logging and Error Handling (2026-11-05) — commit `38015a1`
+
+**Added**
+
+- `src/core/logging/service.ts` — central logging service
+  (`createLogService` / `defaultLogService`). JSON-line entries
+  `{timestamp, level, message}` at `<userData>/logs/panelforge.log` (mode `0600`).
+- Levels `debug`/`info`/`warn`/`error` with minimum-level filtering (default `info`;
+  set from the S0.6 config `logLevel` at startup).
+- Size-limited rotation: 512 KiB active log rotates into
+  `panelforge-1.log` … `panelforge-3.log`; the oldest backup is deleted.
+- Redaction: token/password/secret values, the home directory, and over-long
+  payloads (1024-char cap) are stripped so sensitive data is not unnecessarily
+  logged.
+- `logError()` records Error name + message in the same entry shape (no stacks).
+  Logging never throws.
+- `tests/logging.test.js` — 12 tests: entry shape/location, min-level filtering,
+  error recording without stacks, rotation within the size limit (test limits),
+  redaction, message capping, never-throws, no hardcoded paths, main/registry wiring.
+
+**Changed**
+
+- Main: startup records `PanelForge starting` through the log service; the config
+  failure path now routes through `logError` instead of `console.error`.
+- IPC registry: handler failures are recorded via `logError`; the renderer
+  envelope is unchanged (`HANDLER_ERROR`, no sensitive detail).
+- Register: S0.7 marked **Complete**; §11 next task is S0.8.
+
+### S0.6 — Configuration and User Paths (2026-11-05) — commit `913d575`
+
+**Added**
+
+- `src/core/config/service.ts` — centralized configuration service
+  (`createConfigService` / `defaultConfigService`). Settings at
+  `<userData>/config/config.json`; userData via `app.getPath("userData")`
+  (`PANELFORGE_USER_DATA_DIR` override for tests, `~/.config/panelforge` fallback
+  outside Electron) — never a hardcoded machine-specific path.
+- `CONFIG_VERSION=1` with defaults
+  `{theme:"system", logLevel:"info", launchAtStartup:false, diagnosticsEnabled:true}`.
+- Safe I/O: missing file → defaults; corrupt JSON → timestamped `.bak-` backup +
+  defaults; older versions migrated by filling current defaults; atomic writes
+  (tmp + rename, `0600`); traversal guard in `getUserDataSubPath()`.
+- API: `ensureConfigDir`, `loadConfig`, `saveConfig`, `updateConfig`,
+  `resetConfig` (settings file is only created on first save/update/reset;
+  startup creates the directory and loads — it does not write defaults).
+- `tests/config.test.js` — 12 tests: defaults, settings location, round-trip,
+  atomicity, corrupt backup, migration, traversal guard, no hardcoded paths,
+  main wiring.
+
+**Changed**
+
+- Main: calls `ensureConfigDir()` + `loadConfig()` in `app.whenReady`
+  (try/catch; failures never block the window).
+- Register: S0.6 marked **Complete**; §11 next task is S0.7.
+
+### S0.5 — Safe Diagnostic Operation (2026-11-05) — commit `95da22b`
+
+**Added**
+
+- `panelforge:diagnostics.get` IPC handler returning
+  `{appName, electronVersion, nodeVersion, platform, arch, channel, timestamp}`.
+- Preload frozen `diagnostics.get()` wrapping `ipcRenderer.invoke` for the single
+  approved channel.
+- Renderer: calls the bridge on load and renders `#diagnostic-status`
+  (`index.html` switched to `<script type="module">` so ESM loads).
+
+**Changed**
+
+- `tests/ipc.test.js` extended with diagnostics.get cases (7 tests);
+  `tests/security.test.js` verifies the bridge diagnostic call.
+
+### S0.4 — IPC Foundation (2026-11-05) — commit `8026da3`
+
+**Added**
+
+- `src/core/ipc/registry.ts` — the only place `ipcMain.handle` is called:
+  frozen channel allowlist, argument validation, and the safe
+  `IpcResult<T>` envelope (`{ok:true,data}` / `{ok:false,code,message}`).
+- `src/shared/types/index.ts` — `SafeErrorCode`, `IpcResult<T>`, `IpcRequest<TArgs>`,
+  `DiagnosticsPingArgs/Data`.
+- `tests/ipc.test.js` — 6 tests (allowlist, `INVALID_ARGUMENTS`, envelope).
+
+**Changed**
+
+- Main calls `registerIpcHandlers()` at startup; no direct `ipcMain.handle` in main.
+- `scripts/check.js` IPC guard: `ipcMain` only in the registry.
+
+### S0.3 — Secure BrowserWindow Configuration (2026-11-05) — commit `4c8d10b`
+
+**Added**
+
+- `Docs/PanelForge-Security-Baseline.md` — security baseline document.
+- `tests/security.test.js` — 12 static checks + live renderer probe
+  (`hasRequire:false, hasProcess:false, hasFs:false, hasElectron:false, hasPanelforge:true`).
+- Restricted preload bridge: frozen empty `window.panelforge` via `contextBridge`.
+- Navigation guards (local file only) and window-open deny handler.
+
+**Changed**
+
+- `devTools: !app.isPackaged` (enabled in dev, disabled in packaged builds).
+- `scripts/check.js` guard updated for the bridge (comments stripped before grep).
+- CSP intentionally deferred (decided with the UI framework choice).
+
+### S0.2 — Electron Application Launch (2026-11-05) — commit `0d73f1a`
+
+**Added**
+
+- `electron` devDependency (only dependency added by S0.2).
+- `src/main/index.ts` — main process; secure BrowserWindow defaults from the first
+  launch (Q2): `contextIsolation`, `nodeIntegration: false`, `sandbox: true`,
+  `webSecurity`, `allowRunningInsecureContent: false`.
+- `src/renderer/index.html` + `index.ts` — initial renderer.
+- `src/preload/index.ts` — inert stub (no IPC yet; zero-IPC grep verified).
+- `scripts/copy-renderer-html.js` (built-in `fs`/`path` only) so the renderer HTML
+  is copied by `build`; canonical launch is `electron .` via `package.json`
+  `main: out/node/main/index.js`.
+
+**Changed**
+
+- `package.json`: `start: electron .`; `build` appends the HTML copy;
+  `npm run dev` remains typecheck + baseline check only, `start` launch-only.
+- `tsconfig` `rootDir: src` fixed the renderer output path to
+  `out/web/renderer/`.
+- Register: S0.2 marked **Complete** (register commit `dd38b88`).
+
+### S0.1 — Repository and Package Baseline (2026-11-05) — commit `55853fb`
+
+**Added**
+
+- Git repository root with private `package.json` (`name: panelforge`).
+- Split `tsconfig.json` / `tsconfig.node.json` / `tsconfig.web.json`.
+- `.gitignore` (node_modules, out, logs, env/secrets, models, temp) and `README.md`.
+- `src/` scaffolding (main/preload/renderer/core/engines/modules/database/shared
+  placeholders).
+- `scripts/check.js`, `scripts/dev-check.js`, and `tests/baseline.test.js`.
+- Dependencies: `typescript`, `vitest`, `eslint` only — no database, Electron,
+  or AI packages (D8/Q3 deferred to S0.8).
+
+**Changed**
+
+- Register: S0.1 marked **Complete** (register commit `e1e14e8`); register v3.1
+  corrections recorded (Q2 approved, Q3/Q4/Q5 deferred, S1.5a removed from the
+  implementation sequence, one-task-at-a-time promoted to approved protocol).
