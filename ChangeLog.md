@@ -7,6 +7,27 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.5 — Pause and Cancellation (2026-11-05) — [`4f51ecb`](https://github.com/lychgate/PanelForge/commit/4f51ecbee42019679212df27590eee0ba18bb6fc)
+
+**Added**
+
+- `src/engines/tasks/queue.ts` — `pauseTask`/`cancelTask`/`resumeTask` with an
+  optional per-type `InterruptorMap` (S2.1 interrupt contract, best-effort),
+  plus a no-resurrection settle: an interrupted task's late executor result is
+  ignored, so pause/cancel wins and cancelled tasks stay cancelled.
+- `tests/task-pause.test.js` — 7 tests: in-flight pause + resume, in-flight
+  cancel + no resurrection, interruptor call capture, queued pre-start pause,
+  NOT_FOUND/terminal rejection, cancel-while-queued never executes.
+
+**Changed**
+
+- Transition graph: `queued → paused` added (pausing before start; resumes
+  through the existing `paused → queued`); `preparing`/`loading-model → complete`
+  added (fast executors that report no intermediate stages complete directly —
+  §11: not every provider walks every state).
+- Register: S2.5 marked **Complete**; §11 next task is S2.6.
+- `Plan.md`: S2.5 checked off (2026-11-05).
+
 ### S2.4 — Task State Transitions (2026-11-05) — [`ba43acf`](https://github.com/lychgate/PanelForge/commit/ba43acf59440da15ce857fd84f2861b695d0c3ac)
 
 **Added**

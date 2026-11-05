@@ -377,7 +377,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A running task can be paused and cancelled; cancelled tasks stay cancelled (no resurrection).
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1, S2.3, S2.4.
 - **Stop:** Retry behavior lands in S2.6.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 4f51ecb)
 
 #### S2.6 Retry Handling [SPEC]
 - **Goal:** Bounded, explicit retries.
@@ -881,6 +881,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S2.4 | `DISPLAY=:0 npm test` | Pass — 197 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 9 ipc + 13 security) | `tests/task-transitions.test.js` (7 tests): happy path through states, illegal-transition rejection (terminal states locked), retry edge, crash-resume edges, unknown state/task codes, graph queries. Queue now drives through `transitionTask()` (S2.3 green against the guards). |
 | 2026-11-05 | S2.4 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S2.4 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.5 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.5 | `npm run build` | Pass | `out/node/engines/tasks/queue.js` emitted. |
+| 2026-11-05 | S2.5 | `DISPLAY=:0 npm test` | Pass — 204 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 9 ipc + 13 security) | `tests/task-pause.test.js` (7 tests): in-flight pause (no resurrection) + resume, in-flight cancel + no resurrection + cancel-then-resume rejected, interruptors fire best-effort, queued-task pause before start, NOT_FOUND + terminal rejection, cancel-while-queued never executes. |
+| 2026-11-05 | S2.5 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.5 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.5 implemented files:** `src/engines/tasks/queue.ts` (pauseTask/cancelTask/resumeTask + per-type interruptor map + late-result-ignored settle), `src/engines/tasks/transitions.ts` (queued→paused edge for pausing before start; generating/loading-model→complete for fast executors reporting no intermediate stages), `tests/task-pause.test.js` (New, 7 tests). Retry behavior remains S2.6.
 
 **S2.4 implemented files:** `src/engines/tasks/transitions.ts` (New — allowed transition graph over the 12 states, `canTransition`/`allowedNextStates`, guarded `transitionTask` with `TransitionError`/`NOT_FOUND`), `src/engines/tasks/queue.ts` (runs through `transitionTask`; progress transition awaited before final transition — race fixed), `tests/task-transitions.test.js` (New, 7 tests). Records keep an administrative `setState`; the queue path is guarded. Pause/cancel/retry handlers land in S2.5/S2.6.
 
@@ -974,11 +981,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.5 — Pause and Cancellation [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.6 — Retry Handling [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S2.4 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.5 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S2.5 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.6 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Pause (abort/pause between safe checkpoints where the backend permits) and cancel; resumption where supported.
+**Goal [SPEC]:** Bounded, explicit retries (failed tasks retry without disturbing completed siblings, §11.4).
 
 ---
 
@@ -1021,5 +1028,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.2 complete. Acceptance verified (181 tests incl. 7 task-records; rows persist across restarts; all 12 states). Stopped for owner review before S2.3. | [SPEC] | Crouton (S2.2 implementation) |
 | 2026-11-05 | S2.3 complete. Acceptance verified (190 tests incl. 9 task-queue; FIFO execution; failure isolation; resume to queued). Stopped for owner review before S2.4. | [SPEC] | Crouton (S2.3 implementation) |
 | 2026-11-05 | S2.4 complete. Acceptance verified (197 tests incl. 7 task-transitions; only legal transitions succeed; S2.3 green against the guards). Stopped for owner review before S2.5. | [SPEC] | Crouton (S2.4 implementation) |
+| 2026-11-05 | S2.5 complete. Acceptance verified (204 tests incl. 7 task-pause; in-flight pause/cancel with no resurrection; resume works; cancel stays cancelled). Stopped for owner review before S2.6. | [SPEC] | Crouton (S2.5 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

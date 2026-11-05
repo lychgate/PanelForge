@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (197 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions)
+npm test           # runs Vitest (204 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -149,7 +149,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S2.4 — Task State Transitions:** complete (allowed transition graph + typed guards; the queue runs through the guarded path).
 
-**Next (awaiting owner authorization): S2.5 — Pause and Cancellation**, the fifth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
+- **S2.5 — Pause and Cancellation:** complete (mid-flight pause/cancel with best-effort interruptors; no resurrection; resume re-queues).
+
+**Next (awaiting owner authorization): S2.6 — Retry Handling**, the sixth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
 
 ## Known limitations (end of Stage 0)
 
