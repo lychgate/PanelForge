@@ -17,6 +17,7 @@ import { registerIpcHandlers } from "../core/ipc/registry";
 import { defaultConfigService } from "../core/config/service";
 import { defaultLogService, isLogLevel } from "../core/logging/service";
 import { defaultDatabaseService } from "../database/service";
+import { defaultLifecycleService } from "../core/lifecycle/service";
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -62,30 +63,65 @@ function createWindow(): BrowserWindow {
 }
 
 void app.whenReady().then(() => {
-  registerIpcHandlers();
-  // S0.6: ensure the settings location exists and can be read safely.
-  // S0.7: set the log minimum level from the config, create the log
-  // location, and record a startup entry. Failures here must not prevent
-  // the window from opening; errors are recorded via the log service.
-  try {
-    defaultConfigService.ensureConfigDir();
-    const cfg = defaultConfigService.loadConfig();
-    if (isLogLevel(cfg.logLevel)) defaultLogService.setMinLevel(cfg.logLevel);
-    defaultLogService.ensureLogDir();
-    defaultLogService.info("PanelForge starting");
-  } catch (err) {
-    defaultLogService.logError(err, "startup");
-  }
-  // S0.8: initialize the SQLite foundation (WAL + FK + busy timeout,
-  // migrations). Failure is recorded but never blocks the window.
-  try {
-    const init = defaultDatabaseService.initialize();
-    defaultLogService.info(
-      `database ready (journal=${init.journalMode}, migrations=${init.appliedMigrations.join(",") || "none"})`
-    );
-  } catch (err) {
-    defaultLogService.logError(err, "database");
-  }
+  // S0.9: ordered startup sequence + cleanup hooks, owned by the
+  // lifecycle service. Each step failure is recorded (via the log
+  // service) and never blocks the window from opening.
+  defaultLifecycleService.registerCleanup({
+    name: "database",
+    run: () => {
+      try {
+        defaultDatabaseService.close();
+      } catch (err) {
+        defaultLogService.logError(err, "database close");
+      }
+    },
+  });
+  void defaultLifecycleService
+    .start([
+      {
+        name: "ipc",
+        run: () => {
+          registerIpcHandlers();
+        },
+      },
+      {
+        // S0.6: ensure the settings location exists and can be read safely.
+        // S0.7: set the log minimum level from the config, create the log
+        // location, and record a startup entry.
+        name: "config+logging",
+        run: () => {
+          try {
+            defaultConfigService.ensureConfigDir();
+            const cfg = defaultConfigService.loadConfig();
+            if (isLogLevel(cfg.logLevel)) defaultLogService.setMinLevel(cfg.logLevel);
+            defaultLogService.ensureLogDir();
+            defaultLogService.info("PanelForge starting");
+          } catch (err) {
+            defaultLogService.logError(err, "startup");
+          }
+        },
+      },
+      {
+        // S0.8: initialize the SQLite foundation (WAL + FK + busy timeout,
+        // migrations). Failure is recorded but never blocks the window.
+        name: "database",
+        run: () => {
+          try {
+            const init = defaultDatabaseService.initialize();
+            defaultLogService.info(
+              `database ready (journal=${init.journalMode}, migrations=${init.appliedMigrations.join(",") || "none"})`
+            );
+          } catch (err) {
+            defaultLogService.logError(err, "database");
+          }
+        },
+      },
+    ])
+    .then((summary) => {
+      defaultLogService.info(
+        summary.ok ? "startup complete" : `startup completed with failures: ${summary.failed.join(", ")}`
+      );
+    });
   createWindow();
 
   app.on("activate", () => {
@@ -102,11 +138,15 @@ app.on("window-all-closed", () => {
   }
 });
 
-// S0.8: close the database handle on quit (full lifecycle is S0.9).
+// S0.9: run the ordered shutdown sequence (all registered cleanup hooks,
+// e.g. closing the database handle) so nothing is left behind. The
+// "shutting down" entry is written synchronously first so the trace
+// survives even if the process exits before the async summary runs.
 app.on("before-quit", () => {
-  try {
-    defaultDatabaseService.close();
-  } catch (err) {
-    defaultLogService.logError(err, "database close");
-  }
+  defaultLogService.info("PanelForge shutting down");
+  void defaultLifecycleService.shutdown().then((summary) => {
+    defaultLogService.info(
+      summary.ok ? "shutdown complete" : `shutdown completed with failures: ${summary.failed.join(", ")}`
+    );
+  });
 });
