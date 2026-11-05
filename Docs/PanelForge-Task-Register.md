@@ -296,7 +296,7 @@ All tasks: Status **Not Started**.
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S1.5, S1.6, S1.7.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — format, dedup, retention, restore-target semantics unspecified.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 24246a5)
 
 #### S1.9 Project Portability Test [SPEC]
 - **Deliverables [SPEC]:** Project copy/move test; Path verification; Asset integrity verification.
@@ -699,6 +699,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S1.7 | `DISPLAY=:0 npm test` | Pass — 144 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 7 ipc + 13 security) | `tests/atomic-metadata.test.js` (8 tests): transaction commit, interrupted-transaction rollback (name/description untouched), serialized concurrent updates, corrupted-DB recovery (`.bak-<timestamp>` preserved, fresh DB works), healthy-DB no-recovery, WAL checkpoint, fsync-backed marker write. |
 | 2026-11-05 | S1.7 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S1.7 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S1.8 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S1.8 | `npm run build` | Pass | `out/node/core/project/backup.js` emitted. |
+| 2026-11-05 | S1.8 | `DISPLAY=:0 npm test` | Pass — 153 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 7 ipc + 13 security) | `tests/backup-snapshot.test.js` (9 tests): snapshot manifest/files/db, verify clean, tamper detection (missing+modified), restore-then-integrity + original undamaged, tampered/occupied/self restore refusal, external backup copy, prune retention (newest kept), NOT_FOUND, no hardcoded paths. |
+| 2026-11-05 | S1.8 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S1.8 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S1.8 implemented files:** `src/core/project/backup.ts` (New — `createSnapshot` (in-project `backups/snapshots/<id>/` with `manifest.json` SHA-256 map), `listSnapshots`, `verifySnapshot` (manifest byte-hash check), `createBackup` (external copy), `restoreSnapshot` (fresh-target restore + identify/integrity verification, original never written), `pruneSnapshots` (explicit retention)), `tests/backup-snapshot.test.js` (New, 9 tests). Semantics for unspecified format/retention/restore: snapshot contains marker+db+files (symlinks dereferenced, `backups/` excluded), backups copy a snapshot out of the project, restores only into fresh targets. Dedup remains future work.
 
 **S1.7 implemented files:** `src/core/project/metadata.ts` (integrity-check on open + corruption recovery preserving `<db>.bak-<timestamp>` with `recovered`/`backupPath` reporting; `withMetadataTransaction` serialized batches; `checkpointProjectDatabase` WAL checkpoint = basic autosave; versioned migrations shared by all project DB users), `src/core/project/service.ts` (marker write: fsync + atomic rename), `tests/atomic-metadata.test.js` (New, 8 tests). Recovery dialog deferred (D10 UI scope); write-through commit semantics = no dirty state to lose.
 
@@ -776,11 +783,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S1.8 — Backup and Snapshot System [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S1.9 — Project Portability Test [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S1.7 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.8 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S1.8 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.9 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Snapshot creation, backup creation, restore operation, and verification (a snapshot can be restored and verified without damaging the original project).
+**Goal [SPEC]:** Project copy/move test, path verification, and asset integrity verification (a copied project opens elsewhere without relying on the original machine's absolute paths).
 
 ---
 
@@ -815,5 +822,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S1.5 complete. Acceptance verified (129 tests green incl. 9 asset-registry; import/copy + SHA-256 hashes + UID identity). Stopped for owner review before S1.6. | [SPEC] | Crouton (S1.5 implementation) |
 | 2026-11-05 | S1.6 complete. Acceptance verified (136 tests green incl. 7 asset-integrity; missing/modified reported accurately). Stopped for owner review before S1.7. | [SPEC] | Crouton (S1.6 implementation) |
 | 2026-11-05 | S1.7 complete. Acceptance verified (144 tests green incl. 8 atomic-metadata; interrupted transactions roll back; corruption preserved + fresh start). Stopped for owner review before S1.8. | [SPEC] | Crouton (S1.7 implementation) |
+| 2026-11-05 | S1.8 complete. Acceptance verified (153 tests green incl. 9 backup-snapshot; snapshot/backup/restore/verify; tampered + unsafe restores refused; original undamaged). Stopped for owner review before S1.9. | [SPEC] | Crouton (S1.8 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

@@ -7,6 +7,30 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.8 — Backup and Snapshot System (2026-11-05) — [`24246a5`](https://github.com/lychgate/PanelForge/commit/24246a56eb172c9c9b0716a8d81d10a5955addbb)
+
+**Added**
+
+- `src/core/project/backup.ts` — snapshots inside the project
+  (`backups/snapshots/<id>/` with `project.json`, `project.db`, `files/`, and a
+  `manifest.json` byte-hash map), external backups (snapshot copied out of the
+  project), `verifySnapshot` (manifest byte-hash comparison: missing/modified
+  reported), `restoreSnapshot` (copy into a fresh target — never over the
+  original — then identify + integrity verification), and explicit retention
+  (`pruneSnapshots(keep)`).
+- `tests/backup-snapshot.test.js` — 9 tests: snapshot structure and manifest,
+  clean verification, tamper detection, restore-then-integrity with the original
+  undamaged, refusal of tampered/occupied/self restores, external backup copy,
+  retention pruning, NOT_FOUND.
+
+**Changed**
+
+- Format/retention/restore semantics are engineering judgment where the spec is
+  silent (documented in the module header): full copies, no dedup, explicit
+  pruning, fresh-target restores only.
+- Register: S1.8 marked **Complete**; §11 next task is S1.9.
+- `Plan.md`: S1.8 checked off (2026-11-05).
+
 ### S1.7 — Atomic Metadata Operations (2026-11-05) — [`a3d9141`](https://github.com/lychgate/PanelForge/commit/a3d9141699fd30b212aa3d07bee00685510bd1c8)
 
 **Added**
