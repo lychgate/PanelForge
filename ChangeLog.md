@@ -7,6 +7,24 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.11 — Provider Health Checks (2026-11-05) — [`362f6dc`](https://github.com/lychgate/PanelForge/commit/362f6dc018dfe491896c8a3d7a4945cc77121055)
+
+**Added**
+
+- `src/engines/provider/health.ts` — `checkProviderHealth` (probe + shape
+  validation + expected-model verification; malformed reports degrade to
+  `unknown`), `createHealthMonitor` (parallel `checkAll`, cached timestamped
+  reports, `isReady`/`requireReady`), and `createGatedExecutor` (typed
+  `UNAVAILABLE` fast-fail; zero executions against unhealthy providers).
+- `tests/provider-health.test.js` — 8 tests: ready/unavailable/unknown
+  reports, missing-model unhealthy, monitor caching, UNHEALTHY gating, gated
+  no-dispatch (0 executor calls).
+
+**Changed**
+
+- Register: S2.11 marked **Complete**; §11 next task is S2.12.
+- `Plan.md`: S2.11 checked off (2026-11-05).
+
 ### S2.10 — ComfyUI Connection Adapter (2026-11-05) — [`b59591f`](https://github.com/lychgate/PanelForge/commit/b59591f2643aef4eec08a3c761ff4b1be644276f)
 
 **Added**
