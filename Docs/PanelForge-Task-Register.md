@@ -203,7 +203,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.2.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 70c53e3)
 
 #### S0.11 Initial Packaging [SPEC]
 - **Goal [SPEC]:** Produce an installable or runnable Linux build.
@@ -646,6 +646,14 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.9 | Live launch probe ×3 (`PANELFORGE_USER_DATA_DIR=/tmp/opencode/pf-probe-life`) | Pass — `PanelForge starting` → `database ready (journal=wal, …)` → `startup complete` each launch; `pgrep -x electron` → "no stray electron (clean)" after each | Startup sequence runs through the lifecycle service with failure isolation. |
 | 2026-11-05 | S0.9 | Shutdown probe (re-probe after adding sync shutdown trace) | Pass — `PanelForge shutting down` → `shutdown complete` recorded; DB close hook ran (no strays) | Before-quit log entry written synchronously so the trace survives exit timing. |
 | 2026-11-05 | S0.9 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.10 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S0.10 | `npm run build` | Pass | `out/web/renderer/shortcuts.js` + `navigation.js` emitted. |
+| 2026-11-05 | S0.10 | `npm test` | Pass — 77 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 7 ipc + 13 security) | `tests/shortcuts.test.js` (12 tests): registry normalize/match/duplicate rejection, view navigation, shortcut docs, nav landmark + focus styles, renderer wiring, main menu accelerators, **live probe** (Alt+2/Alt+1 keyboard events switch Diagnostics↔About views). |
+| 2026-11-05 | S0.10 | `npm run check` | Pass | Baseline + IPC guard green (ipcMain only in registry; ipcRenderer only in preload). |
+| 2026-11-05 | S0.10 | Live launch probe ×3 | Pass — `startup complete` each launch; `pgrep -x electron` → "no stray electron (clean)" after each | App menu + new renderer do not break launch/close. |
+| 2026-11-05 | S0.10 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+
+**S0.10 implemented files:** `src/renderer/shortcuts.ts` (New — DOM-free shortcut registry: normalized combos, exact match, duplicate rejection), `src/renderer/navigation.ts` (New — DOM-free view manager: list/current/go with unknown-view rejection), `src/renderer/index.ts` (real focusable nav buttons, `keydown` handling for Alt+1/Alt+2, Diagnostics + About views rendered from the S0.5 payload; `.js`-suffixed ESM imports), `src/renderer/index.html` (labelled `<nav>`, `<main>`, `:focus-visible` outline), `src/main/index.ts` (application menu: File Quit `CmdOrCtrl+Q`, View Reload `CmdOrCtrl+R`), `Docs/PanelForge-Shortcuts.md` (New — shortcut documentation), `tests/shortcuts.test.js` (New, 12 tests). Views are minimal but real (both render the diagnostics payload); Settings/Character UI remain later tasks.
 
 **S0.9 implemented files:** `src/core/lifecycle/service.ts` (New — `createLifecycleService`/`defaultLifecycleService`: ordered failure-isolated startup steps with summaries, reverse-order failure-isolated cleanup hooks, idempotent `shutdown()`, state machine idle→starting→ready→shutting-down→closed, `startup:step|complete` + `shutdown:step|complete` events; dependency-free callbacks), `src/main/index.ts` (startup rewired through lifecycle steps `ipc → config+logging → database`; `registerCleanup("database")`; `before-quit` triggers `shutdown()`; `window-all-closed`/`activate` retained), `tests/lifecycle.test.js` (New, 10 tests). Shutdown summary is best-effort (the synchronous `PanelForge shutting down` entry is the guaranteed trace).
 
@@ -703,11 +711,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.10 — Keyboard Shortcuts and Navigation Foundation [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.11 — Initial Packaging [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.9 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.10 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.10 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.11 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Establish basic keyboard accessibility. **Deliverables [SPEC]:** Shortcut registration; Basic navigation structure; Shortcut documentation. **Acceptance [SPEC]:** Core navigation can be used without relying exclusively on mouse interaction.
+**Goal [SPEC]:** Produce an installable or runnable Linux build. **Deliverables [SPEC]:** Linux packaging configuration; Development build; Initial packaged build. **Acceptance [SPEC]:** Packaged application launches independently of the development environment.
 
 ---
 
@@ -732,5 +740,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.7 complete. Acceptance verified (45 tests green incl. 12 logging; 3× live launch with startup entries recorded; rotation + redaction proven). Stopped for owner review before S0.8. | [SPEC] | Crouton (S0.7 implementation) |
 | 2026-11-05 | S0.8 complete. Acceptance verified (55 tests green incl. 10 database; 3× live launch with `database ready (journal=wal, …)`; WAL + persistence + serialized writes proven). D8/Q3 decided: `node:sqlite`. Stopped for owner review before S0.9. | [SPEC] | Crouton (S0.8 implementation) |
 | 2026-11-05 | S0.9 complete. Acceptance verified (65 tests green incl. 10 lifecycle; 3× live launch `startup complete`; shutdown `PanelForge shutting down` → `shutdown complete`; no strays). Stopped for owner review before S0.10. | [SPEC] | Crouton (S0.9 implementation) |
+| 2026-11-05 | S0.10 complete. Acceptance verified (77 tests green incl. 12 shortcuts + live Alt+2/Alt+1 probe; 3× clean launch). Stopped for owner review before S0.11. | [SPEC] | Crouton (S0.10 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

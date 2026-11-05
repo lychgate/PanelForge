@@ -7,6 +7,31 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S0.10 — Keyboard Shortcuts and Navigation Foundation (2026-11-05) — [`70c53e3`](https://github.com/lychgate/PanelForge/commit/70c53e37a475a44d2256a63052c44f849ccb1bb6)
+
+**Added**
+
+- `src/renderer/shortcuts.ts` — DOM-free shortcut registry (`createShortcutRegistry`):
+  combo normalization (`Alt+1` → `alt+1`), exact `KeyInput` matching, duplicate
+  id/combination rejection. Imported via dynamic `import()` in tests (ESM output).
+- `src/renderer/navigation.ts` — DOM-free view manager (`createNavigation`):
+  ordered views, single current view, unknown-view rejection.
+- Renderer shell: Diagnostics + About views (both rendered from the S0.5 payload),
+  named `.js`-suffixed ESM imports; `index.html` gains a labelled `<nav>`,
+  `<main>`, and a visible `:focus-visible` outline so core navigation works with
+  `Tab` + `Enter`.
+- Application menu (main): File → Quit (`CmdOrCtrl+Q`), View → Reload
+  (`CmdOrCtrl+R`) — accelerators work even when focus is not in the renderer.
+- `Docs/PanelForge-Shortcuts.md` — shortcut documentation (`Alt+1`/`Alt+2`,
+  `Tab`, `Ctrl+Q`, `Ctrl+R`).
+- `tests/shortcuts.test.js` — 12 tests including a **live probe** that launches
+  Electron and dispatches synthetic `Alt+2`/`Alt+1` keydown events against the
+  real renderer, asserting the view switches without any mouse interaction.
+
+**Changed**
+
+- Register: S0.10 marked **Complete**; §11 next task is S0.11.
+
 ### S0.9 — Application Lifecycle Infrastructure (2026-11-05) — [`aa2d0b1`](https://github.com/lychgate/PanelForge/commit/aa2d0b117f9c6f9b9936cb7b584a2588e59927e0)
 
 **Added**

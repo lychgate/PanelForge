@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (65 tests across baseline/security/ipc/config/logging/database/lifecycle)
+npm test           # runs Vitest (77 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 ```
@@ -93,9 +93,10 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 - **S0.7 — Logging and Error Handling:** complete (central log service; rotation, redaction, error recording).
 - **S0.8 — SQLite Foundation:** complete (`node:sqlite` service; WAL/FK/busy timeout, migrations, serialized writes, backups).
 - **S0.9 — Application Lifecycle Infrastructure:** complete (ordered startup steps + cleanup hooks + lifecycle events via `src/core/lifecycle/`).
-- **S0.10 — Keyboard Shortcuts and Navigation Foundation:** **next, awaiting owner authorization** (shortcut registration, basic navigation structure, shortcut docs).
+- **S0.10 — Keyboard Shortcuts and Navigation Foundation:** complete (shortcut registry, Diagnostics/About navigation, application menu; see [`Docs/PanelForge-Shortcuts.md`](Docs/PanelForge-Shortcuts.md)).
+- **S0.11 — Initial Packaging:** **next, awaiting owner authorization** (Linux packaging config + initial packaged build).
 
-Remaining Stage 0 work after S0.9: S0.10–S0.12 (keyboard/navigation foundation, Linux packaging, verification/release prep). Stage 1 follows only after Stage 0 completes.
+Remaining Stage 0 work after S0.10: S0.11–S0.12 (Linux packaging, verification/release prep). Stage 1 follows only after Stage 0 completes.
 
 ## Design principles (per §2, summary)
 
