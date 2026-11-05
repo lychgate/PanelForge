@@ -18,13 +18,16 @@ Local-first desktop application for creating illustrated stories, comics, graphi
 
 ```bash
 npm install
-npm run dev        # runs typecheck + baseline check (S0.1). Electron launch is S0.2.
+npm run build      # compile TS to out/node (main/preload) + out/web (renderer) + copy index.html
+npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
+npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm run build      # compile TS to out/node and out/web
 npm test           # runs Vitest placeholder tests
-npm run check      # verifies the S0.1 baseline (files, private package, no premature deps)
+npm run check      # verifies baseline incl. zero IPC surface under src/ (S0.2)
 npm run lint       # ESLint over TypeScript sources
 ```
+
+Launch flow (S0.2): `npm run build` → `npm start`. `npm start` is launch-only (`electron .`); it does not rebuild. `npm run dev` remains typecheck + baseline check only.
 
 ## Project layout (per §21 of the spec)
 
@@ -53,7 +56,7 @@ Electron, TypeScript, Node.js, SQLite, Drizzle ORM or equivalent, LM Studio (loc
 ## Development status
 
 - **Stage 0 (S0.1):** Repository and package baseline — complete scaffold, no Electron window yet.
-- **Next:** S0.2 (Electron application launch, secure defaults from first window), then S0.3+ — each gated by owner review per the task register.
+- **Stage 0 (S0.2):** Electron application launch — completes launch/close verification; secure defaults from first window (Q2). S0.3 (security verification/docs) + S0.4+ (IPC/logging/DB) remain gated by owner review per the task register. Launch: `npm run build` → `npm start`.
 
 ## Design principles (per §2, summary)
 

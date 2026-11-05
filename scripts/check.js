@@ -1,6 +1,5 @@
-// PanelForge baseline check — verifies the S0.1 package baseline is coherent.
-// This script is intentionally dependency-free so it can run before `npm install`
-// completes, and it never imports application code (none exists yet at S0.1).
+// PanelForge baseline check — verifies the package baseline is coherent
+// (S0.1 scaffold + S0.2 Electron launch). Dependency-free; imports no app code.
 
 const fs = require("fs");
 const path = require("path");
@@ -17,8 +16,8 @@ const requiredFiles = [
   "scripts/check.js",
 ];
 
+// S0.2 allows electron; DB/AI/UI deps remain forbidden until their own tasks.
 const forbiddenDependencies = [
-  "electron",
   "better-sqlite3",
   "drizzle-orm",
   "sharp",
@@ -29,6 +28,8 @@ const forbiddenDependencies = [
   "comfyui",
 ];
 
+const requiredDevDependencies = ["electron", "typescript"];
+
 const errors = [];
 const warnings = [];
 
@@ -38,9 +39,10 @@ for (const file of requiredFiles) {
   }
 }
 
+let pkg = null;
 const pkgPath = path.join(root, "package.json");
 if (fs.existsSync(pkgPath)) {
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+  pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   if (!pkg.name || pkg.name !== "panelforge") {
     errors.push("package.json: name must be 'panelforge'");
   }
@@ -51,15 +53,29 @@ if (fs.existsSync(pkgPath)) {
   for (const forbidden of forbiddenDependencies) {
     if (forbidden in deps) {
       errors.push(
-        `package.json: '${forbidden}' must not be installed at S0.1 ` +
-          "(not needed until its own task; keeps S0.1 deliberately boring)"
+        `package.json: '${forbidden}' must not be installed yet ` +
+          "(not needed until its own task)"
       );
     }
   }
-  for (const script of ["typecheck", "build", "test", "dev"]) {
+  for (const required of requiredDevDependencies) {
+    if (!(required in deps)) {
+      errors.push(`package.json: expected devDependency missing: ${required} (S0.2)`);
+    }
+  }
+  for (const script of ["typecheck", "build", "test", "dev", "start"]) {
     if (!pkg.scripts || typeof pkg.scripts[script] !== "string" || pkg.scripts[script].trim() === "") {
       errors.push(`package.json: scripts.${script} must exist`);
     }
+  }
+  if (pkg.scripts && typeof pkg.scripts.start === "string" && pkg.scripts.start.trim() !== "electron .") {
+    errors.push("package.json: scripts.start must be 'electron .' (canonical launch via main entry)");
+  }
+  if (!pkg.main || !String(pkg.main).includes("out/node/main")) {
+    errors.push("package.json: main must point to out/node/main/index.js (S0.2)");
+  }
+  if (!pkg.scripts || !pkg.scripts.build || !pkg.scripts.build.includes("copy-renderer-html")) {
+    errors.push("package.json: build must include scripts/copy-renderer-html.js (S0.2)");
   }
 }
 
@@ -69,6 +85,30 @@ if (fs.existsSync(gitignorePath)) {
   for (const pattern of ["node_modules/", "out/", "dist/"]) {
     if (!ignore.includes(pattern)) {
       warnings.push(`.gitignore: expected pattern not found: ${pattern}`);
+    }
+  }
+}
+
+// S0.2 zero-IPC guard: no IPC surface may exist under src/.
+const srcDir = path.join(root, "src");
+const forbiddenIpc = ["ipcMain", "ipcRenderer", "contextBridge", "exposeInMainWorld"];
+function walk(dir) {
+  if (!fs.existsSync(dir)) return [];
+  const out = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walk(full));
+    else if (entry.isFile() && full.endsWith(".ts")) out.push(full);
+  }
+  return out;
+}
+for (const file of walk(srcDir)) {
+  const text = fs.readFileSync(file, "utf8");
+  // Strip // comments so explanatory comments mentioning these words don't trip the guard.
+  const code = text.split("\n").map((l) => l.replace(/\/\/.*$/, "")).join("\n");
+  for (const token of forbiddenIpc) {
+    if (code.includes(token)) {
+      errors.push(`src/: forbidden IPC surface '${token}' found in ${path.relative(root, file)} (S0.2 must have zero IPC)`);
     }
   }
 }
@@ -85,8 +125,10 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log("[check] OK — S0.1 package baseline verified:");
+console.log("[check] OK — package baseline verified (S0.1 scaffold + S0.2 electron):");
 console.log("  - Required files present");
 console.log("  - package.json is private, named 'panelforge'");
-console.log("  - No database/AI/Electron dependencies installed at S0.1");
-console.log("  - Scripts: dev, build, typecheck, test");
+console.log("  - Required devDeps present: electron (S0.2); no DB/AI deps");
+console.log("  - main entry + start script (electron .) correct");
+console.log("  - Scripts: dev, build, start, typecheck, test");
+console.log("  - Zero IPC surface under src/ (S0.2)");
