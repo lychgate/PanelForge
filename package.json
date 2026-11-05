@@ -13,12 +13,17 @@
     "dev": "tsc --noEmit --project tsconfig.node.json && tsc --noEmit --project tsconfig.web.json && node scripts/dev-check.js",
     "build": "tsc --project tsconfig.node.json --outDir out/node && tsc --project tsconfig.web.json --outDir out/web && node scripts/copy-renderer-html.js",
     "start": "electron .",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
     "typecheck": "tsc --noEmit --project tsconfig.node.json && tsc --noEmit --project tsconfig.web.json",
     "test": "vitest run",
     "lint": "eslint . --ext .ts",
     "check": "node scripts/check.js"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^8.0.1",
+    "@electron-forge/maker-deb": "^8.0.1",
+    "@electron-forge/maker-zip": "^8.0.1",
     "electron": "^45.2.3",
     "eslint": "^8.57.0",
     "typescript": "^5.3.3",

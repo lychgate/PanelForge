@@ -5,6 +5,7 @@ node_modules/
 out/
 dist/
 build/
+forge-out/
 *.tsbuildinfo
 
 # Logs
