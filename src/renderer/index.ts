@@ -35,9 +35,32 @@ type DiagnosticsResult = {
   message?: string;
 };
 
+type ProjectSummary = {
+  root: string;
+  projectId: string;
+  name: string;
+};
+
+type ProjectResult<T> = {
+  ok: boolean;
+  data?: T;
+  code?: string;
+  message?: string;
+};
+
 type PanelForgeApi = {
   diagnostics: {
     get(): Promise<DiagnosticsResult>;
+  };
+  project: {
+    create(args: { name: string; description?: string | null }): Promise<
+      ProjectResult<{ root: string; projectId: string }>
+    >;
+    list(): Promise<ProjectResult<{ projects: ProjectSummary[] }>>;
+    open(root: string): Promise<ProjectResult<ProjectSummary>>;
+    close(root: string): Promise<ProjectResult<{ closed: true }>>;
+    rename(root: string, newName: string): Promise<ProjectResult<{ root: string; projectId: string }>>;
+    archive(root: string): Promise<ProjectResult<{ root: string; projectId: string }>>;
   };
   version: Record<string, never>;
 };
@@ -46,16 +69,18 @@ type PanelForgeWindow = Window & { panelforge: PanelForgeApi };
 
 const win = window as unknown as PanelForgeWindow;
 
-const VIEWS = ["diagnostics", "about"] as const;
+const VIEWS = ["diagnostics", "about", "projects"] as const;
 const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   diagnostics: "Diagnostics",
   about: "About",
+  projects: "Projects",
 };
 
 const navigation = createNavigation(VIEWS, "diagnostics");
 const shortcuts = createShortcutRegistry();
 shortcuts.register("nav.diagnostics", "Go to Diagnostics view", "Alt+1");
 shortcuts.register("nav.about", "Go to About view", "Alt+2");
+shortcuts.register("nav.projects", "Go to Projects view", "Alt+3");
 
 const root = document.getElementById("root");
 const navEl = document.getElementById("app-nav");
@@ -119,6 +144,7 @@ if (root && navEl) {
     event.preventDefault();
     if (def.id === "nav.diagnostics") goToView("diagnostics");
     if (def.id === "nav.about") goToView("about");
+    if (def.id === "nav.projects") goToView("projects");
   });
 
   renderView();
@@ -152,4 +178,119 @@ if (root && navEl) {
       status.textContent = `diagnostic: exception ${String(err)}`;
       aboutBody.textContent = `about: exception ${String(err)}`;
     });
+
+  // Projects (S1.10): create, list, open, close, rename, archive — all
+  // through the preload bridge; the renderer never touches the database.
+  const projSection = sections.projects;
+  const listEl = document.createElement("div");
+  listEl.id = "project-list";
+  listEl.textContent = "projects: loading…";
+  projSection.appendChild(listEl);
+  const infoEl = document.createElement("div");
+  infoEl.id = "project-info";
+  infoEl.textContent = "No project selected.";
+  projSection.appendChild(infoEl);
+  const nameInput = document.createElement("input");
+  nameInput.id = "project-name";
+  nameInput.placeholder = "Project name";
+  nameInput.setAttribute("aria-label", "Project name");
+  projSection.appendChild(nameInput);
+  const createBtn = document.createElement("button");
+  createBtn.type = "button";
+  createBtn.textContent = "Create project";
+  projSection.appendChild(createBtn);
+
+  let openRoot: string | null = null;
+
+  async function refreshProjects(): Promise<void> {
+    const result = await win.panelforge.project.list();
+    if (!result.ok || !result.data) {
+      listEl.textContent = `projects: unavailable (${result.code ?? "error"} ${result.message ?? ""})`;
+      return;
+    }
+    listEl.replaceChildren();
+    if (result.data.projects.length === 0) {
+      listEl.textContent = "No projects yet.";
+      return;
+    }
+    for (const project of result.data.projects) {
+      const row = document.createElement("div");
+      const label = document.createElement("span");
+      label.textContent = project.name;
+      row.appendChild(label);
+      const openBtn = document.createElement("button");
+      openBtn.type = "button";
+      openBtn.textContent = "Open";
+      openBtn.addEventListener("click", () => {
+        void win.panelforge.project.open(project.root).then((res) => {
+          if (res.ok && res.data) {
+            openRoot = res.data.root;
+            infoEl.textContent = `open: ${res.data.name} (${res.data.projectId})`;
+          } else {
+            infoEl.textContent = `open failed: ${res.code} ${res.message}`;
+          }
+        });
+      });
+      row.appendChild(openBtn);
+      const closeBtn = document.createElement("button");
+      closeBtn.type = "button";
+      closeBtn.textContent = "Close";
+      closeBtn.addEventListener("click", () => {
+        void win.panelforge.project.close(project.root).then((res) => {
+          infoEl.textContent = res.ok
+            ? `closed: ${project.name}`
+            : `close failed: ${res.code} ${res.message}`;
+          if (openRoot === project.root && res.ok) openRoot = null;
+        });
+      });
+      row.appendChild(closeBtn);
+      const renameBtn = document.createElement("button");
+      renameBtn.type = "button";
+      renameBtn.textContent = "Rename";
+      renameBtn.addEventListener("click", () => {
+        const newName = window.prompt("New project name", project.name);
+        if (!newName) return;
+        void win.panelforge.project.rename(project.root, newName).then((res) => {
+          if (res.ok) {
+            void refreshProjects();
+          } else {
+            infoEl.textContent = `rename failed: ${res.code} ${res.message}`;
+          }
+        });
+      });
+      row.appendChild(renameBtn);
+      const archiveBtn = document.createElement("button");
+      archiveBtn.type = "button";
+      archiveBtn.textContent = "Archive";
+      archiveBtn.addEventListener("click", () => {
+        void win.panelforge.project.archive(project.root).then((res) => {
+          if (res.ok) {
+            if (openRoot === project.root) openRoot = null;
+            infoEl.textContent = `archived: ${project.name}`;
+            void refreshProjects();
+          } else {
+            infoEl.textContent = `archive failed: ${res.code} ${res.message}`;
+          }
+        });
+      });
+      row.appendChild(archiveBtn);
+      listEl.appendChild(row);
+    }
+  }
+
+  createBtn.addEventListener("click", () => {
+    void win.panelforge.project
+      .create({ name: nameInput.value })
+      .then((res) => {
+        if (res.ok && res.data) {
+          infoEl.textContent = `created: ${nameInput.value} (${res.data.projectId})`;
+          nameInput.value = "";
+          void refreshProjects();
+        } else {
+          infoEl.textContent = `create failed: ${res.code} ${res.message}`;
+        }
+      });
+  });
+
+  void refreshProjects();
 }

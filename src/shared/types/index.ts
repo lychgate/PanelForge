@@ -9,7 +9,16 @@ export type SafeErrorCode =
   | "INVALID_ARGUMENTS"
   | "NOT_FOUND"
   | "HANDLER_ERROR"
-  | "UNREGISTERED_CHANNEL";
+  | "UNREGISTERED_CHANNEL"
+  // Project operations (S1.10) surface their typed codes directly.
+  | "INVALID_NAME"
+  | "NOT_A_PROJECT"
+  | "CORRUPT_MARKER"
+  | "UNSUPPORTED_VERSION"
+  | "ALREADY_OPEN"
+  | "ALREADY_CLOSED"
+  | "ALREADY_EXISTS"
+  | "INVALID_STATE";
 
 export type IpcResult<T> =
   | { ok: true; data: T }
@@ -43,4 +52,65 @@ export type DiagnosticsGetData = {
   arch: string;
   channel: string;
   timestamp: string;
+};
+
+// Project operations (S1.10) — one method per channel (D1). "parentDir"
+// is optional in args: when omitted the main process resolves the
+// projects library dir (<userData>/projects). UI callers normally omit it.
+export type ProjectSummaryData = {
+  root: string;
+  projectId: string;
+  name: string;
+};
+
+export type ProjectCreateArgs = {
+  name: string;
+  description?: string | null;
+  parentDir?: string;
+};
+
+export type ProjectCreateData = {
+  root: string;
+  projectId: string;
+};
+
+export type ProjectListArgs = {
+  parentDir?: string;
+};
+
+export type ProjectListData = {
+  projects: ProjectSummaryData[];
+};
+
+export type ProjectOpenArgs = {
+  root: string;
+};
+
+export type ProjectOpenData = ProjectSummaryData;
+
+export type ProjectCloseArgs = {
+  root: string;
+};
+
+export type ProjectCloseData = {
+  closed: true;
+};
+
+export type ProjectRenameArgs = {
+  root: string;
+  newName: string;
+};
+
+export type ProjectRenameData = {
+  root: string;
+  projectId: string;
+};
+
+export type ProjectArchiveArgs = {
+  root: string;
+};
+
+export type ProjectArchiveData = {
+  root: string;
+  projectId: string;
 };

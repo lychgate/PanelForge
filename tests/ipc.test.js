@@ -63,11 +63,18 @@ describe("S0.4 IPC Foundation", () => {
 
   it("registers exactly the allowlisted channels", () => {
     registerIpcHandlers();
-    expect(handleCalls).toHaveLength(2);
+    expect(handleCalls).toHaveLength(8);
     expect(handleCalls[0].channel).toBe(IPC_CHANNELS.diagnosticsPing);
     expect(handleCalls[0].channel).toBe("panelforge:diagnostics.ping");
     expect(handleCalls[1].channel).toBe(IPC_CHANNELS.diagnosticsGet);
     expect(handleCalls[1].channel).toBe("panelforge:diagnostics.get");
+    expect(handleCalls[2].channel).toBe(IPC_CHANNELS.projectCreate);
+    expect(handleCalls[2].channel).toBe("panelforge:project.create");
+    expect(handleCalls[3].channel).toBe(IPC_CHANNELS.projectList);
+    expect(handleCalls[4].channel).toBe(IPC_CHANNELS.projectOpen);
+    expect(handleCalls[5].channel).toBe(IPC_CHANNELS.projectClose);
+    expect(handleCalls[6].channel).toBe(IPC_CHANNELS.projectRename);
+    expect(handleCalls[7].channel).toBe(IPC_CHANNELS.projectArchive);
   });
 
   it("rejects calls when the payload is malformed", async () => {
@@ -114,6 +121,55 @@ describe("S0.4 IPC Foundation", () => {
     } else {
       expect(result.code).toBe("HANDLER_ERROR");
     }
+  });
+
+  it("project.create/list/open/close/rename/archive work through the envelope", async () => {
+    const os = require("os");
+    const lib = fs.mkdtempSync(path.join(os.tmpdir(), "panelforge-ipc-proj-"));
+    registerIpcHandlers();
+    const byChannel = Object.fromEntries(handleCalls.map((c) => [c.channel, c.handler]));
+
+    const created = await byChannel[IPC_CHANNELS.projectCreate]({}, {
+      args: { name: "IPC Project", parentDir: lib },
+    });
+    expect(created.ok).toBe(true);
+    expect(created.data.projectId).toBeDefined();
+
+    const listed = await byChannel[IPC_CHANNELS.projectList]({}, { args: { parentDir: lib } });
+    expect(listed.ok).toBe(true);
+    expect(listed.data.projects).toHaveLength(1);
+    expect(listed.data.projects[0].name).toBe("IPC Project");
+
+    const root = created.data.root;
+    const opened = await byChannel[IPC_CHANNELS.projectOpen]({}, { args: { root } });
+    expect(opened.ok).toBe(true);
+    expect(opened.data.name).toBe("IPC Project");
+
+    const closed = await byChannel[IPC_CHANNELS.projectClose]({}, { args: { root } });
+    expect(closed).toEqual({ ok: true, data: { closed: true } });
+
+    const renamed = await byChannel[IPC_CHANNELS.projectRename]({}, {
+      args: { root, newName: "Renamed IPC" },
+    });
+    expect(renamed.ok).toBe(true);
+    const listedAfter = await byChannel[IPC_CHANNELS.projectList]({}, { args: { parentDir: lib } });
+    expect(listedAfter.data.projects[0].name).toBe("Renamed IPC");
+
+    const archived = await byChannel[IPC_CHANNELS.projectArchive]({}, { args: { root: renamed.data.root } });
+    expect(archived.ok).toBe(true);
+    const listedEmpty = await byChannel[IPC_CHANNELS.projectList]({}, { args: { parentDir: lib } });
+    expect(listedEmpty.data.projects).toHaveLength(0);
+  });
+
+  it("project handlers reject invalid arguments and surface typed codes", async () => {
+    registerIpcHandlers();
+    const create = handleCalls.find((c) => c.channel === IPC_CHANNELS.projectCreate).handler;
+    expect((await create({}, { args: { name: "" } })).code).toBe("INVALID_ARGUMENTS");
+    expect((await create({}, { args: { name: "x", parentDir: 123 } })).code).toBe("INVALID_ARGUMENTS");
+    const open = handleCalls.find((c) => c.channel === IPC_CHANNELS.projectOpen).handler;
+    const notProject = await open({}, { args: { root: "/tmp/definitely-not-a-project-99999" } });
+    expect(notProject.ok).toBe(false);
+    expect(notProject.code).toBe("NOT_A_PROJECT");
   });
 
   it("centralized registration: main does not own ipcMain.handle directly", () => {
