@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.9 — LM Studio Connection Adapter (2026-11-05) — [`acdf4c0`](https://github.com/lychgate/PanelForge/commit/acdf4c027fb1878d8e40635c84ee699b7b3a354e)
+
+**Added**
+
+- `src/engines/provider/lmstudio.ts` — the first real provider (S2.1 contract):
+  `createLmStudioAdapter` over LM Studio's OpenAI-compatible HTTP API
+  (`GET /v1/models` health + model listing, streaming `POST
+  /v1/chat/completions` with SSE progress, per-task abort interrupts, typed
+  `UNAVAILABLE`/`TIMEOUT`/`FAILED`/`UNSUPPORTED`/`INTERRUPTED` results). Built-in
+  `fetch` only — no new dependencies; presence optional (§6.6), so an
+  unreachable endpoint never throws across the boundary.
+- `tests/lmstudio.test.js` — 4 tests against a real local-HTTP mock server:
+  health-ready + streaming completion, graceful absence on a closed port,
+  mid-stream interrupt, HTTP error mapping.
+
+**Changed**
+
+- Register: S2.9 marked **Complete**; §11 next task is S2.10.
+- `Plan.md`: S2.9 checked off (2026-11-05).
+
 ### S2.8 — Queue Persistence and Recovery (2026-11-05) — [`102e31f`](https://github.com/lychgate/PanelForge/commit/102e31fd19880f3a697f3fc50f486f1bfb326a45)
 
 **Added**

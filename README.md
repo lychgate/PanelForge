@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (226 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery)
+npm test           # runs Vitest (230 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -157,7 +157,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S2.8 — Queue Persistence and Recovery:** complete (startup `recoverQueue` re-queues interrupted work; idempotent; logged as `queue recovered`).
 
-**Next (awaiting owner authorization): S2.9 — LM Studio Connection Adapter**, the ninth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
+- **S2.9 — LM Studio Connection Adapter:** complete (OpenAI-compatible streaming completions, typed errors, graceful absence).
+
+**Next (awaiting owner authorization): S2.10 — ComfyUI Connection Adapter**, the tenth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
 
 ## Known limitations (end of Stage 0)
 
