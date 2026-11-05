@@ -7,6 +7,31 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.3 — Basic Project Operations (2026-11-05) — [`dea5e4c`](https://github.com/lychgate/PanelForge/commit/dea5e4c54f8e15b4ec10add55497c95b3c5f30de)
+
+**Added**
+
+- `src/core/project/operations.ts` — basic operations over the S1.1/S1.2 project
+  layer: `createProjectAt` (folder + marker + metadata), `listProjects`
+  (valid projects only, junk skipped), `openProject`/`closeProject`
+  (in-process open-set exclusivity), `renameProject` (folder + metadata name,
+  project ID unchanged), `archiveProject` (moves into sibling `.archived/`,
+  leaving the active library). All failures are `ProjectOpError` with typed
+  codes (`INVALID_NAME`, `INVALID_ARGUMENTS`, `NOT_FOUND`, `NOT_A_PROJECT`,
+  `CORRUPT_MARKER`, `UNSUPPORTED_VERSION`, `ALREADY_OPEN`, `ALREADY_CLOSED`,
+  `ALREADY_EXISTS`, `INVALID_STATE`).
+- `tests/project-operations.test.js` — 9 tests covering each operation
+  independently and each error code.
+
+**Changed**
+
+- Semantics for what the spec leaves unspecified (engineering judgment,
+  documented): rename renames folder + metadata; archive moves to
+  `<parent>/.archived/<folder>`; rename/archive while open are rejected.
+- No IPC channels added this task — operation UIs arrive with S1.10.
+- Register: S1.3 marked **Complete**; §11 next task is S1.4.
+- `Plan.md`: S1.3 checked off (2026-11-05).
+
 ### S1.2 — Project Metadata Schema (2026-11-05) — [`a6d8566`](https://github.com/lychgate/PanelForge/commit/a6d8566bcaa42347bc051348067f266a7ff73023)
 
 **Added**
