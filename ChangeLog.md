@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.6 — Retry Handling (2026-11-05) — [`1b8cbbe`](https://github.com/lychgate/PanelForge/commit/1b8cbbeb608c9dabee527869972ab19f21ba0350)
+
+**Added**
+
+- `src/engines/tasks/retry.ts` — `retryTaskWithPolicy(store, queue, taskId, policy)`:
+  bounded attempts (`maxAttempts`), exponential backoff (`backoffMs × 2^(n-1)`),
+  failed-only guard, typed `RetryError` codes. Deferred: none — retries are
+  explicit, never automatic storms.
+- `TaskQueue.runTask(taskId)` — single-task execution (needed by retry); the
+  `runNext` path now shares the same `executeOne` core.
+- `tests/task-retry.test.js` — 6 tests: flaky-then-ok within budget, permanent
+  failure stops after N, sibling isolation, INVALID_STATE/NOT_FOUND/INVALID_POLICY,
+  no hardcoded paths.
+
+**Changed**
+
+- Sibling isolation is structural (only the retried task re-queues).
+- Register: S2.6 marked **Complete**; §11 next task is S2.7.
+- `Plan.md`: S2.6 checked off (2026-11-05).
+
 ### S2.5 — Pause and Cancellation (2026-11-05) — [`4f51ecb`](https://github.com/lychgate/PanelForge/commit/4f51ecbee42019679212df27590eee0ba18bb6fc)
 
 **Added**

@@ -53,7 +53,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S2.3 Task Queue — completed 2026-11-05
 - [x] S2.4 Task State Transitions — completed 2026-11-05
 - [x] S2.5 Pause and Cancellation — completed 2026-11-05
-- [ ] S2.6 Retry Handling
+- [x] S2.6 Retry Handling — completed 2026-11-05
 - [ ] S2.7 Progress Reporting
 - [ ] S2.8 Queue Persistence and Recovery
 - [ ] S2.9 LM Studio Connection Adapter
