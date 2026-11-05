@@ -149,7 +149,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.3.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — contract format, validation library, and error envelope not specified. See D1.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; commit recorded below)
 
 #### S0.5 Safe Diagnostic Operation [SPEC]
 - **Goal [SPEC]:** Verify the renderer-to-main communication path.
@@ -601,6 +601,15 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.3 | Live renderer probe (Electron + `executeJavaScript`) | Pass — `hasRequire:false, hasProcess:false, hasFs:false, hasElectron:false, hasPanelforge:true` | Renderer cannot access Node.js primitives. `window.panelforge` present (frozen bridge). |
 | 2026-11-05 | S0.3 | Launch ×3 `npm start` + `pkill -f electron[.]` clean-close | Pass — each launch started; `pgrep -a -f electron` → "no stray electron (clean)" after each | SIGTERM exits; no stray PIDs remain. GPU errors after kill are teardown artifacts, not startup. |
 | 2026-11-05 | S0.3 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.4 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S0.4 | `npm run build` | Pass | `out/node/core/ipc/registry.js` emitted. |
+| 2026-11-05 | S0.4 | `DISPLAY=:0 npm test` | Pass — 19 passed (1 baseline + 6 ipc + 12 security) | `tests/ipc.test.js` (Module._load mock): allowlist exactly `panelforge:diagnostics.ping`; invalid args → `INVALID_ARGUMENTS`; safe envelope `{ok:true,data:{ok:true}}`. |
+| 2026-11-05 | S0.4 | `npm run check` | Pass | `ipcMain` only in `src/core/ipc/registry.ts`; `contextBridge` only in preload; `ipcRenderer` forbidden everywhere (lands S0.5). |
+| 2026-11-05 | S0.4 | Live renderer probe | Pass — `hasRequire:false, hasProcess:false, hasFs:false, hasElectron:false, hasPanelforge:true, hasIpcRenderer:false` | Renderer has no raw IPC; only the frozen bridge. `IPC_CHANNELS` allowlist probe: `{"diagnosticsPing":"panelforge:diagnostics.ping"}`. |
+| 2026-11-05 | S0.4 | Launch ×3 `npm start` + `pkill -f electron[.]` | Pass — each started; `pgrep -a -f electron` → "no stray electron (clean)" after each | SIGTERM exits; no stray PIDs. |
+| 2026-11-05 | S0.4 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+
+**S0.4 implemented files:** `src/shared/types/index.ts` (SafeErrorCode, IpcResult/IpcRequest, DiagnosticsPingArgs/Data), `src/core/ipc/registry.ts` (New — IPC_CHANNELS allowlist, validate + handle, `registerIpcHandlers`), `src/main/index.ts` (calls `registerIpcHandlers()` at startup; no direct `ipcMain.handle`), `src/preload/index.ts` (still frozen empty api — S0.5 adds Pause), `tests/ipc.test.js` (New), `scripts/check.js` (ipcMain only in registry; ipcRenderer forbidden). Zod deferred (D1); validation handwritten.
 
 **S0.3 implemented files:** `src/preload/index.ts` (frozen empty api), `src/main/index.ts` (devTools `!app.isPackaged`; S0.2 secure flags retained), `tests/security.test.js` (New), `Docs/PanelForge-Security-Baseline.md` (New), `scripts/check.js` (IPC guard updated for bridge), `src/renderer/index.ts` (label S0.3). CSP intentionally not added (deferred).
 
@@ -646,11 +655,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.4 — IPC Foundation [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.5 — Safe Diagnostic Operation [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.3 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.4 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.4 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.5 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Create a controlled communication channel. **Deliverables [SPEC]:** IPC allowlist; Typed request and response structures; Argument validation; Centralized IPC registration. **Acceptance [SPEC]:** Only registered methods can be called; Invalid arguments are rejected; Errors are returned safely.
+**Goal [SPEC]:** Verify the renderer-to-main communication path. **Deliverables [SPEC]:** One diagnostic IPC operation; Preload API method; Renderer test interface. **Acceptance [SPEC]:** Renderer successfully requests diagnostic information; No unrestricted Node.js access is required.
 
 ---
 
@@ -668,5 +677,7 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.2 complete (commits 0d73f1a + register dd38b88). Acceptance verified (typecheck/build/test/check green; zero-IPC grep; 3× launches clean). Stopped for owner review before S0.3. | [SPEC] | Crouton (S0.2 implementation) |
 | 2026-11-05 | S0.3 authorized (owner) — finish security boundary per D2–D4. | [APPROVED CHANGE — owner] | Owner |
 | 2026-11-05 | S0.3 complete. Acceptance verified (typecheck/build/test/check green; live renderer probe proves no Node access; 3× clean-close). Stopped for owner review before S0.4. | [SPEC] | Crouton (S0.3 implementation) |
+| 2026-11-05 | S0.4 authorized (owner) — implement IPC Foundation now. | [APPROVED CHANGE — owner] | Owner |
+| 2026-11-05 | S0.4 complete. Acceptance verified (19 tests green; allowlist/INVALID_ARGUMENTS/safe-envelope proven; live probe confirms no raw renderer IPC). Stopped for owner review before S0.5. | [SPEC] | Crouton (S0.4 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

@@ -1,15 +1,18 @@
-// PanelForge — Electron main process (S0.3).
+// PanelForge — Electron main process (S0.4).
 //
 // Creates the BrowserWindow with secure defaults (verified + documented in
-// S0.3; originally applied in S0.2 per Q2), loads the initial renderer page,
-// and handles basic app lifecycle (launch / close / quit).
+// S0.3; originally applied in S0.2 per Q2), registers the IPC allowlist
+// (S0.4), loads the initial renderer page, and handles basic app lifecycle
+// (launch / close / quit).
 //
-// Boundary: S0.3 owns the security baseline (webPreferences, preload bridge,
-// navigation). IPC allowlist belongs to S0.4; logging/config/lifecycle
-// infrastructure belong to S0.6–S0.9. This file must not reach into those.
+// Boundary: S0.4 owns the IPC allowlist (see src/core/ipc/registry.ts).
+// Main only calls registerIpcHandlers() at startup; handlers live in the
+// registry, never here. Logging/config/lifecycle infrastructure belong to
+// S0.6–S0.9. This file must not own IPC handlers directly.
 
 import { app, BrowserWindow, shell } from "electron";
 import path from "path";
+import { registerIpcHandlers } from "../core/ipc/registry";
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -55,6 +58,7 @@ function createWindow(): BrowserWindow {
 }
 
 void app.whenReady().then(() => {
+  registerIpcHandlers();
   createWindow();
 
   app.on("activate", () => {
