@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (174 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract)
+npm test           # runs Vitest (181 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -143,7 +143,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S2.1 — Provider Interface Definitions:** complete (adapter contract execute/interrupt/progress/health, task types, error taxonomy; no real provider code).
 
-**Next (awaiting owner authorization): S2.2 — Persistent Task Records**, the second of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
+- **S2.2 — Persistent Task Records:** complete (`tasks` table in the app DB, 12 §11.1 states, JSON params, persisted across restarts).
+
+**Next (awaiting owner authorization): S2.3 — Task Queue**, the third of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
 
 ## Known limitations (end of Stage 0)
 

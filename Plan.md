@@ -49,7 +49,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > See `Docs/PanelForge-Task-Register.md` §4D for the full task definitions.
 
 - [x] S2.1 Provider Interface Definitions — completed 2026-11-05
-- [ ] S2.2 Persistent Task Records
+- [x] S2.2 Persistent Task Records — completed 2026-11-05
 - [ ] S2.3 Task Queue
 - [ ] S2.4 Task State Transitions
 - [ ] S2.5 Pause and Cancellation

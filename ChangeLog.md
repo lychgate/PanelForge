@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.2 — Persistent Task Records (2026-11-05) — [`ca9b34c`](https://github.com/lychgate/PanelForge/commit/ca9b34c9d1e95fc8232ea5077314b3be46067e2f)
+
+**Added**
+
+- `src/engines/tasks/store.ts` — persistent task records in the app database:
+  `createTask` / `getTask` / `listTasks` / `setState` over the `tasks` table
+  (UUID task_id, task_type, 12 §11.1 states as machine strings, JSON params,
+  optional project link, created/updated timestamps; `defaultTaskStore` singleton).
+- `tasks` table via app DB migration 002 (`002_tasks`).
+- `tests/task-records.test.js` — 7 tests: create/get roundtrip, restart
+  persistence, state updates, all 12 states, typed errors, list order.
+
+**Changed**
+
+- `tests/database.test.js`: migration list now asserts `002_tasks`.
+- Records layer only — queueing/execution arrive with S2.3+, transition
+  ownership with S2.4.
+- Register: S2.2 marked **Complete**; §11 next task is S2.3.
+- `Plan.md`: S2.2 checked off (2026-11-05).
+
 ### S2.1 — Provider Interface Definitions (2026-11-05) — [`c44c989`](https://github.com/lychgate/PanelForge/commit/c44c9894ebed259b109eebf15e091ce39fdac816)
 
 **Added**
