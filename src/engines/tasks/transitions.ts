@@ -25,9 +25,11 @@ export class TransitionError extends Error {
 }
 
 const EDGES: Readonly<Record<TaskState, readonly TaskState[]>> = {
-  queued: ["preparing", "failed", "cancelled", "waiting-for-resources"],
-  preparing: ["loading-model", "generating", "failed", "paused", "cancelled", "queued"],
-  "loading-model": ["generating", "failed", "paused", "cancelled", "queued"],
+  // S2.5: a queued task can be paused before it starts (same semantics as
+  // pausing mid-flight; resume is paused → queued).
+  queued: ["preparing", "failed", "cancelled", "waiting-for-resources", "paused"],
+  preparing: ["loading-model", "generating", "complete", "failed", "paused", "cancelled", "queued"],
+  "loading-model": ["generating", "complete", "failed", "paused", "cancelled", "queued"],
   generating: ["post-processing", "complete", "failed", "cooling-down", "paused", "cancelled", "queued"],
   "post-processing": ["saving", "failed", "cancelled", "queued"],
   saving: ["complete", "failed", "queued"],
