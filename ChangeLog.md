@@ -7,6 +7,22 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.11 — Stage 1 Test Fixture (2026-11-05) — [`682d753`](https://github.com/lychgate/PanelForge/commit/682d753311c66ac23bed1290a4a38ed198038a03)
+
+**Added**
+
+- `tests/stage1-fixture.test.js` — 2 tests: one sample project exercises the
+  whole Stage 1 lifecycle (create → identify → list/metadata → import asset →
+  integrity → copy → reopen at a new path → snapshot → restore (integrity ok) →
+  rename → archive), plus a gate test that ends with zero missing or modified
+  assets. No production code changed.
+- `Docs/PanelForge-Project-Format.md`: fixture section.
+
+**Changed**
+
+- Register: S1.11 marked **Complete**; **Stage 1 is complete**; §11 next task is S2.1.
+- `Plan.md`: S1.11 checked off (2026-11-05); Stage 1 marked complete.
+
 ### S1.10 — Basic Project Interface (2026-11-05) — [`31aa931`](https://github.com/lychgate/PanelForge/commit/31aa931bb348284b19341ed2c96ff604f09f4d79)
 
 **Added**

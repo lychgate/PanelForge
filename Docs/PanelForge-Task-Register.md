@@ -320,7 +320,7 @@ All tasks: Status **Not Started**.
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S1.1–S1.10.
 - **Stop condition [SPEC]:** Stage 1 stop condition.
 - **Completeness:** Complete in spec as a fixture/gate. [RECOMMENDATION] Format doc should begin at S1.1.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 682d753). **Stage 1 is complete.**
 
 ### 4D. Stage 2 — AI Orchestration and Resource Management [SPEC §15]
 
@@ -858,6 +858,11 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S1.10 | `DISPLAY=:0 npm test` | Pass — 165 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 7 ipc + 13 security) | `tests/ipc.test.js` now 9 tests (8 channels allowlisted, full project CRUD round-trip through the envelope, typed codes preserved); `tests/project-interface.test.js` (5 tests: preload/registry/renderer wiring, shortcuts doc, **live probe** — Alt+3 shows the Projects view). |
 | 2026-11-05 | S1.10 | `npm run check` | Pass | Baseline + IPC guard green (ipcMain only in registry; ipcRenderer only in preload — now two allowlisted project + diagnostics surfaces). |
 | 2026-11-05 | S1.10 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S1.11 | `DISPLAY=:0 npm test` | Pass — 167 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 9 ipc + 13 security) | `tests/stage1-fixture.test.js` (2 tests): the full lifecycle — create → identify → list/metadata → import asset → integrity → byte-level COPY → reopen at new path → snapshot → restore (integrity ok) → rename → archive. |
+| 2026-11-05 | S1.11 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S1.11 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S1.11 implemented files:** `tests/stage1-fixture.test.js` (New, 2 tests — the fixture itself; no production code changed), `Docs/PanelForge-Project-Format.md` (fixture section). **Stage 1 is complete.**
 
 **S1.10 implemented files:** `src/shared/types/index.ts` (ProjectSummary + 6 args/data contracts; project SafeErrorCodes preserved), `src/core/ipc/registry.ts` (`panelforge:project.{create,list,open,close,rename,archive}` + validation + typed-code mapping, library dir `<userData>/projects`), `src/preload/index.ts` (frozen `project.*` bridge), `src/renderer/index.ts` (Projects view: create form + list with Open/Close/Rename/Archive, Alt+3), `Docs/PanelForge-Shortcuts.md` (Alt+3 documented), `tests/ipc.test.js` (9 tests), `tests/project-interface.test.js` (New, 5 tests). Users never touch SQL — the renderer talks only to the bridge.
 
@@ -941,11 +946,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S1.11 — Stage 1 Test Fixture [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.1 — Provider Interface Definitions [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S1.10 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.11 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S1.11 Complete (2026-11-05, acceptance verified; see §10). **Stage 1 is complete.** **Do not begin S2.1 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Stage 1 verification (smoke tests, Stage 1 completion report).
+**Goal [SPEC]:** Define the contract every AI provider adapter implements (execute, interrupt, progress, health) — no real provider code.
 
 ---
 
@@ -983,5 +988,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S1.8 complete. Acceptance verified (153 tests green incl. 9 backup-snapshot; snapshot/backup/restore/verify; tampered + unsafe restores refused; original undamaged). Stopped for owner review before S1.9. | [SPEC] | Crouton (S1.8 implementation) |
 | 2026-11-05 | S1.9 complete. Acceptance verified (158 tests green incl. 5 portability; copy/move proof; no absolute paths stored). Stopped for owner review before S1.10. | [SPEC] | Crouton (S1.9 implementation) |
 | 2026-11-05 | S1.10 complete. Acceptance verified (165 tests green incl. 5 project-interface + live Alt+3 probe; full project CRUD through IPC/preload). Stopped for owner review before S1.11. | [SPEC] | Crouton (S1.10 implementation) |
+| 2026-11-05 | S1.11 complete. Acceptance verified (167 tests incl. 2 stage1-fixture; full lifecycle create/copy/reopen/backup/restore/verify). **Stage 1 is complete.** Stopped for owner review before S2.1. | [SPEC] | Crouton (S1.11 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

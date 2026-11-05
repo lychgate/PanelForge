@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (165 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface)
+npm test           # runs Vitest (167 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -135,7 +135,11 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S1.10 — Basic Project Interface:** complete (Projects view with create/list/open/close/rename/archive over `panelforge:project.*` IPC; library dir `<userData>/projects`).
 
-**Next (awaiting owner authorization): S1.11 — Stage 1 Test Fixture** (Stage 1 verification).
+- **S1.11 — Stage 1 Test Fixture:** complete (end-to-end lifecycle fixture: sample project created, copied, reopened, backed up, restored, and verified).
+
+**Stage 1 is complete.** Its fixture gates the Stage 1 stop condition and now fails if any subsystem regresses.
+
+**Next (awaiting owner authorization): S2.1 — Provider Interface Definitions**, the first of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
 
 ## Known limitations (end of Stage 0)
 
