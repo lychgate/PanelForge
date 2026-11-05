@@ -55,3 +55,24 @@ Stored paths are relative to the project root with `/` separators (D7) — never
 absolute. `resolveProjectPath()` resolves them against the root at the
 filesystem boundary and rejects absolute paths and `../` escapes.
 External asset references remain an explicit, authorized exception (S1.4).
+
+## Project metadata (S1.2)
+
+`database/project.db` holds the metadata row (one row per project):
+
+```sql
+CREATE TABLE projects (
+  project_id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  created_at TEXT NOT NULL,   -- inherited from the S1.1 marker
+  updated_at TEXT NOT NULL
+);
+```
+
+The `project_id` always equals the `projectId` in `project.json` (the marker is
+the identity; this row is its description). `project_id`, `created_at`, and
+`updated_at` are ISO timestamps; updates bump `updated_at` and leave the rest
+unchanged. Writes go through the serialized queue (WAL + foreign keys + busy
+timeout 5000, like the app database), and migrations are tracked in the
+project database's own `schema_migrations` table.
