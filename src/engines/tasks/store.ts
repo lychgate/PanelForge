@@ -121,8 +121,10 @@ export function createTaskStore(database: DatabaseService): TaskStore {
   }
 
   async function listTasks(): Promise<TaskRecord[]> {
+    // rowid order = insertion order (FIFO) — created_at timestamps share
+    // millisecond resolution and cannot break ties deterministically.
     return database
-      .query("SELECT * FROM tasks ORDER BY created_at, task_id")
+      .query("SELECT * FROM tasks ORDER BY rowid")
       .map((row) => toRecord(row as Record<string, unknown>));
   }
 
