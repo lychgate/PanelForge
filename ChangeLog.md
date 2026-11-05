@@ -7,6 +7,28 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.8 — Queue Persistence and Recovery (2026-11-05) — [`102e31f`](https://github.com/lychgate/PanelForge/commit/102e31fd19880f3a697f3fc50f486f1bfb326a45)
+
+**Added**
+
+- `src/engines/tasks/recovery.ts` — `recoverQueue()`: running states
+  (`preparing`/`loading-model`/`generating`/`post-processing`/`saving`) return
+  to `queued` through the guarded transition path; paused/terminal tasks are
+  untouched; the summary (`total`/`resumed`/`queued`/`paused`/`terminal`) is
+  idempotent across restarts.
+- Startup step `queue-recovery` in main (after database init): logs
+  `queue recovered (total=…, resumed=…, queued=…)` on launch; failures are
+  recorded, never blocking the window.
+- `tests/queue-recovery.test.js` — 7 tests: restart resume executes exactly
+  once (no double-runs), paused/terminal untouched, idempotency, every running
+  state recovered, summary counts, main wiring.
+
+**Changed**
+
+- Backend checkpoint resumability arrives with real providers (S2.9–S2.10).
+- Register: S2.8 marked **Complete**; §11 next task is S2.9.
+- `Plan.md`: S2.8 checked off (2026-11-05).
+
 ### S2.7 — Progress Reporting (2026-11-05) — [`f84e340`](https://github.com/lychgate/PanelForge/commit/f84e34097cb7ab2c2842b8dc9959eb93056dc9b1)
 
 **Added**
