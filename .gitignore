@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+out/
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project backups / temp
+*.bak-*
+*.tmp
+*.temp
+
+# Local AI / model artifacts (never committed)
+*.safetensors
+*.ckpt
+*.gguf
+models/
+workflows/

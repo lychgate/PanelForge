@@ -1,0 +1,24 @@
+{
+  "name": "panelforge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PanelForge — local-first desktop application for creating illustrated stories, comics, graphic novels, and webtoons (see Docs/PanelForge.pdf).",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "dev": "tsc --noEmit --project tsconfig.node.json && tsc --noEmit --project tsconfig.web.json && node scripts/dev-check.js",
+    "build": "tsc --project tsconfig.node.json --outDir out/node && tsc --project tsconfig.web.json --outDir out/web",
+    "typecheck": "tsc --noEmit --project tsconfig.node.json && tsc --noEmit --project tsconfig.web.json",
+    "test": "vitest run",
+    "lint": "eslint . --ext .ts",
+    "check": "node scripts/check.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vitest": "^1.6.0",
+    "eslint": "^8.57.0"
+  }
+}
