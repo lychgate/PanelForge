@@ -7,6 +7,24 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.6 — Asset Integrity Checking (2026-11-05) — [`9ec25bb`](https://github.com/lychgate/PanelForge/commit/9ec25bbc971092e56f5f5c9a628c828eccc3a426)
+
+**Added**
+
+- `src/core/project/integrity.ts` — `verifyProjectIntegrity()`: compares every
+  registry row against its file and returns an integrity report
+  (`{projectId, checkedAt, entries, summary}`) with per-asset
+  `ok|missing|modified|unreadable` statuses and expected/actual SHA-256 hashes.
+  Verification is read-only; paths resolve through the S1.4 symlink-safe checker.
+- `tests/asset-integrity.test.js` — 7 tests: clean project all-ok, deleted →
+  missing, tampered → modified (actual hash recorded), mixed-damage counts,
+  empty registry, marker requirement, no-mutation guarantee.
+
+**Changed**
+
+- Register: S1.6 marked **Complete**; §11 next task is S1.7.
+- `Plan.md`: S1.6 checked off (2026-11-05).
+
 ### S1.5 — Asset Registry (2026-11-05) — [`96b28fd`](https://github.com/lychgate/PanelForge/commit/96b28fd3abd53bc60dffe4a1ba7e864b32bcf4d7)
 
 **Added**

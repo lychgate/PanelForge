@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (129 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets)
+npm test           # runs Vitest (136 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -125,7 +125,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S1.5 — Asset Registry:** complete (UID-identified rows in `database/project.db`, SHA-256 hashes, import/copy operations).
 
-**Next (awaiting owner authorization): S1.6 — Asset Integrity Checking** (missing-asset detection, hash verification, integrity reports).
+- **S1.6 — Asset Integrity Checking:** complete (missing/modified detection with hash-verified integrity reports).
+
+**Next (awaiting owner authorization): S1.7 — Atomic Metadata Operations** (safe metadata writes, recovery from interrupted writes, basic autosave).
 
 ## Known limitations (end of Stage 0)
 
