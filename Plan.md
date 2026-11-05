@@ -29,7 +29,7 @@ Stage 0 completion: **complete** (2026-11-05 — see `Docs/PanelForge-Stage0-Com
 ## Stage 1 — Project Management and Portable Storage
 
 - [x] S1.1 Project Folder Format — completed 2026-11-05
-- [ ] S1.2 Project Metadata Schema
+- [x] S1.2 Project Metadata Schema — completed 2026-11-05
 - [ ] S1.3 Basic Project Operations
 - [ ] S1.4 Relative Asset Path Service
 - [ ] S1.5 Asset Registry

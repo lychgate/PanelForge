@@ -7,6 +7,28 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.2 — Project Metadata Schema (2026-11-05) — [`a6d8566`](https://github.com/lychgate/PanelForge/commit/a6d8566bcaa42347bc051348067f266a7ff73023)
+
+**Added**
+
+- `src/core/project/metadata.ts` — project database service on
+  `database/project.db` (the authoritative store per D5):
+  `projects(project_id, name, description, created_at, updated_at)`, WAL +
+  foreign keys + busy timeout 5000, tracked migrations, serialized writes with
+  busy retry, and `createProjectMetadata` / `getProjectMetadata` /
+  `updateProjectMetadata` (name validation, typed error codes:
+  `INVALID_ARGUMENTS` / `NOT_A_PROJECT` / `ALREADY_EXISTS` / `NOT_FOUND`).
+  `projectId` and `createdAt` come from the S1.1 marker.
+- `tests/project-metadata.test.js` — 8 tests: marker-identity rows, roundtrip,
+  reopen persistence, `updated_at` bump, validation and error codes, and
+  marker-required checks.
+
+**Changed**
+
+- `Docs/PanelForge-Project-Format.md`: metadata schema section.
+- Register: S1.2 marked **Complete**; §11 next task is S1.3.
+- `Plan.md`: S1.2 checked off (2026-11-05).
+
 ### S1.1 — Project Folder Format (2026-11-05) — [`3a6d599`](https://github.com/lychgate/PanelForge/commit/3a6d5993c20d3157a0955b8f12dc6385438da63f)
 
 **Added**

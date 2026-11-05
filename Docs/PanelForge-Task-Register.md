@@ -245,7 +245,7 @@ All tasks: Status **Not Started**.
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.8, S1.1.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit a6d8566)
 
 #### S1.3 Basic Project Operations [SPEC]
 - **Deliverables [SPEC]:** Create; List; Open; Close; Rename; Archive.
@@ -670,6 +670,11 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S1.1 | `DISPLAY=:0 npm test` | Pass — 93 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 7 ipc + 13 security) | `tests/project.test.js` (11 tests): marker content, full §7.1 tree, D5 store paths, identify/positive/not-a-project/corrupt/newer-version, traversal + absolute-path rejection, atomic marker write, no hardcoded paths. |
 | 2026-11-05 | S1.1 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S1.1 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S1.2 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S1.2 | `DISPLAY=:0 npm test` | Pass — 101 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 7 ipc + 13 security) | `tests/project-metadata.test.js` (8 tests): marker-identity rows, roundtrip, reopen persistence, `updated_at` bump on patch, name validation, ALREADY_EXISTS/NOT_FOUND/null-on-empty, NOT_A_PROJECT propagation, no hardcoded paths. |
+| 2026-11-05 | S1.2 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S1.2 implemented files:** `src/core/project/metadata.ts` (New — project DB service on `database/project.db`: `projects(project_id, name, description, created_at, updated_at)`, WAL/FK/busy 5000, tracked migrations, serialized writes with busy retry, `create/get/update` API, typed `ProjectMetadataError` codes), `Docs/PanelForge-Project-Format.md` (metadata section), `tests/project-metadata.test.js` (New, 8 tests). Marker remains the identity (D5); the row holds the description (name/description/timestamps).
 
 **S1.1 implemented files:** `src/core/project/service.ts` (New — `PROJECT_FORMAT_VERSION=1`, full §7.1 `PROJECT_DIRECTORIES`, `ProjectMetadata` `{formatVersion, projectId, createdAt}`, `createProject` (tree + atomic marker), `identifyProject` (identification + version check with typed codes), `resolveProjectPath` (D7 relative-path enforcement)), `Docs/PanelForge-Project-Format.md` (New — folder specification), `tests/project.test.js` (New, 11 tests). Owner adopted D5 (SQLite authoritative; `project.json` = version/ID marker; JSON = regenerable mirrors) — recorded as decision + [APPROVED CHANGE — owner].
 
@@ -735,11 +740,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S1.2 — Project Metadata Schema [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S1.3 — Basic Project Operations [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S1.1 Complete (2026-11-05, acceptance verified; see §10; D5 decided). **Do not begin S1.2 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S1.2 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.3 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Define the project database tables (project ID, name/description fields, creation + modification timestamps). Project metadata persists in `database/project.db` (D5: SQLite authoritative).
+**Goal [SPEC]:** Create, list, open, close, rename, and archive projects; each operation works independently with useful errors for invalid projects.
 
 ---
 
@@ -768,5 +773,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.11 complete. Acceptance verified (82 tests green incl. 5 packaging; `package` + `make` produce runnable dir + .deb; packaged binary and extracted .deb both launched with full lifecycle independently of the dev environment). Stopped for owner review before S0.12. | [SPEC] | Crouton (S0.11 implementation) |
 | 2026-11-05 | S0.12 complete. Acceptance verified (82 tests green; smoke test PASS; clean rebuild + packaged launch with full lifecycle). **Stage 0 is complete.** Stopped for owner review before S1.1. | [SPEC] | Crouton (S0.12 implementation) |
 | 2026-11-05 | S1.1 complete (D5 owner-approved). Acceptance verified (93 tests green incl. 11 project; full §7.1 tree + marker + identify/version-check). Stopped for owner review before S1.2. | [SPEC] | Crouton (S1.1 implementation) |
+| 2026-11-05 | S1.2 complete. Acceptance verified (101 tests green incl. 8 project-metadata; projects table persists across reopen). Stopped for owner review before S1.3. | [SPEC] | Crouton (S1.2 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
