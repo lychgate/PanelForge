@@ -16,6 +16,7 @@ import type {
   IpcRequest,
   IpcResult,
 } from "../../shared/types";
+import { defaultLogService } from "../logging/service";
 
 export const IPC_CHANNELS = {
   diagnosticsPing: "panelforge:diagnostics.ping",
@@ -89,7 +90,10 @@ export function registerIpcHandlers(): void {
       try {
         const data = await handle(event, args);
         return { ok: true, data };
-      } catch {
+      } catch (err) {
+        // S0.7: handler failures are recorded; the renderer still only
+        // ever sees the safe envelope (no stack, no sensitive detail).
+        defaultLogService.logError(err, `ipc handler failed: ${channel}`);
         return { ok: false, code: "HANDLER_ERROR", message: "Handler failed" };
       }
     });

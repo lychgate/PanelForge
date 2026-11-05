@@ -15,6 +15,7 @@ import { app, BrowserWindow, shell } from "electron";
 import path from "path";
 import { registerIpcHandlers } from "../core/ipc/registry";
 import { defaultConfigService } from "../core/config/service";
+import { defaultLogService, isLogLevel } from "../core/logging/service";
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -62,12 +63,17 @@ function createWindow(): BrowserWindow {
 void app.whenReady().then(() => {
   registerIpcHandlers();
   // S0.6: ensure the settings location exists and can be read safely.
-  // Failures here must not prevent the window from opening.
+  // S0.7: set the log minimum level from the config, create the log
+  // location, and record a startup entry. Failures here must not prevent
+  // the window from opening; errors are recorded via the log service.
   try {
     defaultConfigService.ensureConfigDir();
-    defaultConfigService.loadConfig();
+    const cfg = defaultConfigService.loadConfig();
+    if (isLogLevel(cfg.logLevel)) defaultLogService.setMinLevel(cfg.logLevel);
+    defaultLogService.ensureLogDir();
+    defaultLogService.info("PanelForge starting");
   } catch (err) {
-    console.error("PanelForge: config service unavailable", err);
+    defaultLogService.logError(err, "startup");
   }
   createWindow();
 
