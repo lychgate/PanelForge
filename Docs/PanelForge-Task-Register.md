@@ -167,7 +167,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.1; informs S0.7/S0.8.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Partial — config format/versioning not specified.
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 913d575)
 
 #### S0.7 Logging and Error Handling [SPEC]
 - **Goal [SPEC]:** Establish useful diagnostics.
@@ -615,6 +615,16 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.5 | Live diagnostic probe (Electron + executeJavaScript) | Pass — `DIAG_RESULT {"ok":true,"data":{appName,electronVersion,nodeVersion,platform,arch,channel:"panelforge:diagnostics.get",timestamp}}` + `NODE_RESULT {hasRequire:false,hasProcess:false,hasPanelforge:true}` | Renderer requests diagnostics via the preload bridge; no direct Node.js access. Root cause of earlier "No handler registered" was the probe script not calling `registerIpcHandlers()` — main itself always registers it. |
 | 2026-11-05 | S0.5 | Launch ×3 `npm start` + `pkill -f electron[.]` | Pass | Each started and closed clean; "no stray electron (clean)" after each. |
 | 2026-11-05 | S0.5 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.6 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S0.6 | `npm run build` | Pass | `out/node/core/config/service.js` emitted; renderer HTML copied. |
+| 2026-11-05 | S0.6 | `npm test` | Pass — 33 passed (1 baseline + 7 ipc + 12 config + 13 security) | `tests/config.test.js` (12 tests, built service + fresh temp userData per test): defaults, settings location `userData/config/config.json`, round-trip, atomic write (no tmp residue), corrupt-JSON backup + defaults, version migration, traversal guard, no hardcoded paths, main ensures dir on startup. |
+| 2026-11-05 | S0.6 | `npm run check` | Pass | Baseline + IPC guard green (ipcMain only in registry; ipcRenderer only in preload). |
+| 2026-11-05 | S0.6 | Live launch probe ×3 (`timeout 12 electron .`, `PANELFORGE_USER_DATA_DIR=/tmp/opencode/pf-probe-userdata`, `pgrep -x electron`) | Pass — main proc + zygote observed each launch; `/tmp/opencode/pf-probe-userdata/config` created on every launch; `pgrep -x electron` → "no stray electron (clean)" after each | Main ensures the settings location in `app.whenReady` (try/catch, never blocks window). Env override only selects userData for the probe; production uses `app.getPath("userData")`. GPU/MESA teardown errors are artifacts, not startup failures. |
+| 2026-11-05 | S0.6 | Config round-trip probe (built service, isolated probe userData) | Pass — `PATH /tmp/opencode/pf-probe-userdata/config/config.json`; `UPDATE {"version":1,"theme":"dark","logLevel":"debug",...}`; `RELOAD` identical; `RESET` back to defaults | Proves read/update/reset against the real settings location with no hardcoded paths. |
+| 2026-11-05 | S0.6 | `grep -rn "/home/wetlander" src/core/config/service.ts src/main/index.ts` | Pass — no matches | Acceptance: no hardcoded machine-specific paths. Service resolves userData via `app.getPath("userData")` (env override and `~/.config/panelforge` fallback only for tests). |
+| 2026-11-05 | S0.6 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+
+**S0.6 implemented files:** `src/core/config/service.ts` (New — `createConfigService`/`defaultConfigService`, `CONFIG_VERSION=1`, defaults `{theme:"system", logLevel:"info", launchAtStartup:false, diagnosticsEnabled:true}`, settings at `<userData>/config/config.json`, atomic tmp+rename `0o600` writes, defensive load with corrupt backup + migration, traversal guard in `getUserDataSubPath`; fs/path + Electron only, no new deps), `src/main/index.ts` (calls `defaultConfigService.ensureConfigDir()` + `loadConfig()` in `app.whenReady`, try/catch), `tests/config.test.js` (New, 12 tests). Config format/versioning choices are engineering judgment where the spec is silent (documented in service header).
 
 **S0.5 implemented files:** `src/shared/types/index.ts` (DiagnosticsGetArgs/Data), `src/core/ipc/registry.ts` (diagnosticsGet handler returning app/electron/node/platform/arch/timestamp), `src/preload/index.ts` (frozen `diagnostics.get()` wrapping `ipcRenderer.invoke` for the single channel), `src/renderer/index.ts` (calls bridge on load, renders `#diagnostic-status`), `src/renderer/index.html` (`<script type="module">` so ESM `export {}` loads), `tests/ipc.test.js` (diagnostics.get cases), `tests/security.test.js` (bridge diagnostic check), `scripts/check.js` (ipcRenderer allowed only in preload).
 
@@ -664,11 +674,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.6 — Configuration and User Paths [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.7 — Logging and Error Handling [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.5 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.6 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.6 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.7 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Centralize application configuration. **Deliverables [SPEC]:** Configuration service; User data path handling; Application settings location; Default configuration. **Acceptance [SPEC]:** No hardcoded machine-specific paths; Configuration can be read and updated safely.
+**Goal [SPEC]:** Establish useful diagnostics. **Deliverables [SPEC]:** Central logging service; Error handling; Size-limited or rotating logs; Consistent error reporting. **Acceptance [SPEC]:** Errors are recorded; Logs remain within configured size limits; Sensitive information is not unnecessarily logged.
 
 ---
 
@@ -688,5 +698,7 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S0.3 complete. Acceptance verified (typecheck/build/test/check green; live renderer probe proves no Node access; 3× clean-close). Stopped for owner review before S0.4. | [SPEC] | Crouton (S0.3 implementation) |
 | 2026-11-05 | S0.4 authorized (owner) — implement IPC Foundation now. | [APPROVED CHANGE — owner] | Owner |
 | 2026-11-05 | S0.4 complete. Acceptance verified (19 tests green; allowlist/INVALID_ARGUMENTS/safe-envelope proven; live probe confirms no raw renderer IPC). Stopped for owner review before S0.5. | [SPEC] | Crouton (S0.4 implementation) |
+| 2026-11-05 | S0.5 complete. Acceptance verified (21 tests green; live diagnostic probe via preload bridge; no direct Node.js access). Stopped for owner review before S0.6. | [SPEC] | Crouton (S0.5 implementation) |
+| 2026-11-05 | S0.6 complete (impl commit 913d575). Acceptance verified (33 tests green incl. 12 config; 3× live launch + config-dir probe; no hardcoded paths). Stopped for owner review before S0.7. | [SPEC] | Crouton (S0.6 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
