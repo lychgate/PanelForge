@@ -3,9 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <title>PanelForge</title>
+    <style>
+      /* Visible keyboard focus: core navigation must not rely on mouse only. */
+      :focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+      }
+      #app-nav {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-bottom: 1px solid #999;
+      }
+      #app-nav button {
+        font: inherit;
+        padding: 0.375rem 0.75rem;
+        cursor: pointer;
+      }
+      #app-nav button[aria-current="page"] {
+        font-weight: bold;
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-    <div id="root">PanelForge</div>
+    <nav id="app-nav" aria-label="Main"></nav>
+    <main id="root"></main>
     <script type="module" src="./index.js"></script>
   </body>
 </html>

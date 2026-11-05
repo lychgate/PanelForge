@@ -11,7 +11,7 @@
 // registry, never here. Logging/lifecycle infrastructure belong to
 // S0.7–S0.9. This file must not own IPC handlers directly.
 
-import { app, BrowserWindow, shell } from "electron";
+import { app, BrowserWindow, Menu, shell } from "electron";
 import path from "path";
 import { registerIpcHandlers } from "../core/ipc/registry";
 import { defaultConfigService } from "../core/config/service";
@@ -63,6 +63,32 @@ function createWindow(): BrowserWindow {
 }
 
 void app.whenReady().then(() => {
+  // S0.10: minimal application menu with keyboard accelerators
+  // (see Docs/PanelForge-Shortcuts.md).
+  Menu.setApplicationMenu(
+    Menu.buildFromTemplate([
+      {
+        label: "File",
+        submenu: [
+          {
+            label: "Quit",
+            accelerator: "CmdOrCtrl+Q",
+            click: () => app.quit(),
+          },
+        ],
+      },
+      {
+        label: "View",
+        submenu: [
+          {
+            label: "Reload",
+            accelerator: "CmdOrCtrl+R",
+            click: () => BrowserWindow.getFocusedWindow()?.reload(),
+          },
+        ],
+      },
+    ])
+  );
   // S0.9: ordered startup sequence + cleanup hooks, owned by the
   // lifecycle service. Each step failure is recorded (via the log
   // service) and never blocks the window from opening.
