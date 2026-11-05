@@ -23,6 +23,7 @@ import type {
   TaskType,
 } from "../provider/types";
 import { createTaskStore, type TaskStore } from "./store";
+import { transitionTask } from "./transitions";
 
 export type TaskExecutor = (request: ProviderTaskRequest) => Promise<ProviderResult>;
 
@@ -53,15 +54,17 @@ export function createTaskQueue(store: TaskStore, executors: ExecutorMap): TaskQ
     const task = queued[0];
     const executor = executors[task.taskType as TaskType];
     if (!executor) {
-      await store.setState(task.taskId, "failed");
+      await transitionTask(store, task.taskId, "failed");
       return { taskId: task.taskId, state: "failed" };
     }
-    await store.setState(task.taskId, "preparing");
-    const sawProgress = { current: false };
+    await transitionTask(store, task.taskId, "preparing");
+    // Container so TS doesn't narrow the closure-assigned promise to null.
+    const progressState: { promise: Promise<unknown> | null } = { promise: null };
     const onProgress = (progress: ProviderProgress) => {
-      if (!sawProgress.current && progress.stage !== "preparing") {
-        sawProgress.current = true;
-        void store.setState(task.taskId, "generating");
+      if (progress.stage !== "preparing" && !progressState.promise) {
+        // Chain the generating transition so runNext can await it before
+        // the final transition (fire-and-forget raced with reads).
+        progressState.promise = transitionTask(store, task.taskId, "generating");
       }
     };
     try {
@@ -71,11 +74,13 @@ export function createTaskQueue(store: TaskStore, executors: ExecutorMap): TaskQ
         params: task.params,
         onProgress,
       });
+      if (progressState.promise) await progressState.promise;
       const finalState = result.ok ? "complete" : "failed";
-      await store.setState(task.taskId, finalState);
+      await transitionTask(store, task.taskId, finalState);
       return { taskId: task.taskId, state: finalState };
-    } catch {
-      await store.setState(task.taskId, "failed");
+    } catch (e) {
+      if (progressState.promise) await progressState.promise.catch(() => undefined);
+      await transitionTask(store, task.taskId, "failed");
       return { taskId: task.taskId, state: "failed" };
     }
   }
@@ -98,7 +103,7 @@ export function createTaskQueue(store: TaskStore, executors: ExecutorMap): TaskQ
     let resumed = 0;
     for (const task of await store.listTasks()) {
       if ((RUNNING_STATES as readonly string[]).includes(task.state)) {
-        await store.setState(task.taskId, "queued");
+        await transitionTask(store, task.taskId, "queued");
         resumed++;
       }
     }
