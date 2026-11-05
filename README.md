@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (110 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations)
+npm test           # runs Vitest (120 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -121,7 +121,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S1.3 — Basic Project Operations:** complete (create, list, open, close, rename, archive with open-set exclusivity and typed errors).
 
-**Next (awaiting owner authorization): S1.4 — Relative Asset Path Service** (relative resolution, normalization, traversal + symlink-escape protection).
+- **S1.4 — Relative Asset Path Service:** complete (canonical relative resolution, normalization, traversal + symlink-escape rejection — see `Docs/PanelForge-Project-Format.md`).
+
+**Next (awaiting owner authorization): S1.5 — Asset Registry** (asset records, type metadata, file hashes, import/copy).
 
 ## Known limitations (end of Stage 0)
 

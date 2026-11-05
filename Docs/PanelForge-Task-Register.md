@@ -264,6 +264,7 @@ All tasks: Status **Not Started**.
 - **Status:** Not Started
 - **Acceptance clarification [RECOMMENDATION — external review, 2026-11-05, not spec text]:** In addition to `../../etc/passwd`-style traversal, S1.4 acceptance testing should include **symbolic-link escape tests**: a symlink inside the project pointing outside must be rejected, even when the apparent relative path looks valid. Target filesystem boundary must resolve symlinks and verify the canonical target remains inside the project root. (To be finalized at S1.4 design; recorded here so it isn't missed.)
 - **Path convention [RECOMMENDATION — owner-directed, prior refinement]:** Stored relative paths use **`/` as canonical separator**; translate to native OS separators only at the filesystem boundary.
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 89214ff)
 
 #### S1.5 Asset Registry [SPEC]
 - **Deliverables [SPEC]:** Asset records; Asset type metadata; File hashes; Import and copy operations.
@@ -678,6 +679,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S1.3 | `DISPLAY=:0 npm test` | Pass — 110 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 7 ipc + 13 security) | `tests/project-operations.test.js` (9 tests): create+list roundtrip, duplicate/invalid-name/empty-parent rejection, missing-dir NOT_FOUND, junk skip, OPEN/CLOSED exclusivity, NOT_A_PROJECT, rename (folder + metadata, ID stable), INVALID_STATE guards, archive move + list removal. |
 | 2026-11-05 | S1.3 | `npm run check` | Pass | Baseline + IPC guard green (no new deps; IPC surface unchanged this task). |
 | 2026-11-05 | S1.3 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S1.4 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S1.4 | `npm run build` | Pass | `out/node/core/project/paths.js` emitted. |
+| 2026-11-05 | S1.4 | `DISPLAY=:0 npm test` | Pass — 120 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 7 ipc + 13 security) | `tests/project-paths.test.js` (10 tests): canonical resolution, normalization (`//`, `.`, internal `..`), traversal/absolute/backslash rejection, **symlink escape rejected + internal symlink accepted**, parent-based resolution for non-existent files, storage inverse, no hardcoded paths. |
+| 2026-11-05 | S1.4 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S1.4 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S1.4 implemented files:** `src/core/project/paths.ts` (New — `normalizeRelative` (lexical canonicalization), `resolveInProject` (canonicalize + join + symlink-resolved boundary check), `toStoragePath` (inverse), `PathError` typed codes), `tests/project-paths.test.js` (New, 10 tests). Translation to native separators happens only in the resolution step; tests cover the external-review symlink clarification.
 
 **S1.3 implemented files:** `src/core/project/operations.ts` (New — `ProjectOpError` with typed codes; `createProjectAt`, `listProjects`, `openProject`, `closeProject`, `renameProject`, `archiveProject`, `createProjectManager` (open-set exclusivity), `defaultProjectManager`), `tests/project-operations.test.js` (New, 9 tests). Semantics for unspecified archive/rename/exclusivity: rename = folder + metadata name (ID unchanged), archive = move to sibling `.archived/`, open/close = in-process exclusivity set (documented judgment). No IPC channels added this task (reserved to S1.10 UI work).
 
@@ -747,11 +755,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S1.4 — Relative Asset Path Service [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S1.5 — Asset Registry [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S1.3 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.4 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S1.4 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S1.5 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Relative path resolution, normalization, and traversal protection (stored paths relative to project root, `/` separators, symlink-escape checks per the S1.4 acceptance clarification).
+**Goal [SPEC]:** Asset records with type metadata, file hashes, and import/copy operations (D6 asset-identity model applies here).
 
 ---
 
@@ -782,5 +790,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S1.1 complete (D5 owner-approved). Acceptance verified (93 tests green incl. 11 project; full §7.1 tree + marker + identify/version-check). Stopped for owner review before S1.2. | [SPEC] | Crouton (S1.1 implementation) |
 | 2026-11-05 | S1.2 complete. Acceptance verified (101 tests green incl. 8 project-metadata; projects table persists across reopen). Stopped for owner review before S1.3. | [SPEC] | Crouton (S1.2 implementation) |
 | 2026-11-05 | S1.3 complete. Acceptance verified (110 tests green incl. 9 project-operations; all six operations independent; typed errors). Stopped for owner review before S1.4. | [SPEC] | Crouton (S1.3 implementation) |
+| 2026-11-05 | S1.4 complete. Acceptance verified (120 tests green incl. 10 project-paths; canonical resolution + traversal/symlink rejection). Stopped for owner review before S1.5. | [SPEC] | Crouton (S1.4 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

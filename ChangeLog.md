@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S1.4 — Relative Asset Path Service (2026-11-05) — [`89214ff`](https://github.com/lychgate/PanelForge/commit/89214ff122cbba87235ab5f391d6ab3b609ef422)
+
+**Added**
+
+- `src/core/project/paths.ts` — relative asset path service: `normalizeRelative`
+  (lexical canonicalization; rejects absolute paths, backslashes, and escapes),
+  `resolveInProject` (canonicalize + join + symlink-resolved target verification —
+  a link pointing outside the project is rejected even when its spelling looks
+  valid), and the `toStoragePath` inverse. Non-existent files resolve by parent.
+- `tests/project-paths.test.js` — 10 tests: correct resolution of valid paths,
+  normalization, traversal/absolute/backslash rejection, symlink escape rejected
+  + internal symlink accepted, non-existent-file resolution, storage inverse.
+
+**Changed**
+
+- `Docs/PanelForge-Project-Format.md` (paths section already specified these
+  rules; S1.4 implements them).
+- Register: S1.4 marked **Complete**; §11 next task is S1.5.
+- `Plan.md`: S1.4 checked off (2026-11-05).
+
 ### S1.3 — Basic Project Operations (2026-11-05) — [`dea5e4c`](https://github.com/lychgate/PanelForge/commit/dea5e4c54f8e15b4ec10add55497c95b3c5f30de)
 
 **Added**
