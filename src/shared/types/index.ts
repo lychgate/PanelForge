@@ -28,3 +28,19 @@ export type DiagnosticsPingArgs = {
 export type DiagnosticsPingData = {
   ok: true;
 };
+
+export type DiagnosticsGetArgs = {
+  // Diagnostic request takes no arguments; the handler returns a minimal
+  // safe payload proving the renderer → main path works end-to-end.
+  token: string;
+};
+
+export type DiagnosticsGetData = {
+  appName: string;
+  electronVersion: string;
+  nodeVersion: string;
+  platform: string;
+  arch: string;
+  channel: string;
+  timestamp: string;
+};

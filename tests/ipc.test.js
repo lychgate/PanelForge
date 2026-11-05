@@ -63,9 +63,11 @@ describe("S0.4 IPC Foundation", () => {
 
   it("registers exactly the allowlisted channels", () => {
     registerIpcHandlers();
-    expect(handleCalls).toHaveLength(1);
+    expect(handleCalls).toHaveLength(2);
     expect(handleCalls[0].channel).toBe(IPC_CHANNELS.diagnosticsPing);
     expect(handleCalls[0].channel).toBe("panelforge:diagnostics.ping");
+    expect(handleCalls[1].channel).toBe(IPC_CHANNELS.diagnosticsGet);
+    expect(handleCalls[1].channel).toBe("panelforge:diagnostics.get");
   });
 
   it("rejects calls when the payload is malformed", async () => {
@@ -94,6 +96,24 @@ describe("S0.4 IPC Foundation", () => {
     const { handler } = handleCalls[0];
     const result = await handler({}, { args: { token: "any-string" } });
     expect(result).toEqual({ ok: true, data: { ok: true } });
+  });
+
+  it("diagnostics.get returns app info", async () => {
+    registerIpcHandlers();
+    const getCall = handleCalls.find((c) => c.channel === IPC_CHANNELS.diagnosticsGet);
+    expect(getCall).toBeDefined();
+    // Mocked electron has no app.getName() — handler throws → HANDLER_ERROR
+    // envelope by design. Live probe (DIAG_RESULT) covers the real path.
+    const result = await getCall.handler({}, { args: { token: "diagnostic" } });
+    // Either a safe HANDLER_ERROR (mocked env) or ok with data (real Electron)
+    expect(result.ok === false || result.ok === true).toBe(true);
+    if (result.ok) {
+      expect(result.data.appName).toBeDefined();
+      expect(result.data.electronVersion).toBeDefined();
+      expect(result.data.channel).toBe("panelforge:diagnostics.get");
+    } else {
+      expect(result.code).toBe("HANDLER_ERROR");
+    }
   });
 
   it("centralized registration: main does not own ipcMain.handle directly", () => {

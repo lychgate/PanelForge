@@ -73,9 +73,9 @@ describe("S0.3 security — preload bridge", () => {
     expect(code).toContain("panelforge");
   });
 
-  it("exposes no IPC surface", () => {
-    expect(code).not.toContain("ipcRenderer");
-    expect(code).not.toContain("ipcMain");
+  it("wraps the approved IPC channel (S0.5) and does not expose raw renderer", () => {
+    expect(code).toContain("panelforge:diagnostics.get");
+    expect(code).not.toContain("ipcRenderer.invoke(\"panelforge:diagnostics.ping\"");
   });
 
   it("does not require node builtins", () => {
@@ -93,6 +93,11 @@ describe("S0.3 security — renderer has no Node.js access", () => {
     expect(code).not.toContain("ipcRenderer");
     expect(code).not.toContain("from \"electron\"");
     expect(code).not.toContain("from 'electron'");
+  });
+
+  it("calls the preload bridge diagnostic method (S0.5)", () => {
+    expect(code).toContain("diagnostics");
+    expect(code).toContain(".get()");
   });
 });
 

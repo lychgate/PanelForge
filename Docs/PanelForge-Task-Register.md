@@ -158,7 +158,7 @@ All tasks: Status **Not Started** unless otherwise recorded. Dependencies marked
 - **Dependencies [SPEC]:** None stated. [RECOMMENDATION] S0.3, S0.4.
 - **Stop condition [SPEC]:** None stated.
 - **Completeness:** Complete in spec as a spike.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; commit recorded below)
 
 #### S0.6 Configuration and User Paths [SPEC]
 - **Goal [SPEC]:** Centralize application configuration.
@@ -608,6 +608,15 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S0.4 | Live renderer probe | Pass — `hasRequire:false, hasProcess:false, hasFs:false, hasElectron:false, hasPanelforge:true, hasIpcRenderer:false` | Renderer has no raw IPC; only the frozen bridge. `IPC_CHANNELS` allowlist probe: `{"diagnosticsPing":"panelforge:diagnostics.ping"}`. |
 | 2026-11-05 | S0.4 | Launch ×3 `npm start` + `pkill -f electron[.]` | Pass — each started; `pgrep -a -f electron` → "no stray electron (clean)" after each | SIGTERM exits; no stray PIDs. |
 | 2026-11-05 | S0.4 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+| 2026-11-05 | S0.5 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S0.5 | `npm run build` | Pass | Registry + preload + renderer emitted. |
+| 2026-11-05 | S0.5 | `DISPLAY=:0 npm test` | Pass — 21 passed (1 baseline + 7 ipc + 13 security) | `tests/ipc.test.js` now 7 tests (added diagnostics.get); security probe checks `diagnostics.get` call. |
+| 2026-11-05 | S0.5 | `npm run check` | Pass | ipcRenderer allowed only in preload for the single approved channel; ipcMain only in registry. |
+| 2026-11-05 | S0.5 | Live diagnostic probe (Electron + executeJavaScript) | Pass — `DIAG_RESULT {"ok":true,"data":{appName,electronVersion,nodeVersion,platform,arch,channel:"panelforge:diagnostics.get",timestamp}}` + `NODE_RESULT {hasRequire:false,hasProcess:false,hasPanelforge:true}` | Renderer requests diagnostics via the preload bridge; no direct Node.js access. Root cause of earlier "No handler registered" was the probe script not calling `registerIpcHandlers()` — main itself always registers it. |
+| 2026-11-05 | S0.5 | Launch ×3 `npm start` + `pkill -f electron[.]` | Pass | Each started and closed clean; "no stray electron (clean)" after each. |
+| 2026-11-05 | S0.5 | `git status` | Clean (commit recorded below) | `out/` and `node_modules/` gitignored. |
+
+**S0.5 implemented files:** `src/shared/types/index.ts` (DiagnosticsGetArgs/Data), `src/core/ipc/registry.ts` (diagnosticsGet handler returning app/electron/node/platform/arch/timestamp), `src/preload/index.ts` (frozen `diagnostics.get()` wrapping `ipcRenderer.invoke` for the single channel), `src/renderer/index.ts` (calls bridge on load, renders `#diagnostic-status`), `src/renderer/index.html` (`<script type="module">` so ESM `export {}` loads), `tests/ipc.test.js` (diagnostics.get cases), `tests/security.test.js` (bridge diagnostic check), `scripts/check.js` (ipcRenderer allowed only in preload).
 
 **S0.4 implemented files:** `src/shared/types/index.ts` (SafeErrorCode, IpcResult/IpcRequest, DiagnosticsPingArgs/Data), `src/core/ipc/registry.ts` (New — IPC_CHANNELS allowlist, validate + handle, `registerIpcHandlers`), `src/main/index.ts` (calls `registerIpcHandlers()` at startup; no direct `ipcMain.handle`), `src/preload/index.ts` (still frozen empty api — S0.5 adds Pause), `tests/ipc.test.js` (New), `scripts/check.js` (ipcMain only in registry; ipcRenderer forbidden). Zod deferred (D1); validation handwritten.
 
@@ -655,11 +664,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S0.5 — Safe Diagnostic Operation [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S0.6 — Configuration and User Paths [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S0.4 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.5 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S0.5 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S0.6 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Verify the renderer-to-main communication path. **Deliverables [SPEC]:** One diagnostic IPC operation; Preload API method; Renderer test interface. **Acceptance [SPEC]:** Renderer successfully requests diagnostic information; No unrestricted Node.js access is required.
+**Goal [SPEC]:** Centralize application configuration. **Deliverables [SPEC]:** Configuration service; User data path handling; Application settings location; Default configuration. **Acceptance [SPEC]:** No hardcoded machine-specific paths; Configuration can be read and updated safely.
 
 ---
 

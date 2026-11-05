@@ -1,4 +1,4 @@
-// PanelForge — Electron main process (S0.4).
+// PanelForge — Electron main process (S0.5).
 //
 // Creates the BrowserWindow with secure defaults (verified + documented in
 // S0.3; originally applied in S0.2 per Q2), registers the IPC allowlist

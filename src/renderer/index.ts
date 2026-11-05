@@ -1,10 +1,55 @@
-// PanelForge — renderer entry (S0.3).
+// PanelForge — renderer entry (S0.5).
 //
-// Minimal renderer: renders a static placeholder page and has no
-// business logic, no Node.js API use, and no IPC. Real UI arrives in later
-// stages once the S0.4–S0.5 security/IPC boundary exists.
+// Renders a static placeholder page and surfaces the S0.5 diagnostic:
+// on load, the renderer calls the preload bridge and displays the
+// main-process response. The renderer has no direct Node.js or
+// ipcRenderer access — only the preload bridge.
+
+export {};
+
+type PanelForgeApi = {
+  diagnostics: {
+    get(): Promise<{
+      ok: boolean;
+      data?: {
+        appName: string;
+        electronVersion: string;
+        nodeVersion: string;
+        platform: string;
+        arch: string;
+        channel: string;
+        timestamp: string;
+      };
+      code?: string;
+      message?: string;
+    }>;
+  };
+  version: Record<string, never>;
+};
+
+type PanelForgeWindow = Window & { panelforge: PanelForgeApi };
+
+const win = window as unknown as PanelForgeWindow;
 
 const root = document.getElementById("root");
 if (root) {
-  root.textContent = "PanelForge — initial window (S0.3)";
+  root.textContent = "PanelForge — initial window (S0.5)";
+  const status = document.createElement("div");
+  status.id = "diagnostic-status";
+  status.textContent = "diagnostic: pending";
+  root.appendChild(status);
+
+  win.panelforge.diagnostics
+    .get()
+    .then((result) => {
+      if (result.ok && result.data) {
+        status.textContent =
+          `diagnostic: ok ${result.data.appName} electron=${result.data.electronVersion} node=${result.data.nodeVersion}`;
+      } else {
+        status.textContent = `diagnostic: error ${result.code} ${result.message}`;
+      }
+    })
+    .catch((err: unknown) => {
+      status.textContent = `diagnostic: exception ${String(err)}`;
+    });
 }

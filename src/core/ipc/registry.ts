@@ -7,8 +7,10 @@
 //   rejected with a safe error envelope (no stack traces to the renderer).
 // - Handlers are centralized: add a channel here, never elsewhere.
 
-import { ipcMain, IpcMainInvokeEvent } from "electron";
+import { app, ipcMain, IpcMainInvokeEvent } from "electron";
 import type {
+  DiagnosticsGetArgs,
+  DiagnosticsGetData,
   DiagnosticsPingArgs,
   DiagnosticsPingData,
   IpcRequest,
@@ -17,6 +19,7 @@ import type {
 
 export const IPC_CHANNELS = {
   diagnosticsPing: "panelforge:diagnostics.ping",
+  diagnosticsGet: "panelforge:diagnostics.get",
 } as const;
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];
@@ -34,31 +37,52 @@ function isValidPingArgs(args: unknown): args is DiagnosticsPingArgs {
   return typeof token === "string" && token.length > 0;
 }
 
+function isValidGetArgs(args: unknown): args is DiagnosticsGetArgs {
+  if (args === null || typeof args !== "object") return false;
+  const keys = Object.keys(args as Record<string, unknown>);
+  if (keys.length !== 1 || keys[0] !== "token") return false;
+  const { token } = args as DiagnosticsGetArgs;
+  return typeof token === "string" && token.length > 0;
+}
+
 const handlers: Record<
   string,
   {
     validate: (args: unknown) => boolean;
-    handle: Handler<DiagnosticsPingArgs, DiagnosticsPingData>;
+    handle: Handler<any, any>;
   }
 > = {
   [IPC_CHANNELS.diagnosticsPing]: {
     validate: isValidPingArgs,
     handle: async (_event, args) => {
-      // No argument content is used in S0.4 — the ping only proves the
-      // channel is registered and validation passed. S0.5 adds content.
       void args;
       return { ok: true };
+    },
+  },
+  [IPC_CHANNELS.diagnosticsGet]: {
+    validate: isValidGetArgs,
+    handle: async (_event, _args) => {
+      void _args;
+      return {
+        appName: app.getName(),
+        electronVersion: process.versions.electron,
+        nodeVersion: process.versions.node,
+        platform: process.platform,
+        arch: process.arch,
+        channel: IPC_CHANNELS.diagnosticsGet,
+        timestamp: new Date().toISOString(),
+      };
     },
   },
 };
 
 export function registerIpcHandlers(): void {
   for (const [channel, { validate, handle }] of Object.entries(handlers)) {
-    ipcMain.handle(channel, async (event: IpcMainInvokeEvent, payload: IpcRequest<DiagnosticsPingArgs>): Promise<IpcResult<DiagnosticsPingData>> => {
+    ipcMain.handle(channel, async (event: IpcMainInvokeEvent, payload: IpcRequest<any>): Promise<IpcResult<any>> => {
       if (!payload || typeof payload !== "object" || !("args" in payload)) {
         return { ok: false, code: "INVALID_ARGUMENTS", message: "Missing args" };
       }
-      const args = (payload as IpcRequest<DiagnosticsPingArgs>).args;
+      const args = (payload as IpcRequest<any>).args;
       if (!validate(args)) {
         return { ok: false, code: "INVALID_ARGUMENTS", message: "Invalid arguments" };
       }

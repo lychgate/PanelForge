@@ -90,8 +90,9 @@ if (fs.existsSync(gitignorePath)) {
 }
 
 // S0.4 IPC guard: src/ may contain ipcMain ONLY inside the centralized
-// registry (src/core/ipc/registry.ts). ipcRenderer stays forbidden except
-// in the preload bridge where the allowlist lives (none yet — S0.5 adds it).
+// registry (src/core/ipc/registry.ts). ipcRenderer is allowed ONLY in the
+// preload bridge for the approved diagnostic method (S0.5). No raw
+// ipcRenderer exposure to the renderer (S0.3 sandbox still protects it).
 // contextBridge/exposeInMainWorld stays forbidden except in preload.
 const srcDir = path.join(root, "src");
 const forbiddenIpc = ["ipcMain", "ipcRenderer"];
@@ -125,9 +126,9 @@ for (const file of walk(srcDir)) {
   if (!isRegistry && code.includes("ipcMain")) {
     errors.push(`src/: forbidden IPC surface 'ipcMain' found in ${path.relative(root, file)} (only src/core/ipc/registry.ts may own it)`);
   }
-  // ipcRenderer forbidden everywhere in S0.4 (preload expose lands in S0.5).
-  if (code.includes("ipcRenderer")) {
-    errors.push(`src/: forbidden IPC surface 'ipcRenderer' found in ${path.relative(root, file)} (renderer IPC lands in S0.5)`);
+  // ipcRenderer allowed only in the preload bridge (approved diagnostic method).
+  if (!isBridge && code.includes("ipcRenderer")) {
+    errors.push(`src/: forbidden IPC surface 'ipcRenderer' found in ${path.relative(root, file)} (only src/preload/index.ts may use it, for the approved channel)`);
   }
   // Bridge must not require node builtins.
   if (isBridge) {
@@ -152,10 +153,10 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log("[check] OK — package baseline verified (S0.1 + S0.2 electron + S0.3 bridge + S0.4 IPC):");
+console.log("[check] OK — package baseline verified (S0.1 + S0.2 electron + S0.3 bridge + S0.4 IPC + S0.5 diagnostic):");
 console.log("  - Required files present");
 console.log("  - package.json is private, named 'panelforge'");
 console.log("  - Required devDeps present: electron; no DB/AI deps");
 console.log("  - main entry + start script (electron .) correct");
 console.log("  - Scripts: dev, build, start, typecheck, test");
-console.log("  - IPC: ipcMain only in src/core/ipc/registry.ts; bridge only in preload (no ipcRenderer yet)");
+console.log("  - IPC: ipcMain only in registry; ipcRenderer only in preload (diagnostic channel)");
