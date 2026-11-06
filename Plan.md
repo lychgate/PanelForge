@@ -201,7 +201,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S8.2 Panel placement (mm geometry, artwork by asset reference) — completed 2026-11-06; Stage 8 now 2 of 14
 - [x] S8.3 Traditional layout templates (grid presets) — completed 2026-11-06; Stage 8 now 3 of 14
 - [x] S8.4 Webtoon / vertical layout (continuous scroll geometry) — completed 2026-11-06; Stage 8 now 4 of 14
-- [ ] S8.5 Borders (presets, vector, never baked into artwork)
+- [x] S8.5 Borders (presets, vector, never baked into artwork) — completed 2026-11-06; Stage 8 now 5 of 14
 - [ ] S8.6 Balloons + tails (speech/caption/thought, anchors)
 - [ ] S8.7 Dialogue/caption editing (overlay text only, artwork byte-identical)
 - [ ] S8.8 Sound effects (SFX vector lettering records)

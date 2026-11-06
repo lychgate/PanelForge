@@ -232,6 +232,27 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.5 — Borders (2026-11-06) — [`42cfc6c`](https://github.com/lychgate/PanelForge/commit/42cfc6c305a8f51bfb61813201d963b77b3a3030)
+
+**Added**
+
+- `src/core/project/borders.ts` —
+  `setBorder`/`getBorder`: none/thin/bold presets +
+  width + rounded, stored per placement
+  (`placement_borders`), validated (width 0..10mm,
+  none takes no width).
+- Migration 052 (`placement_borders`) in
+  `src/core/project/metadata.ts`.
+- `tests/borders.test.js` — 3 tests: preset
+  persistence + round-trips, invalid specs reject,
+  artwork bytes untouched, migration v52.
+
+**Changed**
+
+- Register: S8.5 marked **Complete**; Stage 8 now 5 of 14;
+  §11 next eligible is S8.6.
+- `Plan.md`: S8.5 checked off (2026-11-06).
+
 ### S8.4 — Webtoon / Vertical Layout (2026-11-06) — [`1aa1104`](https://github.com/lychgate/PanelForge/commit/1aa1104cce65978c39e62ca6067e13b1951a4b5f)
 
 **Added**
