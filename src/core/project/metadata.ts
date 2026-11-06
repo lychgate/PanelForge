@@ -579,6 +579,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_page_panels_pair ON page_panels(page_id, panel_id)",
     ],
   },
+  // S8.5: per-placement border specs (rendered by S8.11 SVG).
+  {
+    version: 52,
+    name: "052_placement_borders",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS placement_borders (placement_id TEXT PRIMARY KEY REFERENCES page_panels(placement_id), style TEXT NOT NULL, width_mm REAL NOT NULL, rounded INTEGER NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
