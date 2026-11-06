@@ -619,6 +619,20 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS reading_order (page_id TEXT PRIMARY KEY REFERENCES pages(page_id), order_json TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S8.10: layout snapshots (full copies, parent lineage).
+  {
+    version: 57,
+    name: "057_layout_snapshots",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS layout_snapshots (snapshot_id TEXT PRIMARY KEY, name TEXT NOT NULL, parent_snapshot_id TEXT REFERENCES layout_snapshots(snapshot_id), created_at TEXT NOT NULL)",
+      "CREATE TABLE IF NOT EXISTS snapshot_pages (snapshot_id TEXT NOT NULL REFERENCES layout_snapshots(snapshot_id), page_id TEXT NOT NULL, manuscript_id TEXT NOT NULL, title TEXT NOT NULL, format TEXT NOT NULL, width REAL NOT NULL, height REAL NOT NULL, margin REAL NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, page_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_page_panels (snapshot_id TEXT NOT NULL REFERENCES layout_snapshots(snapshot_id), placement_id TEXT NOT NULL, page_id TEXT NOT NULL, panel_id TEXT NOT NULL, asset_id TEXT NOT NULL, artwork_id TEXT NOT NULL, x REAL NOT NULL, y REAL NOT NULL, width REAL NOT NULL, height REAL NOT NULL, z_order INTEGER NOT NULL, border TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, placement_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_placement_borders (snapshot_id TEXT NOT NULL REFERENCES layout_snapshots(snapshot_id), placement_id TEXT NOT NULL, style TEXT NOT NULL, width_mm REAL NOT NULL, rounded INTEGER NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, placement_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_balloons (snapshot_id TEXT NOT NULL REFERENCES layout_snapshots(snapshot_id), balloon_id TEXT NOT NULL, placement_id TEXT NOT NULL, kind TEXT NOT NULL, shape TEXT NOT NULL, x REAL NOT NULL, y REAL NOT NULL, width REAL NOT NULL, height REAL NOT NULL, tail_x REAL, tail_y REAL, tail_visible INTEGER NOT NULL, text TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, balloon_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_sfx (snapshot_id TEXT NOT NULL REFERENCES layout_snapshots(snapshot_id), sfx_id TEXT NOT NULL, placement_id TEXT NOT NULL, text TEXT NOT NULL, weight TEXT NOT NULL, angle REAL NOT NULL, x REAL NOT NULL, y REAL NOT NULL, scale REAL NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, sfx_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_reading_order (snapshot_id TEXT NOT NULL REFERENCES layout_snapshots(snapshot_id), page_id TEXT NOT NULL, order_json TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, page_id))",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
