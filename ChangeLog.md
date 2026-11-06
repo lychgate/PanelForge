@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.8 — Generation Approval (2026-11-06) — [`b9cc8d2`](https://github.com/lychgate/PanelForge/commit/b9cc8d241c9a3d1db60940cb27bc0d35dc8ddd5b)
+
+**Added**
+
+- `src/core/project/approval.ts` — per-version approval
+  (`setApproval`/`getApproval`): pending default, rationale
+  required, timestamped.
+- Migration 017 (`character_versions` approval columns) in
+  `src/core/project/metadata.ts`.
+- `tests/approval.test.js` — 5 tests: pending default + recorded
+  rationale, validation, binding gate, later-rejection warn,
+  migration v17.
+
+**Changed**
+
+- `src/core/project/version-binding.ts`: `bindVersion` refuses
+  pending/rejected versions (`NOT_APPROVED`); era check warns on
+  rejected bound versions (bindings survive). Version-binding
+  test fixture now approves before binding.
+- Register: S4.8 marked **Complete**; Stage 4 now 8 of 12; §11 next
+  eligible is S4.9.
+- `Plan.md`: S4.8 checked off (2026-11-06).
+
 ### S4.7 — Character Version Binding (2026-11-06) — [`e640be4`](https://github.com/lychgate/PanelForge/commit/e640be469e959689243e712abeee46cb691f0941)
 
 **Added**

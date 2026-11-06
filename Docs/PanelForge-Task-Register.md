@@ -712,7 +712,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Generation approval.
 - **Acceptance:** Rejected/pending versions cannot be bound; approval decisions are recorded; existing bindings on a later-rejected version warn.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.2, S4.7.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit b9cc8d2; see below)
 
 #### S4.9 Generation-request records [SPEC]
 - **Goal:** Stage 4 records generation requests; it never generates.
@@ -1307,6 +1307,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S4.7 | `DISPLAY=:0 npm test` | Pass — 402 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 9 ipc + 13 security) | `tests/version-binding.test.js` (5 tests): exact-version pinning + rebind replaces, typed rejections, bound-version delete guard, era clash/match/unbound warnings, character-scoped listing + migration v16. |
 | 2026-11-06 | S4.7 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S4.7 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S4.8 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S4.8 | `npm run build` | Pass | `out/node/core/project/approval.js` emitted. |
+| 2026-11-06 | S4.8 | `DISPLAY=:0 npm test` | Pass — 407 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 9 ipc + 13 security) | `tests/approval.test.js` (5 tests): pending default + recorded rationale/timestamp, validation, binding gate, later-rejection warn, migration v17. `tests/version-binding.test.js` fixture now approves versions before binding. |
+| 2026-11-06 | S4.8 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S4.8 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S4.8 implemented files:** `src/core/project/approval.ts` (New — `setApproval`/`getApproval`), `src/core/project/metadata.ts` (migration 017 approval columns), `src/core/project/version-binding.ts` (bind refuses non-approved; era check warns on rejected bound versions), `tests/approval.test.js` (New, 5 tests), `tests/version-binding.test.js` (fixture approves before binding). Requests stay S4.9.
 
 **S4.7 implemented files:** `src/core/project/version-binding.ts` (New — `bindVersion`/`getBinding`/`listBindingsByPanel`/`listBindingsByCharacter`/`unbind` + `verifyBindingEra`), `src/core/project/character-versions.ts` (delete refuses bound versions), `src/core/project/metadata.ts` (migration 016 panel_character_bindings), `tests/version-binding.test.js` (New, 5 tests). Approval stays S4.8.
 
@@ -1520,7 +1527,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S4.6:** S4.7 — Character version binding (opaque panel_id; one exact version; wrong-version warnings). **Status: Complete (2026-11-06, impl commit e640be4; 402 tests incl. 5 version-binding). Stage 4 now 7 of 12.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S4.7:** S4.8 — Generation approval (pending/approved/rejected gate on binding). Do not begin without explicit owner authorization.
+**Next eligible after S4.7:** S4.8 — Generation approval (pending/approved/rejected gate on binding). **Status: Complete (2026-11-06, impl commit b9cc8d2; 407 tests incl. 5 approval). Stage 4 now 8 of 12.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S4.8:** S4.9 — Generation-request records (request shape + validation only; zero provider calls). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1603,5 +1612,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S4.5 complete. Acceptance verified (392 tests incl. 5 tier-config; runtime-editable tiers, seeded §8.4 defaults, scorer reads config). Stage 4 now 5 of 12. Stopped for owner review before S4.6. | [SPEC] | Crouton (S4.5 implementation) |
 | 2026-11-06 | S4.6 complete. Acceptance verified (397 tests incl. 5 entity-bridge; name-only copy, one profile per entity, exact source resolution). Stage 4 now 6 of 12. Stopped for owner review before S4.7. | [SPEC] | Crouton (S4.6 implementation) |
 | 2026-11-06 | S4.7 complete. Acceptance verified (402 tests incl. 5 version-binding; exact-version pinning, bound-delete guard, era warnings). Stage 4 now 7 of 12. Stopped for owner review before S4.8. | [SPEC] | Crouton (S4.7 implementation) |
+| 2026-11-06 | S4.8 complete. Acceptance verified (407 tests incl. 5 approval; binding gate, recorded rationale, later-rejection warn). Stage 4 now 8 of 12. Stopped for owner review before S4.9. | [SPEC] | Crouton (S4.8 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
