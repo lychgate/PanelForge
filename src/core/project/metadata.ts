@@ -360,6 +360,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE INDEX IF NOT EXISTS idx_object_history_profile ON object_history(profile_id)",
     ],
   },
+  // S6.1: storyboard scene records (§8.7). Wraps Stage 3
+  // extraction scenes; never rewrites them.
+  {
+    version: 29,
+    name: "029_storyboard_scenes",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS storyboard_scenes (scene_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), chapter_id TEXT REFERENCES chapters(chapter_id), extraction_scene_id TEXT REFERENCES scenes(scene_id), narrative_purpose TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
