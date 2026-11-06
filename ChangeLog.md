@@ -232,6 +232,32 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.12 — Generation Provenance (2026-11-06) — [`d2175b5`](https://github.com/lychgate/PanelForge/commit/d2175b52dc91349148e9f73885ce15a561ef447e)
+
+**Added**
+
+- `src/core/project/provenance.ts` —
+  `recordProvenance` (append-only ledger:
+  template + hash, prompt + negative, seed,
+  model/provider, references, job ID) and
+  `getProvenance` (full replay per artwork; unknown
+  artwork rejects typed). No update/delete API.
+- S7.6/S7.8/S7.9 artwork creation instrumented:
+  every generated version (generate/variations/
+  inpaint/outpaint) records provenance atomically
+  with its artwork row.
+- Migration 048 (`artwork_provenance`) in
+  `src/core/project/metadata.ts`.
+- `tests/provenance.test.js` — 2 tests: full replay
+  of a real dispatch, unknown-artwork typed refusal,
+  migration v48.
+
+**Changed**
+
+- Register: S7.12 marked **Complete**; Stage 7 now 12 of 15;
+  §11 next eligible is S7.13.
+- `Plan.md`: S7.12 checked off (2026-11-06).
+
 ### S7.11 — Side-by-Side and Approved-Reference Comparison (2026-11-06) — [`b55d66d`](https://github.com/lychgate/PanelForge/commit/b55d66d23d127a76f27db5691bc23197d5b3f6e3)
 
 **Added**
