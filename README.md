@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (243 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio+comfyui+provider-health)
+npm test           # runs Vitest (253 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio+comfyui+provider-health+mock-provider)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -163,7 +163,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S2.11 — Provider Health Checks:** complete (adapter probes with caches/timestamps + a gate so unhealthy providers never receive work).
 
-**Next (awaiting owner authorization): S2.12 — Mock Provider Testing**, the twelfth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
+- **S2.12 — Mock Provider Testing:** complete (scripted success/failure/slow/varied-progress mocks drive the full create→recover acceptance without real providers).
+
+**Next (awaiting owner authorization): S2.13 — Resource Profiles**, the thirteenth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
 
 ## Known limitations (end of Stage 0)
 

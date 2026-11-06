@@ -440,7 +440,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** The whole Stage-2 stage acceptance (create→persist→execute→interrupt→resume→recover) passes against mocks.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1–S2.11.
 - **Stop:** Mocks never ship as production behavior.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 4812845)
 
 #### S2.13 Resource Profiles [SPEC]
 - **Goal:** Conservative, user-visible resource policy.
@@ -916,6 +916,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S2.11 | `DISPLAY=:0 npm test` | Pass — 243 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 9 ipc + 13 security) | `tests/provider-health.test.js` (8 tests): ready/unavailable/unknown reports, missing-model unhealthy, monitor cache + timestamps, `requireReady` typed UNHEALTHY, gated executor (0 executions when unhealthy). |
 | 2026-11-05 | S2.11 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S2.11 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.12 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.12 | `npm run build` | Pass | `out/node/engines/provider/mock.js` emitted. |
+| 2026-11-05 | S2.12 | `DISPLAY=:0 npm test` | Pass — 253 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 ipc + 13 security) | `tests/mock-provider.test.js` (10 tests): queue success/failure isolation, S2.1 validator conformance, scripted mixed progress, slow interrupt → INTERRUPTED, queue pause/resume, failNext + bounded retry, health gating (0 dispatches), restart recovery, no production import of mocks. |
+| 2026-11-05 | S2.12 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.12 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.12 implemented files:** `src/engines/provider/mock.ts` (New — `createMockAdapter`: scripted `success`/`failure`/`slow` (cancellable wait → INTERRUPTED) /`mixed` (caller-supplied varied progress; no invented percents), `failNext` for retry testing, `healthStatus` for gating, `getCalls` counting), `tests/mock-provider.test.js` (New, 10 tests proving create→persist→execute→interrupt→resume→recover against mocks).
 
 **S2.11 implemented files:** `src/engines/provider/health.ts` (New — `checkProviderHealth` (probe + shape validation + expected-model verification, malformed → unknown), `createHealthMonitor` (parallel `checkAll`, cached reports, readiness gate), `createGatedExecutor` (typed UNAVAILABLE fast-fail; zero executions against unhealthy providers)), `tests/provider-health.test.js` (New, 8 tests). Scheduling/policy consumption stays S2.13+.
 
@@ -1023,11 +1030,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.12 — Mock Provider Testing [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.13 — Resource Profiles [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S2.11 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.12 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S2.12 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.13 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Scripted mock adapters (success/failure/slow/varied progress) implementing the S2.1 contract for provider-independent testing.
+**Goal [SPEC]:** Conservative, user-visible resource policy (Safe/Balanced/Performance/Custom) constraining queue concurrency, memory, generation size, and cooling intervals; never overclock.
 
 ---
 
@@ -1077,5 +1084,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.9 complete. Acceptance verified (230 tests incl. 4 lmstudio; streaming execution, interrupt, graceful absence against a local mock). Stopped for owner review before S2.10. | [SPEC] | Crouton (S2.9 implementation) |
 | 2026-11-05 | S2.10 complete. Acceptance verified (235 tests incl. 5 comfyui; prompt→history→image flow, node-error mapping, interrupt, graceful absence against a local mock). Stopped for owner review before S2.11. | [SPEC] | Crouton (S2.10 implementation) |
 | 2026-11-05 | S2.11 complete. Acceptance verified (243 tests incl. 8 provider-health; unhealthy reports + gated no-dispatch). Stopped for owner review before S2.12. | [SPEC] | Crouton (S2.11 implementation) |
+| 2026-11-05 | S2.12 complete. Acceptance verified (253 tests incl. 10 mock-provider; full create→recover acceptance against mocks, zero production wiring). Stopped for owner review before S2.13. | [SPEC] | Crouton (S2.12 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

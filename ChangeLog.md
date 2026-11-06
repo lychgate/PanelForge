@@ -7,6 +7,27 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.12 — Mock Provider Testing (2026-11-05) — [`4812845`](https://github.com/lychgate/PanelForge/commit/48128454127a3c42ed120db0761ca1c14d7783ea)
+
+**Added**
+
+- `src/engines/provider/mock.ts` — `createMockAdapter` (scripted S2.1
+  test doubles: `success`, `failure`, `slow` with cancellable wait,
+  `mixed` varied progress from a caller-supplied script; `failNext` for
+  retry testing; `healthStatus` for gated-executor testing; `getCalls`
+  invocation counting).
+- `tests/mock-provider.test.js` — 10 tests proving the Stage-2
+  acceptance (create→persist→execute→interrupt→resume→recover) against
+  mocks: queue success/failure isolation, S2.1 validator conformance,
+  scripted progress sequence, slow interrupt → INTERRUPTED, queue
+  pause/resume, failNext + bounded retry, health gating with zero
+  dispatches, restart recovery, and no production import of mocks.
+
+**Changed**
+
+- Register: S2.12 marked **Complete**; §11 next task is S2.13.
+- `Plan.md`: S2.12 checked off (2026-11-05).
+
 ### S2.11 — Provider Health Checks (2026-11-05) — [`362f6dc`](https://github.com/lychgate/PanelForge/commit/362f6dc018dfe491896c8a3d7a4945cc77121055)
 
 **Added**
