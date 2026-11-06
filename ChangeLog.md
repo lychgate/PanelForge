@@ -7,6 +7,31 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.13 — Style Variants + Priority Resolution (2026-11-06) — [`4efddec`](https://github.com/lychgate/PanelForge/commit/4efddec433301f93ae5e71e67199524a6974fc4b)
+
+**Added**
+
+- `src/core/project/style-variants.ts` — §9.1/§9.2 predictable
+  conflict resolution: `createVariant`/`listVariants`/
+  `deleteVariant` (validated style, scope, priority, lock),
+  `resolveStyle` (deterministic panel > character > scene >
+  project, lower number wins, total tie-break; default fallback;
+  field conflicts + locked/strong override warnings; explicit
+  guidance-only note).
+- Migration 010 (`style_variants` table + style index) in
+  `src/core/project/metadata.ts`.
+- `tests/style-variants.test.js` — 6 tests: CRUD validation,
+  scope precedence, same-winner determinism, lock warnings +
+  conflicts, silent-identical + default fallback.
+
+**Changed**
+
+- `src/core/project/styles.ts`: deleting a style now cascades to
+  its variants (FK-safe cleanup; existing behavior unchanged
+  otherwise).
+- Register: S3.13 marked **Complete**; §11 next eligible is S3.14.
+- `Plan.md`: S3.13 checked off (2026-11-06).
+
 ### S3.12 — Style Profile Persistence (2026-11-06) — [`c15a1d2`](https://github.com/lychgate/PanelForge/commit/c15a1d2c8e584b4eb9728afc65e68346496f20b6)
 
 **Added**

@@ -88,7 +88,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S3.10 PDF import (text extraction; OCR deferred as Unknown) — completed 2026-11-05
 - [x] S3.11 Art Style Manager (CRUD + canonical default) — completed 2026-11-06
 - [x] S3.12 Style profile persistence (project store + asset references) — completed 2026-11-06
-- [ ] S3.13 Style variants + priority resolution (§9.1/§9.2 lock strength + conflict warnings)
+- [x] S3.13 Style variants + priority resolution (§9.1/§9.2 lock strength + conflict warnings) — completed 2026-11-06
 - [ ] S3.14 Stage 3 acceptance fixture (import → extract → classify → style a scene)
 
 ## Stage 4 — Character Studio
