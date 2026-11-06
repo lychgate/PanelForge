@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.8 — Generation-Request Records (Both Studios) (2026-11-06) — [`5880660`](https://github.com/lychgate/PanelForge/commit/5880660f8f157c38c62deef8201f13dda2d19c4f)
+
+**Added**
+
+- `src/core/project/studio-requests.ts` — request-side only:
+  `createRequest` (provider/prompt validation, one request per
+  (studio, variation, slot), recreate replaces) /
+  `getRequest` / `listRequestsBySubject` / `attachResultAsset`
+  (fulfilled link for Stage 7). One shared table + subject
+  discriminator; subjects validated against the matching
+  variation table. No provider imports, no network.
+- Migration 027 (`studio_generation_requests` table) in
+  `src/core/project/metadata.ts`.
+- `tests/studio-requests.test.js` — 4 tests: store/replace,
+  studio isolation, table-matched subjects + zero provider
+  traffic scan, result attach + migration v27.
+
+**Changed**
+
+- Register: S5.8 marked **Complete**; Stage 5 now 8 of 10;
+  §11 next eligible is S5.9.
+- `Plan.md`: S5.8 checked off (2026-11-06).
+
 ### S5.7 — Entity → Location/Object Bridge (2026-11-06) — [`3be35c1`](https://github.com/lychgate/PanelForge/commit/3be35c1fab452895a6bd70fd5fa0f348d25ac7c7)
 
 **Added**
