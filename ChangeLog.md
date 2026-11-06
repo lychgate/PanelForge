@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.3 — Location Reference Association (2026-11-06) — [`b8ef842`](https://github.com/lychgate/PanelForge/commit/b8ef842defc10e0c5adbeb23da061b65f6b21f4c)
+
+**Added**
+
+- `src/core/project/location-references.ts` — §8.5 reference
+  association (`associateReference`/`getReference`/
+  `listReferencesByVariation`/`listReferencesBySlot`/
+  `removeReference`): S1.5-registry-validated assets bound to a
+  variation under one of eight slot kinds (exterior, interior,
+  overview, detail, day, night, weather, damaged); an asset may
+  serve any number of variations/slots.
+- Migration 022 (`location_references` table) in
+  `src/core/project/metadata.ts`.
+- `tests/location-references.test.js` — 5 tests: association by
+  slot with registry validation, typed rejections, all eight
+  slots, multi-variation asset reuse, remove + migration v22.
+
+**Changed**
+
+- Register: S5.3 marked **Complete**; Stage 5 now 3 of 10;
+  §11 next eligible is S5.4.
+- `Plan.md`: S5.3 checked off (2026-11-06).
+
 ### S5.2 — Location Variations (2026-11-06) — [`3ba1b77`](https://github.com/lychgate/PanelForge/commit/3ba1b77c2ec138d29b66a8177e0978d3f2f3e25d)
 
 **Added**
