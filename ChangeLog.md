@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.6 — Entity Extraction Framework (2026-11-05) — [`fa0e774`](https://github.com/lychgate/PanelForge/commit/fa0e774d8559f1940c2013a8949be2efbff1cc30)
+
+**Added**
+
+- `src/core/project/entities.ts` — typed candidates (character/
+  location/object/event/chronology) with exact spans + heuristic
+  confidence; `deterministicCandidates` spine, injectable
+  `LlmEntityClassifier` + LM Studio factory with verbatim-quote
+  validation (hallucinations rejected), `storeEntities`/`listEntities`.
+- Migration 007 (`entities` table) in `src/core/project/metadata.ts`.
+- `tests/entities.test.js` — 5 tests: exact spans, hallucination
+  rejection, fixture storage + source resolution, classifier
+  injection, missing-input rejection. Q5 LLM baseline nominated in
+  the module header (3B instruct Q4; verify on-policy).
+
+**Changed**
+
+- Register: S3.6 marked **Complete**; §11 next eligible is S3.7.
+- `Plan.md`: S3.6 checked off (2026-11-05).
+
 ### S3.5 — Source Relationships (2026-11-05) — [`6828c83`](https://github.com/lychgate/PanelForge/commit/6828c8368fbeebf83ca2e6166a9cfb8a68548c60)
 
 **Added**
