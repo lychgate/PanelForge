@@ -369,6 +369,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS storyboard_scenes (scene_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), chapter_id TEXT REFERENCES chapters(chapter_id), extraction_scene_id TEXT REFERENCES scenes(scene_id), narrative_purpose TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S6.2: storyboard panel records (§8.7). Panels carry no
+  // artwork yet; sort order persists.
+  {
+    version: 30,
+    name: "030_storyboard_panels",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS storyboard_panels (panel_id TEXT PRIMARY KEY, scene_id TEXT NOT NULL REFERENCES storyboard_scenes(scene_id), sort_order INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE INDEX IF NOT EXISTS idx_storyboard_panels_scene ON storyboard_panels(scene_id, sort_order)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
