@@ -232,6 +232,28 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.3 — Traditional Layout Templates (2026-11-06) — [`075b8fd`](https://github.com/lychgate/PanelForge/commit/075b8fdbdb6b2d37c377d19ac53419798be387c7)
+
+**Added**
+
+- `src/core/project/layout-templates.ts` —
+  `listPresets` (five built-in grids) and
+  `applyPreset`: generates evenly guttered
+  placements in row-major reading order; application
+  replaces only UNLABELED placements (labeled ones
+  stay in place for S8.6 balloons/S8.8 SFX).
+- `tests/layout-templates.test.js` — 3 tests: six-
+  panel fills six evenly guttered placements,
+  over-capacity/unknown/non-traditional rejections,
+  re-apply replaces unlabeled only. No new migration
+  (presets are code).
+
+**Changed**
+
+- Register: S8.3 marked **Complete**; Stage 8 now 3 of 14;
+  §11 next eligible is S8.4.
+- `Plan.md`: S8.3 checked off (2026-11-06).
+
 ### S8.2 — Panel Placement (2026-11-06) — [`2c2d51e`](https://github.com/lychgate/PanelForge/commit/2c2d51e4d32ab173ceea957318a1484327c4c7fc)
 
 **Added**
