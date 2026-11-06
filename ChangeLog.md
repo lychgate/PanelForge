@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.1 — Character Profile Records (2026-11-06) — [`ef87547`](https://github.com/lychgate/PanelForge/commit/ef875476b685ff9318df2b2b66f6f44a3144aa88)
+
+**Added**
+
+- `src/core/project/characters.ts` — §8.4 profile CRUD
+  (`createCharacter`/`getCharacter`/`listCharacters`/
+  `updateCharacter`/`deleteCharacter`): name required, all other
+  fields (description, physical appearance, age, personality,
+  clothing, equipment, distinguishing features, relationships,
+  timeline) optional structured text defaulting to `""`; identity
+  stable across updates.
+- Migration 011 (`characters` table) in
+  `src/core/project/metadata.ts`.
+- `tests/characters.test.js` — 5 tests: create with §8.4 fields,
+  empty-string defaults, validation, partial-update identity
+  stability, list/delete + migration v11.
+
+**Changed**
+
+- Register: S4.1 marked **Complete**; Stage 4 now 1 of 12; §11 next
+  eligible is S4.2.
+- `Plan.md`: S4.1 checked off (2026-11-06).
+
 ### Stage 4 Planning — Character Studio Expansion (2026-11-06)
 
 **Changed**
