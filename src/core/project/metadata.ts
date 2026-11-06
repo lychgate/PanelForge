@@ -553,6 +553,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       `CREATE TABLE IF NOT EXISTS artwork_provenance (artwork_id TEXT PRIMARY KEY REFERENCES panel_artwork(artwork_id), template_name TEXT NOT NULL, template_hash TEXT NOT NULL, prompt TEXT NOT NULL, negative_prompt TEXT NOT NULL, seed INTEGER, model TEXT NOT NULL, provider TEXT NOT NULL, "references" TEXT NOT NULL, job_id TEXT NOT NULL, created_at TEXT NOT NULL)`,
     ],
   },
+  // S7.13: artwork approval ledger + approved pointer (restore never deletes).
+  {
+    version: 49,
+    name: "049_artwork_approvals",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS artwork_approvals (artwork_id TEXT PRIMARY KEY REFERENCES panel_artwork(artwork_id), status TEXT NOT NULL, rationale TEXT NOT NULL, decided_at TEXT, updated_at TEXT NOT NULL)",
+      "CREATE TABLE IF NOT EXISTS panel_approved_artwork (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), artwork_id TEXT NOT NULL REFERENCES panel_artwork(artwork_id), updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
