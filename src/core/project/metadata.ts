@@ -239,6 +239,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "ALTER TABLE character_versions ADD COLUMN approval_decided_at TEXT",
     ],
   },
+  // S4.9: generation-request records (§8.4 — request side only).
+  // One request per (version, slot); result_asset_id stays NULL
+  // until a Stage 7 run produces an asset. No execution here.
+  {
+    version: 18,
+    name: "018_generation_requests",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS generation_requests (request_id TEXT PRIMARY KEY, version_id TEXT NOT NULL REFERENCES character_versions(version_id), slot TEXT NOT NULL, provider TEXT NOT NULL, prompt TEXT NOT NULL, negative_prompt TEXT NOT NULL, result_asset_id TEXT, status TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_generation_requests_slot ON generation_requests(version_id, slot)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
