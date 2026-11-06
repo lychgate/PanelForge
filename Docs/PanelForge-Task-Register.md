@@ -598,7 +598,9 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Fixture PDF matches its text twin; OCR absence is explicit, never silent.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2; parser selection requires owner approval (new dependency).
 - **Stop:** OCR stays deferred; scanned PDFs are Unknown by design.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+
+**Parser decision (owner, 2026-11-05):** zero-new-dependency reader (Node `zlib` FlateDecode + PDF text operators + ToUnicode subset) — no new dependency installed.
 
 #### S3.11 Art Style Manager [SPEC]
 - **Goal:** Visual identity of a project (§9).
