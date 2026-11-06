@@ -540,7 +540,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Fixture segments into expected scenes; overrides correct boundaries without changing source text.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.3.
 - **Stop:** Storyboard panels stay Stage 6.
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; impl commit 8c4a205; see below)
 
 #### S3.5 Source relationships [SPEC]
 - **Goal:** Every extracted span links back to source.
@@ -1098,6 +1098,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S3.3 | `DISPLAY=:0 npm test` | Pass — 312 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 9 ipc + 13 security) | `tests/chapters.test.js` (5 tests): ATX/CHAPTER/all-caps segmentation with exact tiling spans, prose rejection, CRLF byte-offset resolution, determinism, missing-normalization rejection. |
 | 2026-11-05 | S3.3 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S3.3 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S3.4 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S3.4 | `npm run build` | Pass | `out/node/core/project/scenes.js` emitted. |
+| 2026-11-05 | S3.4 | `DISPLAY=:0 npm test` | Pass — 317 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 9 ipc + 13 security) | `tests/scenes.test.js` (5 tests): *** + ### + location-cue segmentation with tiling spans, chapter linking + byte resolution, recut overrides without source change, typed rejections, missing-input rejection. |
+| 2026-11-05 | S3.4 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S3.4 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S3.4 implemented files:** `src/core/project/scenes.ts` (New — `matchSceneHeading` + `splitChapterIntoScenes` + `storeScenes`/`recutScenes`/`listScenes`), `src/core/project/chapters.ts` (scene cues excluded from chapter all-caps rule), `src/core/project/metadata.ts` (migration 006 scenes table), `tests/scenes.test.js` (New, 5 tests). Board panels stay Stage 6.
 
 **S3.3 implemented files:** `src/core/project/chapters.ts` (New — `matchChapterHeading` + `extractChapters` + `storeChapters`/`listChapters`), `src/core/project/metadata.ts` (migration 005 chapters table), `tests/chapters.test.js` (New, 5 tests). AI segmentation out of scope.
 
@@ -1237,7 +1244,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S3.2:** S3.3 — Chapter extraction (deterministic heading segmentation). **Status: Complete (2026-11-05, impl commit df93505; 312 tests incl. 5 chapters).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.3:** S3.4 — Scene extraction (deterministic segmentation + override framework). Do not begin without explicit owner authorization.
+**Next eligible after S3.3:** S3.4 — Scene extraction (deterministic segmentation + override framework). **Status: Complete (2026-11-05, impl commit 8c4a205; 317 tests incl. 5 scenes).** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S3.4:** S3.5 — Source relationships (chapter→scene→span links with offset verification). Do not begin without explicit owner authorization.
 
 ---
 
@@ -1299,5 +1308,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S3.2 complete. Acceptance verified (307 tests incl. 5 text-normalize; offset-preserving spans reconstruct exactly; originals untouched). Stopped for owner review before S3.3. | [SPEC] | Crouton (S3.2 implementation) |
 | 2026-11-05 | S3.2 complete. Acceptance verified (307 tests incl. 5 text-normalize; offset-preserving spans reconstruct exactly; originals untouched). Stopped for owner review before S3.3. | [SPEC] | Crouton (S3.2 implementation) |
 | 2026-11-05 | S3.3 complete. Acceptance verified (312 tests incl. 5 chapters; exact tiling spans; segmentation never alters source text). Stopped for owner review before S3.4. | [SPEC] | Crouton (S3.3 implementation) |
+| 2026-11-05 | S3.4 complete. Acceptance verified (317 tests incl. 5 scenes; scene fixture + chapter links; overrides correct boundaries without changing source text). Stopped for owner review before S3.5. | [SPEC] | Crouton (S3.4 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

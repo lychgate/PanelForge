@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.4 — Scene Extraction (2026-11-05) — [`8c4a205`](https://github.com/lychgate/PanelForge/commit/8c4a205f9551d3552d60a3bb5d16a4ce2f8e4ba9)
+
+**Added**
+
+- `src/core/project/scenes.ts` — deterministic scene-break rules
+  (`***`, level 2–3 ATX, INT./EXT./LATER/MEANWHILE/BACK TO/CUT TO cues),
+  `splitChapterIntoScenes` with exact tiling spans (bare `***` absorbs
+  into the scene it opens), `storeScenes` (chapter-linked), and
+  `recutScenes` manual overrides from explicit split points.
+- Migration 006 (`scenes` table) in `src/core/project/metadata.ts`;
+  scene cues excluded from the chapter all-caps rule.
+- `tests/scenes.test.js` — 5 tests: fixture segmentation, fallback,
+  chapter linking + byte resolution, override recuts, typed rejections.
+
+**Changed**
+
+- Register: S3.4 marked **Complete**; §11 next eligible is S3.5.
+- `Plan.md`: S3.4 checked off (2026-11-05).
+
 ### S3.3 — Chapter Extraction (2026-11-05) — [`df93505`](https://github.com/lychgate/PanelForge/commit/df935052d84ededd0a5c8f632e2bb87e91cfb3be)
 
 **Added**
