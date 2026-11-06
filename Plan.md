@@ -106,7 +106,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S4.1 Character profile records (§8.4 fields + CRUD) — completed 2026-11-06
 - [x] S4.2 Character version records (independently identifiable labels) — completed 2026-11-06
 - [x] S4.3 Reference asset association (portrait/front/side/rear/expression/pose/clothing/equipment slots) — completed 2026-11-06
-- [ ] S4.4 Reference completeness scoring (Basic / Recommended / Full tiers, missing-slot warnings)
+- [x] S4.4 Reference completeness scoring (Basic / Recommended / Full tiers, missing-slot warnings) — completed 2026-11-06
 - [ ] S4.5 Minimum Viable Reference Set config (tiers editable, defaults = §8.4)
 - [ ] S4.6 Entity → character bridge (explicit create-from-entity; source span link; never auto-create)
 - [ ] S4.7 Character version binding (panel_id opaque until Stage 6; one exact version; wrong-version warnings)

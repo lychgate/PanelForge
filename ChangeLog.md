@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.4 — Reference Completeness Scoring (2026-11-06) — [`988226c`](https://github.com/lychgate/PanelForge/commit/988226c2e33441f3cad9aa6d70f40c2d6ddf2541)
+
+**Added**
+
+- `src/core/project/completeness.ts` — deterministic §8.4
+  scoring (`scoreCompleteness` + `DEFAULT_TIERS`): per-tier
+  verdicts (Basic = any reference; Recommended = portrait +
+  front + expression; Full = + side/rear, 2 expressions, pose,
+  clothing, equipment) with `missing` naming the exact gaps and
+  the highest passed tier as `overall`. Read-only; no migration.
+- `tests/completeness.test.js` — 5 tests: empty version fails
+  all tiers, per-tier gaps named, full set passes silently.
+
+**Changed**
+
+- Register: S4.4 marked **Complete**; Stage 4 now 4 of 12; §11 next
+  eligible is S4.5.
+- `Plan.md`: S4.4 checked off (2026-11-06).
+
 ### S4.3 — Reference Asset Association (2026-11-06) — [`b238a96`](https://github.com/lychgate/PanelForge/commit/b238a9647fa5604acdbcb3717a14574d8ba934cb)
 
 **Added**
