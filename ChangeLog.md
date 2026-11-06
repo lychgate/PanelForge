@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.5 — Object Variations (2026-11-06) — [`3fe1e2b`](https://github.com/lychgate/PanelForge/commit/3fe1e2b994956232217d232473279ddf12864148)
+
+**Added**
+
+- `src/core/project/object-variations.ts` — variation CRUD
+  (`createVariation`/`getVariation`/`listVariations`/
+  `updateVariation`/`deleteVariation`): labels unique per
+  object (case-insensitive), per-variation overrides
+  (appearance/damage states) defaulting to `""` = inherit from
+  the profile; identity stable.
+- Migration 024 (`object_variations` table + unique index) in
+  `src/core/project/metadata.ts`.
+- `tests/object-variations.test.js` — 5 tests: multiple
+  variations per object, per-object label uniqueness, FK +
+  validation, override inheritance, rename collision,
+  list/delete + migration v24.
+
+**Changed**
+
+- Register: S5.5 marked **Complete**; Stage 5 now 5 of 10;
+  §11 next eligible is S5.6.
+- `Plan.md`: S5.5 checked off (2026-11-06).
+
 ### S5.4 — Object Profile Records (2026-11-06) — [`6f470d6`](https://github.com/lychgate/PanelForge/commit/6f470d63cdb6332ca27e6f9e9bccbff04299c494)
 
 **Added**
