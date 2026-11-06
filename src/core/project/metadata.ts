@@ -519,6 +519,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "ALTER TABLE panel_artwork ADD COLUMN variant_index INTEGER",
     ],
   },
+  // S7.8: inpaint regions + repaint records.
+  {
+    version: 45,
+    name: "045_inpaint",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_inpaint_regions (region_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), x INTEGER NOT NULL, y INTEGER NOT NULL, width INTEGER NOT NULL, height INTEGER NOT NULL)",
+      "CREATE TABLE IF NOT EXISTS panel_repaints (repaint_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), base_artwork_id TEXT NOT NULL REFERENCES panel_artwork(artwork_id), regions_json TEXT NOT NULL, prompt TEXT NOT NULL, created_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
