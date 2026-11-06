@@ -22,6 +22,16 @@ import type {
   ProjectOpenArgs,
   ProjectRenameArgs,
 } from "../../shared/types";
+import {
+  StoryboardRootArgs,
+  StoryboardPanelDetailsArgs,
+  StoryboardSetTextArgs,
+  StoryboardSetCameraArgs,
+  StoryboardSetInstructionsArgs,
+  StoryboardCreatePanelArgs,
+  StoryboardSnapshotCreateArgs,
+  StoryboardSnapshotRestoreArgs,
+} from "../../shared/types";
 import { defaultLogService } from "../logging/service";
 import {
   archiveProject,
@@ -35,6 +45,12 @@ import {
 } from "../project/operations";
 import * as fs from "fs";
 import * as path from "path";
+import { listBoard, getPanelDetails } from "../project/storyboard-board";
+import { createPanel } from "../project/storyboard-panels";
+import { setText } from "../project/panel-text";
+import { setCamera } from "../project/panel-cameras";
+import { setInstructions } from "../project/panel-instructions";
+import { createSnapshot, listSnapshots, restoreSnapshot } from "../project/snapshots";
 
 export const IPC_CHANNELS = {
   diagnosticsPing: "panelforge:diagnostics.ping",
@@ -45,6 +61,15 @@ export const IPC_CHANNELS = {
   projectClose: "panelforge:project.close",
   projectRename: "panelforge:project.rename",
   projectArchive: "panelforge:project.archive",
+  storyboardList: "panelforge:storyboard.list",
+  storyboardPanelDetails: "panelforge:storyboard.panelDetails",
+  storyboardCreatePanel: "panelforge:storyboard.createPanel",
+  storyboardSetText: "panelforge:storyboard.setText",
+  storyboardSetCamera: "panelforge:storyboard.setCamera",
+  storyboardSetInstructions: "panelforge:storyboard.setInstructions",
+  storyboardSnapshotsList: "panelforge:storyboard.snapshots.list",
+  storyboardSnapshotCreate: "panelforge:storyboard.snapshot.create",
+  storyboardSnapshotRestore: "panelforge:storyboard.snapshot.restore",
 } as const;
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];
@@ -135,6 +160,75 @@ function unwrapProjectError(err: unknown): { code: string; message: string } {
   throw err;
 }
 
+// Storyboard core errors (S6.11) carry the same typed .code shape;
+// the dispatch catch preserves them so the renderer sees real codes
+// (NOT_FOUND, INVALID_ARGUMENTS, NOT_APPROVED, ...) instead of a
+// generic HANDLER_ERROR.
+function coreErrorCode(err: unknown): string | null {
+  if (err instanceof ProjectOpError) return err.code;
+  if (err !== null && typeof err === "object" && "code" in err) {
+    const code = (err as { code?: unknown }).code;
+    return typeof code === "string" && code !== "" ? code : null;
+  }
+  return null;
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim() !== "";
+}
+
+function isStringFields(args: Record<string, unknown>, fields: string[]): boolean {
+  return fields.every((field) => args[field] === undefined || typeof args[field] === "string");
+}
+
+const SHOT_TYPES = ["close-up", "medium", "wide", "extreme-wide"];
+
+function isValidStoryboardRootArgs(args: unknown): args is StoryboardRootArgs {
+  if (!isRecord(args)) return false;
+  return isNonEmptyString((args as { root?: unknown }).root);
+}
+
+function isValidStoryboardPanelArgs(args: unknown): args is StoryboardPanelDetailsArgs {
+  if (!isValidStoryboardRootArgs(args)) return false;
+  return isNonEmptyString((args as { panelId?: unknown }).panelId);
+}
+
+function isValidStoryboardSetTextArgs(args: unknown): args is StoryboardSetTextArgs {
+  if (!isValidStoryboardPanelArgs(args)) return false;
+  return isStringFields(args as Record<string, unknown>, ["dialogue", "captions", "actions", "expressions"]);
+}
+
+function isValidStoryboardSetCameraArgs(args: unknown): args is StoryboardSetCameraArgs {
+  if (!isValidStoryboardPanelArgs(args)) return false;
+  const a = args as { shotType?: unknown; angle?: unknown };
+  if (typeof a.shotType !== "string" || !SHOT_TYPES.includes(a.shotType)) return false;
+  return a.angle === undefined || typeof a.angle === "string";
+}
+
+function isValidStoryboardSetInstructionsArgs(args: unknown): args is StoryboardSetInstructionsArgs {
+  if (!isValidStoryboardPanelArgs(args)) return false;
+  return isStringFields(args as Record<string, unknown>, ["compositionPrompt", "backgroundDetail", "artDirectionNotes"]);
+}
+
+function isValidStoryboardCreatePanelArgs(args: unknown): args is StoryboardCreatePanelArgs {
+  if (!isValidStoryboardRootArgs(args)) return false;
+  return isNonEmptyString((args as { sceneId?: unknown }).sceneId);
+}
+
+function isValidStoryboardSnapshotCreateArgs(args: unknown): args is StoryboardSnapshotCreateArgs {
+  if (!isValidStoryboardRootArgs(args)) return false;
+  const a = args as { name?: unknown; parentSnapshotId?: unknown };
+  return (
+    (a.name === undefined || typeof a.name === "string") &&
+    (a.parentSnapshotId === undefined || (typeof a.parentSnapshotId === "string" && a.parentSnapshotId.trim() !== ""))
+  );
+}
+
+function isValidStoryboardSnapshotRestoreArgs(args: unknown): args is StoryboardSnapshotRestoreArgs {
+  if (!isValidStoryboardRootArgs(args)) return false;
+  return isNonEmptyString((args as { snapshotId?: unknown }).snapshotId);
+}
+
 const handlers: Record<
   string,
   {
@@ -214,6 +308,69 @@ const handlers: Record<
       return archiveProject(args.root, defaultProjectManager);
     },
   },
+  [IPC_CHANNELS.storyboardList]: {
+    validate: isValidStoryboardRootArgs,
+    handle: async (_event, args) => {
+      return listBoard(args.root);
+    },
+  },
+  [IPC_CHANNELS.storyboardPanelDetails]: {
+    validate: isValidStoryboardPanelArgs,
+    handle: async (_event, args) => {
+      return getPanelDetails(args.root, args.panelId);
+    },
+  },
+  [IPC_CHANNELS.storyboardCreatePanel]: {
+    validate: isValidStoryboardCreatePanelArgs,
+    handle: async (_event, args) => {
+      return createPanel(args.root, args.sceneId);
+    },
+  },
+  [IPC_CHANNELS.storyboardSetText]: {
+    validate: isValidStoryboardSetTextArgs,
+    handle: async (_event, args) => {
+      return setText(args.root, args.panelId, {
+        dialogue: args.dialogue,
+        captions: args.captions,
+        actions: args.actions,
+        expressions: args.expressions,
+      });
+    },
+  },
+  [IPC_CHANNELS.storyboardSetCamera]: {
+    validate: isValidStoryboardSetCameraArgs,
+    handle: async (_event, args) => {
+      return setCamera(args.root, args.panelId, args.shotType as "close-up" | "medium" | "wide" | "extreme-wide", args.angle);
+    },
+  },
+  [IPC_CHANNELS.storyboardSetInstructions]: {
+    validate: isValidStoryboardSetInstructionsArgs,
+    handle: async (_event, args) => {
+      return setInstructions(args.root, args.panelId, {
+        compositionPrompt: args.compositionPrompt,
+        backgroundDetail: args.backgroundDetail,
+        artDirectionNotes: args.artDirectionNotes,
+      });
+    },
+  },
+  [IPC_CHANNELS.storyboardSnapshotsList]: {
+    validate: isValidStoryboardRootArgs,
+    handle: async (_event, args) => {
+      return { snapshots: await listSnapshots(args.root) };
+    },
+  },
+  [IPC_CHANNELS.storyboardSnapshotCreate]: {
+    validate: isValidStoryboardSnapshotCreateArgs,
+    handle: async (_event, args) => {
+      return createSnapshot(args.root, { name: args.name, parentSnapshotId: args.parentSnapshotId });
+    },
+  },
+  [IPC_CHANNELS.storyboardSnapshotRestore]: {
+    validate: isValidStoryboardSnapshotRestoreArgs,
+    handle: async (_event, args) => {
+      return restoreSnapshot(args.root, args.snapshotId);
+    },
+  },
 };
 
 export function registerIpcHandlers(): void {
@@ -233,9 +390,11 @@ export function registerIpcHandlers(): void {
         // S0.7: handler failures are recorded; the renderer still only
         // ever sees the safe envelope (no stack, no sensitive detail).
         // S1.10: project operation codes are preserved as envelope codes.
+        // S6.11: storyboard core typed codes are preserved the same way.
         defaultLogService.logError(err, `ipc handler failed: ${channel}`);
-        if (err instanceof ProjectOpError) {
-          return { ok: false, code: err.code as never, message: err.message };
+        const code = coreErrorCode(err);
+        if (code) {
+          return { ok: false, code: code as never, message: err instanceof Error ? err.message : "Operation failed" };
         }
         return { ok: false, code: "HANDLER_ERROR", message: "Handler failed" };
       }

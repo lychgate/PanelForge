@@ -10,6 +10,7 @@ shortcut registry (`src/renderer/shortcuts.ts`) and documented here.
 | `Alt+1` | Go to the Diagnostics view |
 | `Alt+2` | Go to the About view |
 | `Alt+3` | Go to the Projects view |
+| `Alt+4` | Go to the Storyboard view |
 | `Tab` / `Shift+Tab` | Move focus through navigation and view controls |
 | `Enter` / `Space` | Activate the focused control |
 | `Ctrl+Q` (`Cmd+Q` on macOS) | Quit the application (application menu, File) |

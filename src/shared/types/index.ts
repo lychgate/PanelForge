@@ -18,7 +18,11 @@ export type SafeErrorCode =
   | "ALREADY_OPEN"
   | "ALREADY_CLOSED"
   | "ALREADY_EXISTS"
-  | "INVALID_STATE";
+  | "INVALID_STATE"
+  // Storyboard UI (S6.11) surfaces core typed codes directly.
+  | "NOT_APPROVED"
+  | "BOUND_PANEL"
+  | "BOUND_VERSION";
 
 export type IpcResult<T> =
   | { ok: true; data: T }
@@ -113,4 +117,58 @@ export type ProjectArchiveArgs = {
 export type ProjectArchiveData = {
   root: string;
   projectId: string;
+};
+
+// Storyboard UI (S6.11) — one method per channel (D1). "root" is
+// the project directory resolved by the main process; the
+// renderer never touches the database directly.
+export type StoryboardRootArgs = {
+  root: string;
+};
+
+export type StoryboardPanelDetailsArgs = {
+  root: string;
+  panelId: string;
+};
+
+export type StoryboardKeyArgs = StoryboardPanelDetailsArgs;
+
+export type StoryboardSetTextArgs = {
+  root: string;
+  panelId: string;
+  dialogue?: string;
+  captions?: string;
+  actions?: string;
+  expressions?: string;
+};
+
+export type StoryboardSetCameraArgs = {
+  root: string;
+  panelId: string;
+  shotType: string;
+  angle?: string;
+};
+
+export type StoryboardSetInstructionsArgs = {
+  root: string;
+  panelId: string;
+  compositionPrompt?: string;
+  backgroundDetail?: string;
+  artDirectionNotes?: string;
+};
+
+export type StoryboardCreatePanelArgs = {
+  root: string;
+  sceneId: string;
+};
+
+export type StoryboardSnapshotCreateArgs = {
+  root: string;
+  name?: string;
+  parentSnapshotId?: string;
+};
+
+export type StoryboardSnapshotRestoreArgs = {
+  root: string;
+  snapshotId: string;
 };
