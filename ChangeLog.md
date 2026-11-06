@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.10 — PDF Import (2026-11-05) — [`c203241`](https://github.com/lychgate/PanelForge/commit/c203241126d11884fb2ad79b866bf1143052f867)
+
+**Added**
+
+- `src/core/project/pdf-import.ts` — zero-dependency text-layer
+  reader (`extractPdfStreams` with FlateDecode inflate,
+  `extractContentStream` Tj/TJ operators, ToUnicode subset,
+  `extractPdfText`, `importPdfManuscript`). Extracted PDFs persist
+  normalization; scanned-only PDFs record with status "scanned" and
+  no normalization row (Unknown by design, never silent).
+- `tests/pdf-import.test.js` — 5 tests: inflate in order, twin match,
+  ToUnicode mapping, scanned→Unknown, extracted persistence +
+  non-PDF rejection.
+
+**Changed**
+
+- Register: S3.10 marked **Complete**; §11 next eligible is S3.11.
+- `Plan.md`: S3.10 checked off (2026-11-05).
+
 ### S3.9 — EPUB Import (2026-11-05) — [`0fc34d8`](https://github.com/lychgate/PanelForge/commit/0fc34d821074df506a13ddd17a8db05aa239700e)
 
 **Added**

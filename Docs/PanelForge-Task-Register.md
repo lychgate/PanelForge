@@ -598,7 +598,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Fixture PDF matches its text twin; OCR absence is explicit, never silent.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2; parser selection requires owner approval (new dependency).
 - **Stop:** OCR stays deferred; scanned PDFs are Unknown by design.
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; impl commit c203241; see below)
 
 **Parser decision (owner, 2026-11-05):** zero-new-dependency reader (Node `zlib` FlateDecode + PDF text operators + ToUnicode subset) — no new dependency installed.
 
@@ -1135,6 +1135,14 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S3.9 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S3.9 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
 
+| 2026-11-05 | S3.10 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S3.10 | `npm run build` | Pass | `out/node/core/project/pdf-import.js` emitted. |
+| 2026-11-05 | S3.10 | `DISPLAY=:0 npm test` | Pass — 346 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 9 ipc + 13 security) | `tests/pdf-import.test.js` (5 tests): FlateDecode inflate in order, Tj/TJ twin match, ToUnicode mapping, scanned→Unknown explicit, extracted persistence + non-PDF rejection. |
+| 2026-11-05 | S3.10 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S3.10 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S3.10 implemented files:** `src/core/project/pdf-import.ts` (New — zero-dependency `extractPdfStreams` + `extractContentStream` + `extractPdfText` + `importPdfManuscript`; Tj/TJ + ToUnicode subset; scanned→Unknown), `tests/pdf-import.test.js` (New, 5 tests). OCR deferred by design.
+
 **S3.9 implemented files:** `src/core/project/epub-import.ts` (New — zero-dependency spine reader + `extractXhtmlText` + `importEpubManuscript`; container→OPF→XHTML order), `tests/epub-import.test.js` (New, 4 tests). MathML/footnotes out of scope.
 
 **S3.8 implemented files:** `src/core/project/docx-import.ts` (New — zero-dependency ZIP reader + `extractDocumentXml` + `importDocxManuscript`; document.xml paragraphs/headings/tabs/breaks), `tests/docx-import.test.js` (New, 5 tests). Tracked changes/comments out of scope.
@@ -1297,7 +1305,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S3.8:** S3.9 — EPUB import. **Status: Complete (2026-11-05, impl commit 0fc34d8; 341 tests incl. 4 epub-import).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.9:** S3.10 — PDF import (text layer only; OCR deferred as Unknown per owner decision). Do not begin without explicit owner authorization.
+**Next eligible after S3.9:** S3.10 — PDF import (text layer only; OCR deferred as Unknown per owner decision). **Status: Complete (2026-11-05, impl commit c203241; 346 tests incl. 5 pdf-import).** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
 ---
 
@@ -1365,5 +1375,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S3.7 complete. Acceptance verified (332 tests incl. 5 canon; suggestion quarantine + promotion; contradictions unknown, never merged). Stopped for owner review before S3.8. | [SPEC] | Crouton (S3.7 implementation) |
 | 2026-11-05 | S3.8 complete. Acceptance verified (337 tests incl. 5 docx-import; twin-verified, originals preserved, zero new dependencies). Stopped for owner review before S3.9. | [SPEC] | Crouton (S3.8 implementation) |
 | 2026-11-05 | S3.9 complete. Acceptance verified (341 tests incl. 4 epub-import; spine-ordered, originals preserved). Stopped for owner review before S3.10. | [SPEC] | Crouton (S3.9 implementation) |
+| 2026-11-05 | S3.10 complete. Acceptance verified (346 tests incl. 5 pdf-import; twin-verified, scanned→Unknown explicit, zero new dependencies). Stopped for owner review before S3.11. | [SPEC] | Crouton (S3.10 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

@@ -85,7 +85,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S3.7 Canon classification (explicit / interpretation / suggestion / unknown; anti-fabrication) — completed 2026-11-05
 - [x] S3.8 DOCX import (parser dependency) — completed 2026-11-05
 - [x] S3.9 EPUB import (parser dependency) — completed 2026-11-05
-- [ ] S3.10 PDF import (text extraction; OCR deferred as Unknown)
+- [x] S3.10 PDF import (text extraction; OCR deferred as Unknown) — completed 2026-11-05
 - [ ] S3.11 Art Style Manager (CRUD + canonical default)
 - [ ] S3.12 Style profile persistence (project store + asset references)
 - [ ] S3.13 Style variants + priority resolution (§9.1/§9.2 lock strength + conflict warnings)
