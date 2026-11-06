@@ -232,6 +232,32 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.13 — Version History, Approval, and Restoration (2026-11-06) — [`6089d2b`](https://github.com/lychgate/PanelForge/commit/6089d2bc5396878f71f12ea61116744bd106b835)
+
+**Added**
+
+- `src/core/project/artwork-approval.ts` —
+  `setArtworkApproval`/`restoreApproved`/
+  `getApprovedArtwork`/`listHistory`: per-version
+  pending/approved/rejected ledger (S4.8 pattern,
+  rationale required) + approved pointer per panel.
+  Restore moves the pointer back without deleting
+  later versions; generation never touches approvals
+  (§2.4: approved work never silently replaced).
+- Migration 049 (`artwork_approvals` +
+  `panel_approved_artwork`) in
+  `src/core/project/metadata.ts`.
+- `tests/artwork-approval.test.js` — 3 tests:
+  approve + restore with later versions intact,
+  rejection recording + rationale enforcement,
+  migration v49.
+
+**Changed**
+
+- Register: S7.13 marked **Complete**; Stage 7 now 13 of 15;
+  §11 next eligible is S7.14.
+- `Plan.md`: S7.13 checked off (2026-11-06).
+
 ### S7.12 — Generation Provenance (2026-11-06) — [`d2175b5`](https://github.com/lychgate/PanelForge/commit/d2175b52dc91349148e9f73885ce15a561ef447e)
 
 **Added**
