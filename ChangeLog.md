@@ -206,6 +206,34 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.11 — Minimal Storyboard UI (2026-11-06) — [`0870cdf`](https://github.com/lychgate/PanelForge/commit/0870cdff8ee7e94dbc5f8ff2d9d31e7649fa655d)
+
+**Added**
+
+- `src/core/project/storyboard-board.ts` — board view model
+  (`listBoard`/`getPanelDetails`): scenes + panels + per-panel
+  cards (source scene, character + version labels, location,
+  camera, text, instructions).
+- IPC: 9 storyboard channels in `src/core/ipc/registry.ts`
+  (allowlist + validators + core typed-code preservation),
+  preload bridge in `src/preload/index.ts`, shared types.
+- Renderer Storyboard view (Alt+4) in
+  `src/renderer/index.ts`: scene/panel lists, detail cards
+  with save-text/camera/instructions, add panel, snapshot
+  create/restore; hand-rolled, keyboard-navigable, no
+  generation controls.
+- `tests/storyboard-ui.test.js` — 5 tests: board
+  aggregation, panel card shows source scene + versions,
+  IPC validation, IPC edit round-trip with typed codes,
+  built-renderer checks; `tests/ipc.test.js` now 17
+  channels; shortcuts doc gains Alt+4.
+
+**Changed**
+
+- Register: S6.11 marked **Complete**; Stage 6 now 11 of 13;
+  §11 next eligible is S6.12.
+- `Plan.md`: S6.11 checked off (2026-11-06).
+
 ### S6.10 — Storyboard Snapshots + Lightweight Branching (2026-11-06) — [`3eab400`](https://github.com/lychgate/PanelForge/commit/3eab4005aa918163ae02bb027b15c3d141a7b19a)
 
 **Added**
