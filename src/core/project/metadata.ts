@@ -528,6 +528,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS panel_repaints (repaint_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), base_artwork_id TEXT NOT NULL REFERENCES panel_artwork(artwork_id), regions_json TEXT NOT NULL, prompt TEXT NOT NULL, created_at TEXT NOT NULL)",
     ],
   },
+  // S7.9: outpaint extension + records.
+  {
+    version: 46,
+    name: "046_outpaint",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_outpaint (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), ext_left INTEGER NOT NULL, ext_right INTEGER NOT NULL, ext_top INTEGER NOT NULL, ext_bottom INTEGER NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE TABLE IF NOT EXISTS panel_outpaints (outpaint_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), base_artwork_id TEXT NOT NULL REFERENCES panel_artwork(artwork_id), extension_json TEXT NOT NULL, prompt TEXT NOT NULL, created_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
