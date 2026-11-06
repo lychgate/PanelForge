@@ -211,6 +211,10 @@ export async function deleteVersion(root: string, versionId: string): Promise<vo
       await runWithBusyRetry(() => {
         const current = db.prepare("SELECT * FROM character_versions WHERE version_id = ?").get(versionId);
         if (!current) throw new CharacterVersionError("NOT_FOUND", `No version with id: ${versionId}`);
+        const bound = db.prepare("SELECT COUNT(*) AS n FROM panel_character_bindings WHERE version_id = ?").get(versionId) as Record<string, unknown>;
+        if (Number(bound.n) > 0) {
+          throw new CharacterVersionError("BOUND_VERSION", `Version ${versionId} is bound to ${Number(bound.n)} panel(s); unbind first`);
+        }
         db.prepare("DELETE FROM character_versions WHERE version_id = ?").run(versionId);
       });
     } finally {

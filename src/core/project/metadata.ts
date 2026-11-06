@@ -216,6 +216,18 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_characters_source_entity ON characters(source_entity_id) WHERE source_entity_id IS NOT NULL",
     ],
   },
+  // S4.7: character version binding (§8.4). panel_id is an opaque
+  // ID until Stage 6 panel records exist; one binding per
+  // (panel, character) pair.
+  {
+    version: 16,
+    name: "016_panel_character_bindings",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_character_bindings (binding_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL, character_id TEXT NOT NULL REFERENCES characters(character_id), version_id TEXT NOT NULL REFERENCES character_versions(version_id), created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_character_bindings_pair ON panel_character_bindings(panel_id, character_id)",
+      "CREATE INDEX IF NOT EXISTS idx_panel_character_bindings_version ON panel_character_bindings(version_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
