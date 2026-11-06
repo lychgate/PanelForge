@@ -492,6 +492,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS panel_negative_prompts (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), negative_prompt TEXT NOT NULL, source TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S7.5: reference conditioning (slots + exact asset IDs per panel).
+  {
+    version: 42,
+    name: "042_panel_conditioning",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_conditioning (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), character_slot TEXT, character_asset_ids TEXT, location_slot TEXT, location_asset_ids TEXT, object_slot TEXT, object_asset_ids TEXT, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
