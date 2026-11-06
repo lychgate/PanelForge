@@ -300,6 +300,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS objects (object_id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL, dimensions TEXT NOT NULL, materials TEXT NOT NULL, appearance TEXT NOT NULL, damage_states TEXT NOT NULL, category TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S5.5: object variations (§8.6). Labels unique per object
+  // via normalized label_key; per-variation overrides default
+  // to "" = inherit from the profile.
+  {
+    version: 24,
+    name: "024_object_variations",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS object_variations (variation_id TEXT PRIMARY KEY, object_id TEXT NOT NULL REFERENCES objects(object_id), label TEXT NOT NULL, label_key TEXT NOT NULL, appearance TEXT NOT NULL, damage_states TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_object_variations_label ON object_variations(object_id, label_key)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
