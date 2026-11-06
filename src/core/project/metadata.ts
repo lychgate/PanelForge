@@ -280,6 +280,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_location_variations_label ON location_variations(location_id, label_key)",
     ],
   },
+  // S5.3: location reference association (§8.5). Registry assets
+  // bound to a variation under one slot kind; an asset may serve
+  // any number of variations/slots.
+  {
+    version: 22,
+    name: "022_location_references",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS location_references (reference_id TEXT PRIMARY KEY, variation_id TEXT NOT NULL REFERENCES location_variations(variation_id), asset_id TEXT NOT NULL, slot TEXT NOT NULL, created_at TEXT NOT NULL)",
+      "CREATE INDEX IF NOT EXISTS idx_location_references_variation ON location_references(variation_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
