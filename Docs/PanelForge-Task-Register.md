@@ -494,7 +494,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A small-GPU profile runs the queue within its memory budget; approved art is never silently replaced.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.13, S2.14, S2.17.
 - **Stop:** Target is practical compatibility, not a guarantee for every model/workflow (§10.3).
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 **Stage acceptance [SPEC]:** Tasks can be created, persisted, executed, interrupted, resumed where supported, and recovered after restart. Real generation remains independently testable from UI.
 
