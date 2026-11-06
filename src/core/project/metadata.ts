@@ -291,6 +291,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE INDEX IF NOT EXISTS idx_location_references_variation ON location_references(variation_id)",
     ],
   },
+  // S5.4: object profile records (§8.6). Structured-text
+  // fields (name required); identity is object_id, stable.
+  {
+    version: 23,
+    name: "023_objects",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS objects (object_id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL, dimensions TEXT NOT NULL, materials TEXT NOT NULL, appearance TEXT NOT NULL, damage_states TEXT NOT NULL, category TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
