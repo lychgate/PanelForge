@@ -27,7 +27,8 @@ const servicePath = path.join(root, "out/node/core/project/service.js");
 const backupPath = path.join(root, "out/node/core/project/backup.js");
 const metadataPath = path.join(root, "out/node/core/project/metadata.js");
 
-const { createProject, createProjectAt } = require(servicePath);
+const { createProject } = require(servicePath);
+const { createProjectAt } = require(servicePath.replace("service.js", "operations.js"));
 const { createSnapshot, restoreSnapshot } = require(backupPath);
 const { saveTemplate, getTemplate, listTemplates } = require(templatesPath);
 
