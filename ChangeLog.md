@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.6 — Entity → Character Bridge (2026-11-06) — [`0ae0b62`](https://github.com/lychgate/PanelForge/commit/0ae0b6207ff9dde6f824989dcf28a5b038c4d134)
+
+**Added**
+
+- `src/core/project/entity-bridge.ts` — explicit
+  create-from-entity (`createProfileFromEntity`: copies only the
+  name, records `source_entity_id`, everything else starts empty;
+  one profile per entity), `getCharacterFromEntity`,
+  `resolveEntitySource` (exact normalized slice + original bytes
+  via the S3.2 offset map).
+- Migration 015 (`characters.source_entity_id` + partial unique
+  index) in `src/core/project/metadata.ts`;
+  `src/core/project/characters.ts` surfaces `sourceEntityId`.
+- `tests/entity-bridge.test.js` — 5 tests: name-only copy,
+  `DUPLICATE_SOURCE` on second creation, typed rejections, exact
+  source resolution, migration v15.
+
+**Changed**
+
+- Register: S4.6 marked **Complete**; Stage 4 now 6 of 12; §11 next
+  eligible is S4.7.
+- `Plan.md`: S4.6 checked off (2026-11-06).
+
 ### S4.5 — MVRS Tier Config (2026-11-06) — [`9af6bdc`](https://github.com/lychgate/PanelForge/commit/9af6bdcb83f8341c68b5995685b79211712d596d)
 
 **Added**

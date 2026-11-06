@@ -695,7 +695,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** (group: profile creation support)
 - **Acceptance:** A profile created from an entity keeps a resolvable link to its source span; an entity never spawns two profiles; fields outside the name are empty until the owner fills them.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.6, S4.1.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 0ae0b62; see below)
 
 #### S4.7 Character version binding [SPEC]
 - **Goal:** Every panel can identify the exact version it uses.
@@ -1297,6 +1297,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S4.5 | `DISPLAY=:0 npm test` | Pass — 392 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 9 ipc + 13 security) | `tests/tier-config.test.js` (5 tests): seeded §8.4 defaults, same-fixture rescore on edit, reset, validation, migration v14. `tests/completeness.test.js` missing-order expectation updated to the config's alphabetical slot order. |
 | 2026-11-06 | S4.5 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S4.5 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S4.6 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S4.6 | `npm run build` | Pass | `out/node/core/project/entity-bridge.js` emitted. |
+| 2026-11-06 | S4.6 | `DISPLAY=:0 npm test` | Pass — 397 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 9 ipc + 13 security) | `tests/entity-bridge.test.js` (5 tests): create-from-entity copies name only, DUPLICATE_SOURCE on second creation, typed rejections, exact source resolution, migration v15. |
+| 2026-11-06 | S4.6 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S4.6 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S4.6 implemented files:** `src/core/project/entity-bridge.ts` (New — `createProfileFromEntity`/`getCharacterFromEntity`/`resolveEntitySource`), `src/core/project/characters.ts` (`sourceEntityId` surfaced), `src/core/project/metadata.ts` (migration 015 source_entity_id + partial unique index), `tests/entity-bridge.test.js` (New, 5 tests). Binding stays S4.7.
 
 **S4.5 implemented files:** `src/core/project/tier-config.ts` (New — `getTierConfig`/`setTierRequirement`/`removeTierRequirement`/`resetTierConfig`), `src/core/project/metadata.ts` (migration 014 completeness_tiers, seeded with §8.4 defaults), `src/core/project/completeness.ts` (scorer now reads the config table), `tests/tier-config.test.js` (New, 5 tests), `tests/completeness.test.js` (missing-order expectation updated). Entity bridge stays S4.6.
 
@@ -1502,7 +1509,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S4.4:** S4.5 — Minimum Viable Reference Set config (tiers editable at runtime, defaults = §8.4). **Status: Complete (2026-11-06, impl commit 9af6bdc; 392 tests incl. 5 tier-config). Stage 4 now 5 of 12.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S4.5:** S4.6 — Entity → character bridge (explicit create-from-entity; source span link; never auto-create). Do not begin without explicit owner authorization.
+**Next eligible after S4.5:** S4.6 — Entity → character bridge (explicit create-from-entity; source span link; never auto-create). **Status: Complete (2026-11-06, impl commit 0ae0b62; 397 tests incl. 5 entity-bridge). Stage 4 now 6 of 12.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S4.6:** S4.7 — Character version binding (opaque panel_id; one exact version; wrong-version warnings). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1583,5 +1592,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S4.3 complete. Acceptance verified (382 tests incl. 5 version-references; slot association with registry validation + exact slot queries). Stage 4 now 3 of 12. Stopped for owner review before S4.4. | [SPEC] | Crouton (S4.3 implementation) |
 | 2026-11-06 | S4.4 complete. Acceptance verified (387 tests incl. 5 completeness; per-tier verdicts with named missing slots, overall tier). Stage 4 now 4 of 12. Stopped for owner review before S4.5. | [SPEC] | Crouton (S4.4 implementation) |
 | 2026-11-06 | S4.5 complete. Acceptance verified (392 tests incl. 5 tier-config; runtime-editable tiers, seeded §8.4 defaults, scorer reads config). Stage 4 now 5 of 12. Stopped for owner review before S4.6. | [SPEC] | Crouton (S4.5 implementation) |
+| 2026-11-06 | S4.6 complete. Acceptance verified (397 tests incl. 5 entity-bridge; name-only copy, one profile per entity, exact source resolution). Stage 4 now 6 of 12. Stopped for owner review before S4.7. | [SPEC] | Crouton (S4.6 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
