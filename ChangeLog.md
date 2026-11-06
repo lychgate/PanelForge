@@ -206,6 +206,26 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.9 — Panel Instructions (2026-11-06) — [`0176fbc`](https://github.com/lychgate/PanelForge/commit/0176fbc3ad8928aca9b0fc22c1164d1860e82574)
+
+**Added**
+
+- `src/core/project/panel-instructions.ts` — one instruction
+  block per panel (`setInstructions`/`getInstructions`):
+  composition prompt, background detail, and art direction
+  notes; setting again replaces; malformed input rejects with
+  typed errors.
+- Migration 036 (`panel_instructions` table) in
+  `src/core/project/metadata.ts`.
+- `tests/panel-instructions.test.js` — 4 tests: all three
+  blocks, replace, typed rejections, migration v36.
+
+**Changed**
+
+- Register: S6.9 marked **Complete**; Stage 6 now 9 of 13;
+  §11 next eligible is S6.10.
+- `Plan.md`: S6.9 checked off (2026-11-06).
+
 ### S6.8 — Scene Style Overrides (2026-11-06) — [`237afdc`](https://github.com/lychgate/PanelForge/commit/237afdc7ebacaec7e9642c0cebcef1a7bb34771a)
 
 **Added**

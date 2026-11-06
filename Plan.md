@@ -158,7 +158,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S6.6 Character positioning (foreground/midground/background + left/center/right guidance only) — completed 2026-11-06
 - [x] S6.7 Dialogue, captions, actions, and expressions (editable line rows) — completed 2026-11-06
 - [x] S6.8 Scene style overrides (S3.13 resolveStyle consumer; default fallback) — completed 2026-11-06
-- [ ] S6.9 Panel instructions (generation-ready text for Stage 7)
+- [x] S6.9 Panel instructions (generation-ready text for Stage 7) — completed 2026-11-06
 - [ ] S6.10 Storyboard snapshots + lightweight branching (full-copy snapshots, parent lineage)
 - [ ] S6.11 Minimal storyboard UI (read/edit without artwork; hand-rolled HTML/CSS + shortcuts; new IPC channels)
 - [ ] S6.12 Composition review (gap/mismatch warnings naming panel + fix)
