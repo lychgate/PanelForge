@@ -7,6 +7,24 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.12 — Stage 4 Acceptance Fixture (2026-11-06) — [`ac6afc9`](https://github.com/lychgate/PanelForge/commit/ac6afc9fac5e7a4f2bed5f42457671e1dcc1eaf6)
+
+**Added**
+
+- `tests/stage4-fixture.test.js` — 2 acceptance tests running
+  fixture characters through the whole Character Studio
+  (entity → bridge → versions → references → tiers → approval
+  → binding → comparison → history replay), plus a second
+  character proving the same gates. Incomplete references
+  warn; approved work intact.
+
+**Changed**
+
+- Register: S4.12 marked **Complete**; Stage 4 gate passes (12
+  of 12); next stage (Stage 5 Location/Object) expands only per
+  §16.2 before implementation.
+- `Plan.md`: S4.12 checked off (2026-11-06); Stage 4 complete.
+
 ### S4.11 — Character History (2026-11-06) — [`8004a63`](https://github.com/lychgate/PanelForge/commit/8004a63b5ba8024da50dccda568ab9ecfccf26fd)
 
 **Added**
