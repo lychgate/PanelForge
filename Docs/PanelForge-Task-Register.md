@@ -587,7 +587,9 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Fixture .epub lands in spine order with exact spans.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2; parser selection requires owner approval (new dependency).
 - **Stop:** MathML/footnote fidelity is out of scope.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+
+**Parser decision (owner, 2026-11-05):** zero-new-dependency reader (reuses the S3.8 ZIP reader) — no new dependency installed.
 
 #### S3.10 PDF import [SPEC]
 - **Goal:** PDF manuscripts import (text layer).
