@@ -133,7 +133,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S5.4 Object profile records (§8.6 fields + CRUD) — completed 2026-11-06
 - [x] S5.5 Object variations (states like "OmniPad, pristine/damaged") — completed 2026-11-06
 - [x] S5.6 Object reference association (front/side/detail/in-use/damaged slots) — completed 2026-11-06
-- [ ] S5.7 Entity → location/object bridge (explicit create-from-entity; link, never auto-create)
+- [x] S5.7 Entity → location/object bridge (explicit create-from-entity; link, never auto-create) — completed 2026-11-06
 - [ ] S5.8 Generation-request records (request shape + validation only; zero provider calls)
 - [ ] S5.9 Asset history (append-only lifecycle replay)
 - [ ] S5.10 Stage 5 acceptance fixture (create → variants → reference → regenerate independently)

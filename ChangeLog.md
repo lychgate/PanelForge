@@ -7,6 +7,31 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.7 — Entity → Location/Object Bridge (2026-11-06) — [`3be35c1`](https://github.com/lychgate/PanelForge/commit/3be35c1fab452895a6bd70fd5fa0f348d25ac7c7)
+
+**Added**
+
+- `src/core/project/location-object-bridge.ts` — explicit
+  create-from-entity for both studios
+  (`createLocationFromEntity`/`createObjectFromEntity`: copies
+  only the name, records `source_entity_id`, everything else
+  starts empty; one profile per entity per studio) +
+  `getLocationFromEntity`/`getObjectFromEntity`. The S4.6
+  `resolveEntitySource` remains the shared span resolver.
+- Migration 026 (`source_entity_id` on `locations` + `objects`
+  with partial unique indexes) in
+  `src/core/project/metadata.ts`.
+- `tests/location-object-bridge.test.js` — 6 tests:
+  name-only copy for both studios, `DUPLICATE_SOURCE` per
+  studio, typed rejections, exact source resolution,
+  migration v26.
+
+**Changed**
+
+- Register: S5.7 marked **Complete**; Stage 5 now 7 of 10;
+  §11 next eligible is S5.8.
+- `Plan.md`: S5.7 checked off (2026-11-06).
+
 ### S5.6 — Object Reference Association (2026-11-06) — [`e21548a`](https://github.com/lychgate/PanelForge/commit/e21548a1840e02fa134fd9907ad6249c640625d1)
 
 **Added**
