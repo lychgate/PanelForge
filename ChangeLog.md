@@ -232,6 +232,29 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.13 — Traceability (2026-11-06) — [`50094df`](https://github.com/lychgate/PanelForge/commit/50094dfa07682b794c8c9186ff22973886190384)
+
+**Added**
+
+- `src/core/project/traceability.ts` —
+  `getPlacementTrace`/`getPageTrace`: each
+  placement resolves to its source panel, scene
+  purpose, and character-version assignments;
+  empty pages flag `EMPTY_PAGE`, never broken.
+- `layout-board.ts`: placements now carry `trace`;
+  page details carry `flags`; board pages carry
+  `flag`. Renderer Layout cards show `trace:`
+  lines (scene + versions + flags).
+- `tests/traceability.test.js` — 3 tests:
+  scene+version trace, empty-page flagging with
+  SVG still rendering, typed rejections.
+
+**Changed**
+
+- Register: S8.13 marked **Complete**; Stage 8 now 13 of 14;
+  §11 next eligible is S8.14.
+- `Plan.md`: S8.13 checked off (2026-11-06).
+
 ### S8.12 — Layout UI (2026-11-06) — [`03012cf`](https://github.com/lychgate/PanelForge/commit/03012cff9e24d35749894f2a712907899781f101)
 
 **Added**

@@ -209,7 +209,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S8.10 Layout snapshots (full copies, parent lineage) — completed 2026-11-06; Stage 8 now 10 of 14
 - [x] S8.11 SVG page render (deterministic vector composition) — completed 2026-11-06; Stage 8 now 11 of 14
 - [x] S8.12 Layout UI — hand-rolled canvas (drag/resize, keyboard alternatives, no export buttons) — completed 2026-11-06; Stage 8 now 12 of 14
-- [ ] S8.13 Traceability (pages → storyboard panels + versions)
+- [x] S8.13 Traceability (pages → storyboard panels + versions) — completed 2026-11-06; Stage 8 now 13 of 14
 - [ ] S8.14 Stage 8 acceptance fixture (both formats, lettering editable, artwork untouched)
 
 ## Stage 9 — Continuity and QA (expanded 2026-11-06: S9.1–S9.12)
