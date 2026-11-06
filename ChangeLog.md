@@ -232,6 +232,44 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.12 — Layout UI (2026-11-06) — [`03012cf`](https://github.com/lychgate/PanelForge/commit/03012cff9e24d35749894f2a712907899781f101)
+
+**Added**
+
+- `src/core/project/layout-board.ts` —
+  `listLayoutBoard`/`getLayoutPage`: pages across
+  manuscripts, placements in reading order with
+  borders, balloons/lettering, SFX, and the SVG
+  string the canvas draws from. Read-only board.
+- `updatePlacement` (`placements.ts`) and
+  `updateBalloon` (`balloons.ts`): drag/resize
+  geometry with the same typed validation.
+- 11 `layout.*` IPC channels (pages/page/place/
+  updatePlacement/setBorder/createBalloon/
+  updateBalloon/retargetTail/setLettering/setSfx/
+  setReadingOrder) + validators + typed-code
+  preservation; preload `layout` bridge.
+- Renderer Layout view `Alt+5`: page list, SVG
+  canvas with pointer drag over placement groups,
+  focusable number-input alternatives for every
+  drag, border picker, balloon/SFX/text edits,
+  tail retarget, reading-order Move up/down. No
+  export controls.
+- `tests/layout-ui.test.js` — 5 tests: board
+  aggregation, page details, IPC validation
+  (28 channels total), edit round-trip with
+  artwork hash pinned, renderer strings with no
+  export UI.
+- Type-only fix in `layout-snapshots.ts`
+  (`DatabaseLike`) that unblocked the node+web
+  build; renderer bundle refreshed.
+
+**Changed**
+
+- Register: S8.12 marked **Complete**; Stage 8 now 12 of 14;
+  §11 next eligible is S8.13.
+- `Plan.md`: S8.12 checked off (2026-11-06).
+
 ### S8.11 — SVG Page Render (2026-11-06) — [`512631e`](https://github.com/lychgate/PanelForge/commit/512631ecccd9aa777c036ad7f389f0523a3f2840)
 
 **Added**
