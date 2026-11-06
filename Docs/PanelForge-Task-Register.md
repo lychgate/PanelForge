@@ -476,7 +476,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Killing telemetry yields Unknown everywhere, conservative scheduling, and an explicit unavailable indicator.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.14, S2.15.
 - **Stop:** Pausing on thresholds lands in S2.17.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S2.17 Cooling Down State [SPEC]
 - **Goal:** An explicit, distinguishable thermal pause (§10.5).
