@@ -7,6 +7,24 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.3 — Chapter Extraction (2026-11-05) — [`df93505`](https://github.com/lychgate/PanelForge/commit/df935052d84ededd0a5c8f632e2bb87e91cfb3be)
+
+**Added**
+
+- `src/core/project/chapters.ts` — deterministic heading segmentation
+  (`matchChapterHeading`: Markdown ATX + CHAPTER/PART + all-caps
+  convention; `extractChapters` with exact tiling spans; front-matter/
+  untitled fallbacks), `storeChapters`/`listChapters`.
+- Migration 005 (`chapters` table) in `src/core/project/metadata.ts`.
+- `tests/chapters.test.js` — 5 tests: expected segmentation, prose
+  rejection, CRLF byte-offset resolution, determinism, missing-
+  normalization rejection. Source text never altered.
+
+**Changed**
+
+- Register: S3.3 marked **Complete**; §11 next eligible is S3.4.
+- `Plan.md`: S3.3 checked off (2026-11-05).
+
 ### S3.2 — TXT/Markdown Normalization (2026-11-05) — [`bf8d427`](https://github.com/lychgate/PanelForge/commit/bf8d4274a09457ceb50c913617d4784086b2c29e)
 
 **Added**
