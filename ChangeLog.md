@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.10 — Reference Comparison (2026-11-06) — [`824dfe9`](https://github.com/lychgate/PanelForge/commit/824dfe9281061a255be46c04f15d47eb2364a82b)
+
+**Added**
+
+- `src/core/project/version-comparison.ts` — read-only
+  `compareVersions`: slot-by-slot reference sets from both
+  versions (with `onlyIn`), effective field diffs
+  (override-or-inherited), and approval states. Cross-character
+  pairs reject; comparison never mutates.
+- `tests/version-comparison.test.js` — 4 tests: slot/field
+  diffs named exactly, approval + identical-clean, rejections,
+  zero mutation.
+
+**Changed**
+
+- Register: S4.10 marked **Complete**; Stage 4 now 10 of 12;
+  §11 next eligible is S4.11.
+- `Plan.md`: S4.10 checked off (2026-11-06).
+
 ### S4.9 — Generation-Request Records (2026-11-06) — [`90a3a6e`](https://github.com/lychgate/PanelForge/commit/90a3a6eac9cbac972b296ec8c704358d1b8f2615)
 
 **Added**
