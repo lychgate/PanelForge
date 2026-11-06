@@ -260,6 +260,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE INDEX IF NOT EXISTS idx_character_history_character ON character_history(character_id)",
     ],
   },
+  // S5.1: location profile records (§8.5). Structured-text
+  // fields (name required); identity is location_id, stable.
+  {
+    version: 20,
+    name: "020_locations",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS locations (location_id TEXT PRIMARY KEY, name TEXT NOT NULL, architecture TEXT NOT NULL, geography TEXT NOT NULL, layout TEXT NOT NULL, lighting TEXT NOT NULL, time_of_day TEXT NOT NULL, weather TEXT NOT NULL, materials TEXT NOT NULL, color_palette TEXT NOT NULL, damage_states TEXT NOT NULL, historical_variations TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
