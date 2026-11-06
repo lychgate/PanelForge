@@ -76,7 +76,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > generation UI. See `Docs/PanelForge-Task-Register.md` §4E Stage 3 for full
 > per-task Goal/Scope/Deliverables/Deps/Acceptance/Stop.
 
-- [ ] S3.1 Source document records (manuscript rows + asset linkage; originals preserved)
+- [x] S3.1 Source document records (manuscript rows + asset linkage; originals preserved) — completed 2026-11-05
 - [ ] S3.2 TXT/Markdown import + normalization (hash + offset-preserving spans)
 - [ ] S3.3 Chapter extraction (deterministic heading segmentation)
 - [ ] S3.4 Scene extraction (deterministic segmentation + override framework)

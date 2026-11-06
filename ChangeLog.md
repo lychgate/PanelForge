@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.1 — Source Document Records (2026-11-05) — [`0ca58a5`](https://github.com/lychgate/PanelForge/commit/0ca58a54869f8ff41e15874f1aace20743c4502f)
+
+**Added**
+
+- `src/core/project/manuscripts.ts` — `importManuscript` (copy into
+  `manuscripts/original/`, asset-registered, hashed, row inserted),
+  `getManuscript`/`listManuscripts`, `readManuscriptOriginal`
+  (byte-for-byte re-open), `verifyManuscript` (ok/modified/missing/
+  unreadable), extension format detection.
+- Migration 003 (`manuscripts` table + FK to assets) in
+  `src/core/project/metadata.ts`.
+- `tests/manuscripts.test.js` — 5 tests: preservation + hash, round-trip,
+  integrity without mutation, typed rejections, migration v3.
+
+**Changed**
+
+- Register: S3.1 marked **Complete**; §11 next eligible is S3.2.
+- `Plan.md`: S3.1 checked off (2026-11-05).
+
 ### S2.18 — Small GPU Mode (2026-11-05) — [`a30f908`](https://github.com/lychgate/PanelForge/commit/a30f908cffaa5b215420b97e4b197d0007b6de51)
 
 **Added**
