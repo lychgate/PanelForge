@@ -430,6 +430,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_text_panel ON panel_text(panel_id)",
     ],
   },
+  // S6.9: generation-ready panel instructions (§8.7).
+  // One instruction block per panel.
+  {
+    version: 36,
+    name: "036_panel_instructions",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_instructions (instruction_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), composition_prompt TEXT NOT NULL, background_detail TEXT NOT NULL, art_direction_notes TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_instructions_panel ON panel_instructions(panel_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
