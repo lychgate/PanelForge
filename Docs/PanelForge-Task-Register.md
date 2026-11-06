@@ -540,7 +540,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Fixture segments into expected scenes; overrides correct boundaries without changing source text.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.3.
 - **Stop:** Storyboard panels stay Stage 6.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S3.5 Source relationships [SPEC]
 - **Goal:** Every extracted span links back to source.

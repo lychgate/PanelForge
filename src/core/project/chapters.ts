@@ -52,11 +52,14 @@ function requireProject(root: string): void {
 const ATX = /^#{1,6}\s+(.+?)\s*$/;
 const CHAPTER_PART = /^(chapter|part|book)\s+([ivx\d]+(?:\s*[-:.]\s*(.+))?|[-:.]\s*(.+))$/i;
 const ALL_CAPS = /^[A-Z0-9][A-Z0-9\s:'",.!?()-]*$/;
+// Scene location/time cues (S3.4) must never be chapters.
+const SCENE_CUE = /^(INT\.|EXT\.|LATER|MEANWHILE|BACK TO|CUT TO)(?:\s|$)/i;
 
 /** Title for a line, or null when the line is not a heading. */
 export function matchChapterHeading(line: string): string | null {
   const trimmed = line.trim();
   if (trimmed === "") return null;
+  if (SCENE_CUE.test(trimmed)) return null;
   const atx = ATX.exec(trimmed);
   if (atx) return atx[1].trim();
   const cp = CHAPTER_PART.exec(trimmed);

@@ -109,6 +109,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS chapters (chapter_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), title TEXT NOT NULL, norm_start INTEGER NOT NULL, norm_end INTEGER NOT NULL, sort_order INTEGER NOT NULL, created_at TEXT NOT NULL)",
     ],
   },
+  // S3.4: scene segmentation within chapters. Each row records one
+  // scene's normalized span + title + order + chapter link; `source`
+  // is "auto" (rule-derived) or "override" (manually corrected).
+  {
+    version: 6,
+    name: "006_scenes",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS scenes (scene_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), chapter_id TEXT NOT NULL REFERENCES chapters(chapter_id), title TEXT NOT NULL, norm_start INTEGER NOT NULL, norm_end INTEGER NOT NULL, sort_order INTEGER NOT NULL, source TEXT NOT NULL, created_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
