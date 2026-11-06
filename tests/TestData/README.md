@@ -24,8 +24,11 @@ S6.12 composition review with real, varied input.
   zero-dependency parser. Expect `INVALID_PDF`/parse failure there
   until the parser handles its encoding.
 
-To test the full Stage 3 pipeline (import → extract → classify)
-against these files, either add OCR, export text-layer PDFs from
-the authoring tool, or pick chapters that export with embedded
-text. Stage 6 fixture work (S6.13) should record which path it
-takes here and in the register.
+## Import strategy (owner decision, 2026-11-06, for S6.13)
+
+Autodetect: try the text layer first; when absent (scanned),
+fall back to OCR — and save the OCR output as an **editable
+text copy** attached to the manuscript, so OCR runs exactly
+once per file and corrections persist. S6.13 implements this
+(replacing the S3.10 "scanned → Unknown, no OCR" stance for this
+path). OCR engine choice comes at S6.13 planning.

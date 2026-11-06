@@ -30,6 +30,11 @@ remains the authoritative progress record; this file summarizes what each task c
   finding.
 - **No implementation yet** — S5.1/S6.1 must not begin without
   explicit owner authorization.
+- **PDF import strategy (owner decision, 2026-11-06, for S6.13):**
+  autodetect — text layer first, then OCR fallback; OCR output
+  saved as an editable text copy (runs once per file, reusable
+  and correctable). Supersedes S3.10's no-OCR stance for the
+  Stage 6 path.
 
 ### S4.12 — Stage 4 Acceptance Fixture (2026-11-06) — [`ac6afc9`](https://github.com/lychgate/PanelForge/commit/ac6afc9fac5e7a4f2bed5f42457671e1dcc1eaf6)
 

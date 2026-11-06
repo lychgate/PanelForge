@@ -946,7 +946,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 
 #### S6.13 Stage 6 acceptance fixture [SPEC]
 - **Goal:** End-to-end proof of Stage 6 on the real book.
-- **Scope:** Import one `tests/TestData` chapter (text-layer PDF or extraction note per S3.10) → storyboard it (scenes, panels, assignments, camera, dialogue, instructions) → snapshot + branch + restore → composition review; storyboard changes never touch approved artwork (character versions, style profiles, and references intact throughout).
+- **Scope:** Import one `tests/TestData` chapter → storyboard it (scenes, panels, assignments, camera, dialogue, instructions) → snapshot + branch + restore → composition review; storyboard changes never touch approved artwork (character versions, style profiles, and references intact throughout). **PDF import strategy [APPROVED CHANGE — owner, 2026-11-06]: autodetect — try the text layer first; if absent (scanned), run OCR once and save the OCR output as an editable text copy attached to the manuscript, so re-imports reuse it and owners can correct OCR errors. This supersedes the S3.10 "scanned → Unknown, no OCR" stance for the Stage 6 fixture path; OCR engine choice comes at S6.13 planning.**
 - **Deliverables [SPEC]:** Stage 6 fixture.
 - **Acceptance:** The whole Stage-6 acceptance passes on the fixture; every panel identifies source scene + character versions; storyboard edits leave approved artwork byte-identical.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.1–S6.12.
