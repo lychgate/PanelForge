@@ -195,6 +195,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE INDEX IF NOT EXISTS idx_character_version_references_version ON character_version_references(version_id)",
     ],
   },
+  // S4.5: MVRS tier config (§8.4). (tier, slot, min_count) rows
+  // seeded with the spec defaults; the scorer reads this table.
+  {
+    version: 14,
+    name: "014_completeness_tiers",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS completeness_tiers (tier TEXT NOT NULL, slot TEXT NOT NULL, min_count INTEGER NOT NULL, PRIMARY KEY (tier, slot))",
+      "INSERT OR IGNORE INTO completeness_tiers (tier, slot, min_count) VALUES ('recommended', 'portrait', 1), ('recommended', 'front', 1), ('recommended', 'expression', 1), ('full', 'portrait', 1), ('full', 'front', 1), ('full', 'side', 1), ('full', 'rear', 1), ('full', 'expression', 2), ('full', 'pose', 1), ('full', 'clothing', 1), ('full', 'equipment', 1)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {

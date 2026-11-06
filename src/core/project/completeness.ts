@@ -91,13 +91,16 @@ export async function scoreCompleteness(root: string, versionId: string): Promis
       if (isReferenceSlot(slot)) counts.set(slot, Number(row.n));
     }
     const present = [...counts.keys()].sort();
+    // Tier requirements come from the S4.5 config table (defaults = §8.4).
+    const { getTierConfig } = await import("./tier-config");
+    const config = await getTierConfig(root);
     const tiers: TierVerdict[] = TIER_ORDER.map((tier) => {
       if (tier === "basic") {
         const any = counts.size > 0;
         return { tier, passed: any, present, missing: any ? [] : ["any reference"] };
       }
       const missing: string[] = [];
-      for (const req of DEFAULT_TIERS[tier]) {
+      for (const req of config[tier]) {
         const have = counts.get(req.slot) ?? 0;
         if (have < req.min) {
           missing.push(req.min === 1 ? req.slot : `${req.slot} (need ${req.min}, have ${have})`);

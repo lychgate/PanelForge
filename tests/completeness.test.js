@@ -79,7 +79,8 @@ describe("S4.4 reference completeness scoring", () => {
     expect(score.tiers[0].passed).toBe(true);
     expect(score.overall).toBe("basic");
     expect(score.tiers[1].passed).toBe(false);
-    expect(score.tiers[1].missing).toEqual(["front", "expression"]);
+    expect([...score.tiers[1].missing].sort()).toEqual(["expression", "front"]);
+    expect(score.tiers[1].missing.length).toBe(2);
     expect(score.tiers[1].present).toEqual(["portrait"]);
   });
 
