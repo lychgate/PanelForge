@@ -192,13 +192,41 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [ ] S7.13 Version history, approval, and restoration (restore returns pointer, never deletes)
 - [ ] S7.14 Stage 7 acceptance fixture (brief → artwork → approve; approved work preserved)
 
-## Stage 8 — Comic Layout Studio
+## Stage 8 — Comic Layout Studio (expanded 2026-11-06: S8.1–S8.14)
 
-- [ ] Stage 8 — not started
+> Owner decisions: SVG vector-first pages (raster at Stage 10); lettering as overlay records, baked at export; React framework for the layout canvas; PDF library pdfkit.
 
-## Stage 9 — Continuity and QA
+- [ ] S8.1 Page records (format traditional|webtoon, size, margin)
+- [ ] S8.2 Panel placement (mm geometry, artwork by asset reference)
+- [ ] S8.3 Traditional layout templates (grid presets)
+- [ ] S8.4 Webtoon / vertical layout (continuous scroll geometry)
+- [ ] S8.5 Borders (presets, vector, never baked into artwork)
+- [ ] S8.6 Balloons + tails (speech/caption/thought, anchors)
+- [ ] S8.7 Dialogue/caption editing (overlay text only, artwork byte-identical)
+- [ ] S8.8 Sound effects (SFX vector lettering records)
+- [ ] S8.9 Reading order (explicit per-page order)
+- [ ] S8.10 Layout snapshots (full copies, parent lineage)
+- [ ] S8.11 SVG page render (deterministic vector composition)
+- [ ] S8.12 Layout UI — React canvas (drag/resize, keyboard alternatives, no export buttons)
+- [ ] S8.13 Traceability (pages → storyboard panels + versions)
+- [ ] S8.14 Stage 8 acceptance fixture (both formats, lettering editable, artwork untouched)
 
-- [ ] Stage 9 — not started
+## Stage 9 — Continuity and QA (expanded 2026-11-06: S9.1–S9.12)
+
+> Owner decisions: severity thresholds tunable per project; checks use recorded/explicit facts only (unknown skips, never guesses); suppression requires rationale and is auditable.
+
+- [ ] S9.1 QA threshold settings (per-kind severity + noise caps)
+- [ ] S9.2 Version/age checks (S4.7 era + assignments)
+- [ ] S9.3 Clothing/equipment checks (canon explicit-only)
+- [ ] S9.4 Injury/wound checks (recorded injury states)
+- [ ] S9.5 Location checks (panel vs scene location)
+- [ ] S9.6 Chronology checks (extraction vs storyboard order, dated entries)
+- [ ] S9.7 Reference checks (artwork vs version references)
+- [ ] S9.8 Severity aggregation (Critical/Warning/Informational, deterministic)
+- [ ] S9.9 Suppression / overrides (rationale-required, auditable)
+- [ ] S9.10 Recommendations (concrete fix per warning)
+- [ ] S9.11 QA review UI (warnings + suppress, read-only checks)
+- [ ] S9.12 Stage 9 acceptance fixture (planted inconsistencies → severities)
 
 ## Stage 10 — Publishing and Export
 

@@ -8,11 +8,13 @@ deferral (below).
 
 > **Superseded notes (written as S0.3, read today):** the bridge is no
 > longer empty — since S0.5 it exposes `diagnostics.get`, and the S0.4
-> allowlist now covers the 9 registered channels (see
+> allowlist now covers the 17 registered channels (diagnostics,
+> project, and S6.11 storyboard channels; see
 > `src/core/ipc/registry.ts`). The IPC guard in `scripts/check.js`
 > enforces that `ipcMain` lives only in the registry and
 > `ipcRenderer` only in preload. CSP remains deferred until the UI
-> framework choice (see §4 and register D3).
+> framework + asset-loader work (framework now chosen: React for the
+> Stage 8 canvas; final policy still pending — see §4 and register D3).
 
 ## 1. webPreferences baseline (verified by tests)
 

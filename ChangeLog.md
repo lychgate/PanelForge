@@ -206,6 +206,36 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### Stage 8 + 9 Planning — Expansion (2026-11-06)
+
+**Changed**
+
+- Register §4E: Stage 8 expanded to 14 micro-tasks S8.1–S8.14
+  (page records, placement, traditional/webtoon layouts,
+  borders, balloons/tails, lettering edits, SFX, reading
+  order, layout snapshots, SVG render, React canvas UI,
+  traceability, acceptance fixture last).
+- Stage 9 expanded to 12 micro-tasks S9.1–S9.12 (threshold
+  settings, version/age, clothing/equipment, injury,
+  location, chronology, reference checks, severity
+  aggregation, suppression/overrides, recommendations,
+  review UI, acceptance fixture last).
+- Owner decisions (2026-11-06): pages composed as SVG
+  vector first (raster only at Stage 10); balloons/SFX are
+  overlay records, baked at export only; layout UI
+  introduces React for the canvas drag/zoom work; PDF
+  library pdfkit chosen (§14); QA severity thresholds
+  tunable per project; QA checks use explicit facts only.
+- `Plan.md`: Stage 8/9 task lists added (all Not Started).
+- Docs audit: `Docs/PanelForge-Project-Format.md` schema
+  table to head 38; `Docs/PanelForge-Security-Baseline.md`
+  allowlist note to 17 channels + React/CSP update;
+  README status brought current (Stages 2–6 complete);
+  `Docs/PanelForge-Shortcuts.md` already lists Alt+4;
+  `Docs/PanelForge-Stage0-Completion.md` is a historical
+  Stage 0 record, unchanged.
+- Spec PDF `Docs/PanelForge.pdf` untouched (authoritative).
+
 ### S6.13 — Stage 6 Acceptance Fixture (2026-11-06) — [`d3b5de5`](https://github.com/lychgate/PanelForge/commit/d3b5de5fa5b25125a0272907a8c22bb1d735e5ec)
 
 **Added**

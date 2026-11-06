@@ -1074,12 +1074,234 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Stop:** Stage gate — Comic Layout Studio (S8) begins only after this passes.
 - **Status:** Not Started
 
-Stages 8–11 — task groups [SPEC §15]
+**Stage 8 — Comic Layout Studio: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
+
+> Goal [SPEC]: Assemble approved artwork into finished pages.
+> Stage acceptance [SPEC]: page assembled without modifying original artwork; dialogue/captions editable; traditional + vertical formats work.
+> Owner decisions (2026-11-06): pages are composed as SVG vector first (raster only at Stage 10 export); balloons/SFX are overlay records, baked into raster only at Stage 10 (SPEC §8.9: text not baked into artwork); layout UI introduces a lightweight framework (React) for the canvas drag/zoom work, ending the hand-rolled era from S6.11; PDF library **pdfkit** chosen early (§14) for Stage 10.
+> Spine-first: records + vector composition before interactive canvas.
+
+#### S8.1 Page records [SPEC]
+- **Goal:** Pages as first-class records with format + size.
+- **Scope:** `pages` (page_id, title, format traditional|webtoon, width/height, margin, created/updated). CRUD.
+- **Deliverables [SPEC]:** Page records.
+- **Acceptance:** Pages persist and list per manuscript; invalid formats reject typed.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.2, S7.14 (approved artwork exists).
+- **Status:** Not Started
+
+#### S8.2 Panel placement [SPEC]
+- **Goal:** Place storyboard panels (approved artwork slots) on pages.
+- **Scope:** `page_panels` (placement_id, page_id, panel_id → approved artwork version slot, x/y/w/h in mm, z-order). Artwork referenced by asset id, never copied/modified. CRUD + move.
+- **Deliverables [SPEC]:** Placement records.
+- **Acceptance:** A page shows its panels in placement order; artwork assets unchanged (hash check in tests).
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.1, S7.14.
+- **Status:** Not Started
+
+#### S8.3 Traditional layout templates [SPEC]
+- **Goal:** Grid presets for traditional pages.
+- **Scope:** Template presets (rows × cols + gutter + margin) that generate placements for a page; applying one replaces unlabeled placements only.
+- **Deliverables [SPEC]:** Traditional layout presets.
+- **Acceptance:** A 2×3 preset yields six evenly guttered placements.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.2.
+- **Status:** Not Started
+
+#### S8.4 Webtoon / vertical layout [SPEC]
+- **Goal:** Continuous-scroll geometry for vertical strips.
+- **Scope:** Webtoon pages: width-fixed, height grows with stacked panels (1 per row, full-bleed option); reading order follows vertical order.
+- **Deliverables [SPEC]:** Webtoon layout mode.
+- **Acceptance:** Three webtoon panels stack vertically in reading order.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.2.
+- **Status:** Not Started
+
+#### S8.5 Borders [SPEC]
+- **Goal:** Vector borders for placed panels.
+- **Scope:** Border presets (none, thin, bold + rounded option) + width; stored per placement; rendered in SVG (S8.11), never baked into artwork.
+- **Deliverables [SPEC]:** Border presets.
+- **Acceptance:** Border style persists per placement and renders in SVG output.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.2.
+- **Status:** Not Started
+
+#### S8.6 Balloons + tails [SPEC]
+- **Goal:** Speech/caption/thought balloons with portable tails.
+- **Scope:** `balloons` (balloon_id, page_panel_id, kind speech|caption|thought, shape ellipse|rounded|rect, x/y/w/h, tail: speaker point (x/y) + visibility). CRUD + retarget tail.
+- **Deliverables [SPEC]:** Balloon records.
+- **Acceptance:** Balloons persist with tails; orphan tails (missing anchor) warn, never crash.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.2.
+- **Status:** Not Started
+
+#### S8.7 Dialogue/caption editing [SPEC]
+- **Goal:** Edit lettering text on overlays only.
+- **Scope:** Balloon text edit (dialogue/caption strings per balloon); edits never touch artwork assets or S6.7 panel text; byte-identical artwork check.
+- **Deliverables [SPEC]:** Page-level lettering edits.
+- **Acceptance:** Balloon text edits round-trip; artwork hashes unchanged.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.6.
+- **Status:** Not Started
+
+#### S8.8 Sound effects (SFX) [SPEC]
+- **Goal:** SFX text overlays as vector lettering.
+- **Scope:** `sfx` (sfx_id, page_panel_id, text, weight, angle, x/y/scale). CRUD; rendered as SVG text in S8.11.
+- **Deliverables [SPEC]:** SFX records.
+- **Acceptance:** SFX text/angle persist and render in SVG.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.2.
+- **Status:** Not Started
+
+#### S8.9 Reading order [SPEC]
+- **Goal:** Explicit reading order independent of placement z-order.
+- **Scope:** Reading-order records per page (ordered placement list); traditional = row-major default, webtoon = vertical; reordering never moves artwork.
+- **Deliverables [SPEC]:** Reading order.
+- **Acceptance:** Reordered page reads panels in the new order.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.2.
+- **Status:** Not Started
+
+#### S8.10 Layout snapshots [SPEC]
+- **Goal:** Preserve + branch page layouts like S6.10.
+- **Scope:** Full-copy layout snapshots (pages + placements + balloons + SFX + reading order) with parent lineage; restore replaces live layout; snapshots never feed Stage 10 directly.
+- **Deliverables [SPEC]:** Layout snapshots.
+- **Acceptance:** Layout dump before snapshot equals dump after restore; branched edits leave parent intact.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.1–S8.9, S6.10 pattern.
+- **Status:** Not Started
+
+#### S8.11 SVG page render [SPEC]
+- **Goal:** Deterministic vector pages from records.
+- **Scope:** SVG composition: artwork by reference (asset href/local file path resolved at render time), borders, balloon shapes + tails, SFX text, balloon text (wrapped). Pure function of records → same bytes every time. Rasterization/export stays Stage 10.
+- **Deliverables [SPEC]:** SVG page render.
+- **Acceptance:** Identical records render byte-identical SVG; artwork files unmodified.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.2–S8.9.
+- **Status:** Not Started
+
+#### S8.12 Layout UI (React canvas) [SPEC]
+- **Goal:** Read/edit pages interactively with artwork.
+- **Scope:** React renderer surface: page list, canvas with drag/resize placement + balloon/SFX position, tail retarget, border picker, text edit, reading-order list; keyboard-navigable alternatives for every pointer action; new IPC channels (S0.4 allowlist); no export buttons (Stage 10).
+- **Deliverables [SPEC]:** Layout UI surface.
+- **Acceptance:** A page edits fully without opening the filesystem; artwork hashes unchanged.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.1–S8.11.
+- **Status:** Not Started
+
+#### S8.13 Traceability [SPEC]
+- **Goal:** Pages clearly trace to storyboard panels.
+- **Scope:** Every placement shows its source storyboard panel + character versions; pages with no artwork slot are flagged, never broken.
+- **Deliverables [SPEC]:** Trace links.
+- **Acceptance:** Each placed panel identifies its source scene + versions.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.12.
+- **Status:** Not Started
+
+#### S8.14 Stage 8 acceptance fixture [SPEC]
+- **Goal:** End-to-end proof of Stage 8.
+- **Scope:** Storyboard panels from the Stage 6/7 fixtures assemble on traditional + webtoon pages → balloons/SFX → SVG render → layout snapshot/branch/restore; artwork byte-identical throughout.
+- **Deliverables [SPEC]:** Stage 8 fixture.
+- **Acceptance:** Pages assemble without modifying original artwork; lettering editable; both formats render.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.1–S8.13.
+- **Stop:** Stage gate — Continuity and QA (S9) begins only after this passes.
+- **Status:** Not Started
+
+**Stage 9 — Continuity and QA: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
+
+> Goal [SPEC]: Detect meaningful inconsistencies.
+> Stage acceptance [SPEC]: major inconsistencies reported; minor issues don't overwhelm; warnings identify affected scene/panel.
+> Owner decisions (2026-11-06): severity thresholds are **tunable per project** (S9.1); checks only use recorded/explicit facts (canon is explicit-only per S3.7 — unknown data skips, never guesses); suppression requires rationale and is auditable (S9.9).
+> Spine-first: settings + checks before aggregation/UI.
+
+#### S9.1 QA threshold settings [SPEC]
+- **Goal:** Tunable severity thresholds per project.
+- **Scope:** Per-check-kind severity (Critical|Warning|Informational) + noise caps; validated; project-scoped; defaults owner-approved at implementation.
+- **Deliverables [SPEC]:** Threshold settings.
+- **Acceptance:** Lowering a threshold changes which warnings surface; invalid severities reject typed.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.14.
+- **Status:** Not Started
+
+#### S9.2 Version/age checks [SPEC]
+- **Goal:** Bound versions tell a consistent story.
+- **Scope:** Panel assignments/bindings' version age vs asserted age (S4.7 era data + S6.12 review reuse); mismatches = Critical by default; missing age data skips.
+- **Deliverables [SPEC]:** Age checks.
+- **Acceptance:** Planted age disagreement reports Critical naming panel + versions.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.1, S4.7, S6.3.
+- **Status:** Not Started
+
+#### S9.3 Clothing/equipment checks [SPEC]
+- **Goal:** Costume/gear stays consistent.
+- **Scope:** Compare bound version clothing/equipment fields against canon explicit facts where recorded; unrecorded fields skip (never guess).
+- **Deliverables [SPEC]:** Wardrobe checks.
+- **Acceptance:** Canon-recorded vs bound mismatch reports; unrecorded passes silent.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.1, S3.7 canon.
+- **Status:** Not Started
+
+#### S9.4 Injury/wound checks [SPEC]
+- **Goal:** Injuries persist until healed.
+- **Scope:** Recorded injury states per version/scene vs panels asserting them; contradictions warn; unrecorded skips.
+- **Deliverables [SPEC]:** Injury checks.
+- **Acceptance:** Panel asserting a healed injury warns; unknown-injury panels pass silent.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.1.
+- **Status:** Not Started
+
+#### S9.5 Location checks [SPEC]
+- **Goal:** Scenes stay in the right places.
+- **Scope:** Panel location vs storyboard scene location consistency; variation mismatch warns.
+- **Deliverables [SPEC]:** Location checks.
+- **Acceptance:** Cross-location panel flags naming panel + expected location.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.1, S6.4.
+- **Status:** Not Started
+
+#### S9.6 Chronology checks [SPEC]
+- **Goal:** Story order stays coherent.
+- **Scope:** Extraction scene order vs storyboard order; time-marker contradictions (dated journal entries ch. 4–15) warn.
+- **Deliverables [SPEC]:** Chronology checks.
+- **Acceptance:** Out-of-order or date-contradicting panels report.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.1.
+- **Status:** Not Started
+
+#### S9.7 Reference checks [SPEC]
+- **Goal:** Artwork answers its references.
+- **Scope:** Approved artwork's reference assets vs assigned version's references; missing references warn.
+- **Deliverables [SPEC]:** Reference checks.
+- **Acceptance:** Unreferenced artwork warns naming panel + version.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.1, S4.3/S5.3/S5.6.
+- **Status:** Not Started
+
+#### S9.8 Severity aggregation [SPEC]
+- **Goal:** Major issues surface; noise never overwhelms.
+- **Scope:** Apply S9.1 thresholds to check results; roll up Informational counts; warnings identify affected scene/panel; deterministic order (severity → scene → panel).
+- **Deliverables [SPEC]:** Aggregation.
+- **Acceptance:** Same board → same ordered warning list every time.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.1–S9.7.
+- **Status:** Not Started
+
+#### S9.9 Suppression / overrides [SPEC]
+- **Goal:** Owners can silence known issues auditable.
+- **Scope:** Per-warning suppression with required rationale + author + timestamp; suppressed warnings count separately; unsuppress restores.
+- **Deliverables [SPEC]:** Suppression records.
+- **Acceptance:** Suppressed warnings stay hidden but auditable; rationale required.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.8.
+- **Status:** Not Started
+
+#### S9.10 Recommendations [SPEC]
+- **Goal:** Every warning says how to fix it.
+- **Scope:** Per-kind fix strings + recommended action (reassign/approve/bind/etc.); no auto-fix of artwork or canon.
+- **Deliverables [SPEC]:** Fix recommendations.
+- **Acceptance:** Every surfaced warning carries a concrete fix.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.8.
+- **Status:** Not Started
+
+#### S9.11 QA review UI [SPEC]
+- **Goal:** Read warnings and suppress without leaving the studio.
+- **Scope:** Renderer review surface (extends S8.12 React canvas host): warning list grouped by severity, scene/panel links, suppress/unsuppress; checks are read-only (never rewrite data).
+- **Deliverables [SPEC]:** QA review surface.
+- **Acceptance:** Warnings viewable + suppressible; data unchanged by review.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.8–S9.10.
+- **Status:** Not Started
+
+#### S9.12 Stage 9 acceptance fixture [SPEC]
+- **Goal:** End-to-end proof of Stage 9.
+- **Scope:** Stage 6/7/8 fixture storyboards with planted inconsistencies (version/age/clothing/injury/location/chronology/reference) → Critical/Warning/Informational produced per tunable thresholds; suppressed items auditable; clean boards pass silent.
+- **Deliverables [SPEC]:** Stage 9 fixture.
+- **Acceptance:** Major inconsistencies reported with severity; minor issues don't overwhelm; every warning names scene/panel.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.1–S9.11.
+- **Stop:** Stage gate — Publishing and Export (S10) begins only after this passes.
+- **Status:** Not Started
+
+Stages 10–11 — task groups [SPEC §15]
 
 All groups: **Completeness Incomplete; Status Needs Clarification.** Each must be expanded per §16.2 before implementation.
-- **Stage 8 — Comic Layout Studio.** Goal: Assemble approved artwork into finished pages. Acceptance: page assembled without modifying original artwork; dialogue/captions editable; traditional + vertical formats work. Groups: page creation, traditional/webtoon layouts, placement/resizing/borders, balloon creation/positioning/tail, dialogue/caption editing, sound effects, reading order, layout snapshots. Note [SPEC §8.9]: text not baked into artwork.
-- **Stage 9 — Continuity and QA.** Goal: Detect meaningful inconsistencies. Acceptance: major inconsistencies reported; minor issues don't overwhelm; warnings identify affected scene/panel. Groups: version/age/clothing/equipment/injury/location/chronology/reference checks, severity classification (§8.10: Critical/Warning/Informational), suppression/overrides, actionable recommendations.
-- **Stage 10 — Publishing and Export.** Goal: Produce finished deliverables. Acceptance: layout preserved; text readable; output passes integrity checks. Groups: PDF/CBZ/PNG/JPEG/webtoon export, dimensions/resolution/DPI/margins/bleed/metadata, export validation. Note [SPEC §8.11]: PDF/CBZ/PNG/JPEG/webtoon sequences; settings include dimensions/resolution/DPI/color profile/bleed/margins/reading direction/cover/metadata.
+- **Stage 10 — Publishing and Export.** Goal: Produce finished deliverables. Acceptance: layout preserved; text readable; output passes integrity checks. Groups: PDF/CBZ/PNG/JPEG/webtoon export, dimensions/resolution/DPI/margins/bleed/metadata, export validation. Note [SPEC §8.11]: PDF/CBZ/PNG/JPEG/webtoon sequences; settings include dimensions/resolution/DPI/color profile/bleed/margins/reading direction/cover/metadata. **PDF library decided: pdfkit (owner, 2026-11-06);** vector-first pages (S8) mean export rasterizes SVG → images and embeds lettering at export time.
 - **Stage 11 — Advanced Features (Deferred).** Headless CLI, batch processing, background daemon, advanced continuity, LoRA training, advanced reference conditioning, animation, video, voice, localization, cloud sync, distributed generation, advanced print features. Core Engine must support future headless operation; separate CLI/daemon not required for initial release. Example future commands in spec are illustrative, not requirements.
 
 ### 4F. Cross-cutting spec summaries (for reference only — spec remains authoritative)
@@ -1125,6 +1347,9 @@ Dependencies below are **[RECOMMENDATION]** inferred from spec ordering where [S
 | 22 | S1.10 | S1.3, S0.4/S0.5 | Users manage projects without DB interaction |
 | 23 | S1.11 | S1.1–S1.10 | Sample created/copied/reopened/backed up/restored/verified — **STOP GATE** |
 | 24+ | Stage 2+ | Spec gates above | Expand groups to per-task spec (Goal/Deliverables/Acceptance/Deps/Stop) before any code; then follow spec order |
+| 25 | S7.1–S7.14 (planned) | S6.13 gate | Live ComfyUI execution; each task needs owner authorization |
+| 26 | S8.1–S8.14 (planned) | S7.14 gate | Layout records + SVG-first pages; React canvas; no export (Stage 10) |
+| 27 | S9.1–S9.12 (planned) | S8.14 gate | Read-only QA checks; tunable thresholds; suppression auditable |
 
 Stage gates [SPEC]: Do not begin Character Studio or real ComfyUI integration until Stage 0 + Stage 1 are complete. Placeholders/mocks only to validate architecture (§16.5).
 
@@ -2214,5 +2439,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S6.11 complete. Acceptance verified (514 tests incl. 5 storyboard-ui; board + panel cards, IPC round-trip, no generation UI). Stage 6 now 11 of 13. Stopped for owner review before S6.12. | [SPEC] | Crouton (S6.11 implementation) |
 | 2026-11-06 | S6.12 complete. Acceptance verified (519 tests incl. 5 composition-review; planted gaps named + fixes, clean silent). Stage 6 now 12 of 13. Stopped for owner review before S6.13. | [SPEC] | Crouton (S6.12 implementation) |
 | 2026-11-06 | S6.13 complete. Acceptance verified (522 tests incl. 3 stage6-fixture; real chapter OCR'd once, full pipeline, artwork byte-identical). Stage 6 gate passes 13/13. Stopped for owner review before Stage 7. | [SPEC] | Crouton (S6.13 implementation) |
+| 2026-11-06 | Stages 8 + 9 expanded (S8.1–S8.14, S9.1–S9.12; owner-authorized planning). Owner decisions: SVG vector-first pages; lettering overlay, baked at export; React framework for S8 canvas; pdfkit for PDF; tunable QA thresholds. Docs audited (register §4E/§5/§12, Plan.md, README, ChangeLog, Project-Format, Security-Baseline, Shortcuts); S0/S1-era docs left as historical record. | [SPEC] | Crouton (planning) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
