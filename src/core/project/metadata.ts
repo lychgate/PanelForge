@@ -467,6 +467,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_manuscript_ocr_hash ON manuscript_ocr(source_hash)",
     ],
   },
+  // S7.2: workflow template registry (§8.8). Files live under
+  // workflows/; hash-verified at load.
+  {
+    version: 39,
+    name: "039_workflow_templates",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS workflow_templates (template_id TEXT PRIMARY KEY, name TEXT NOT NULL UNIQUE, relative_path TEXT NOT NULL UNIQUE, hash TEXT NOT NULL, version TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
