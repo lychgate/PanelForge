@@ -172,3 +172,95 @@ export type StoryboardSnapshotRestoreArgs = {
   root: string;
   snapshotId: string;
 };
+
+// Layout UI (S8.12) — one method per channel (D1). "root" is the
+// project directory resolved by the main process; the renderer
+// never touches the database directly.
+export type LayoutRootArgs = {
+  root: string;
+};
+
+export type LayoutPageArgs = {
+  root: string;
+  pageId: string;
+};
+
+export type LayoutPlaceArgs = {
+  root: string;
+  pageId: string;
+  panelId: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type LayoutUpdatePlacementArgs = {
+  root: string;
+  placementId: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type LayoutSetBorderArgs = {
+  root: string;
+  placementId: string;
+  style: string;
+  widthMm?: number;
+  rounded?: boolean;
+};
+
+export type LayoutCreateBalloonArgs = {
+  root: string;
+  placementId: string;
+  kind: string;
+  shape: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  tail?: { x: number; y: number; visible?: boolean };
+};
+
+export type LayoutUpdateBalloonArgs = {
+  root: string;
+  balloonId: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+export type LayoutRetargetTailArgs = {
+  root: string;
+  balloonId: string;
+  x: number;
+  y: number;
+  visible: boolean;
+};
+
+export type LayoutSetLetteringArgs = {
+  root: string;
+  balloonId: string;
+  text: string;
+};
+
+export type LayoutSetSfxArgs = {
+  root: string;
+  placementId: string;
+  text: string;
+  weight?: string;
+  angle?: number;
+  x: number;
+  y: number;
+  scale?: number;
+  sfxId?: string;
+};
+
+export type LayoutSetReadingOrderArgs = {
+  root: string;
+  pageId: string;
+  placementIds: string[];
+};

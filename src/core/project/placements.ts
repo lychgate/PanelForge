@@ -10,6 +10,8 @@
 //   pins the panel's APPROVED artwork version (S7.13
 //   pointer) at placement time.
 // - `movePlacement` re-stacks one placement's z-order.
+// - `updatePlacement` edits geometry (drag/resize,
+//   S8.12) with the same page-bounds validation.
 // - Placement changes never touch the asset store;
 //   byte identity is preserved by construction.
 // - Traditional/webtoon templates stay S8.3/S8.4.
@@ -209,6 +211,56 @@ export async function removePlacement(root: string, placementId: string): Promis
       const current = db.prepare("SELECT placement_id FROM page_panels WHERE placement_id = ?").get(placementId);
       if (!current) throw new PlacementError("NOT_FOUND", `No placement with id: ${placementId}`);
       await runWithBusyRetry(() => db.prepare("DELETE FROM page_panels WHERE placement_id = ?").run(placementId));
+    } finally {
+      db.close();
+    }
+  });
+}
+
+/**
+ * Edit one placement's geometry (S8.12 drag/resize).
+ * Merges with the stored record and reuses the same
+ * page-bounds validation as placement. Artwork
+ * references and identity never change.
+ */
+export async function updatePlacement(
+  root: string,
+  placementId: string,
+  patch: Partial<Pick<PlacementInput, "x" | "y" | "width" | "height">>
+): Promise<PagePlacement> {
+  requireProject(root);
+  if (typeof placementId !== "string" || placementId.trim() === "") {
+    throw new PlacementError("INVALID_ARGUMENTS", "placementId must not be empty");
+  }
+  const now = new Date().toISOString();
+  return enqueueWrite(async () => {
+    const { db } = openProjectDatabase(root);
+    try {
+      const current = db.prepare("SELECT * FROM page_panels WHERE placement_id = ?").get(placementId) as Record<string, unknown> | undefined;
+      if (!current) throw new PlacementError("NOT_FOUND", `No placement with id: ${placementId}`);
+      const page = db.prepare("SELECT * FROM pages WHERE page_id = ?").get(String(current.page_id)) as Record<string, unknown> | undefined;
+      if (!page) throw new PlacementError("NOT_FOUND", `No page with id: ${String(current.page_id)}`);
+      const merged: PlacementInput = {
+        pageId: String(current.page_id),
+        panelId: String(current.panel_id),
+        x: patch.x ?? Number(current.x),
+        y: patch.y ?? Number(current.y),
+        width: patch.width ?? Number(current.width),
+        height: patch.height ?? Number(current.height),
+      };
+      validateGeometry(merged, { width: Number(page.width), height: Number(page.height), margin: Number(page.margin) });
+      await runWithBusyRetry(() =>
+        db.prepare("UPDATE page_panels SET x = ?, y = ?, width = ?, height = ?, updated_at = ? WHERE placement_id = ?").run(
+          merged.x,
+          merged.y,
+          merged.width,
+          merged.height,
+          now,
+          placementId
+        )
+      );
+      const row = db.prepare("SELECT * FROM page_panels WHERE placement_id = ?").get(placementId) as Record<string, unknown>;
+      return toRecord(row);
     } finally {
       db.close();
     }

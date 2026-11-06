@@ -226,3 +226,54 @@ export async function deleteBalloon(root: string, balloonId: string): Promise<vo
     }
   });
 }
+
+/**
+ * Edit one balloon's geometry/kind/shape (S8.12
+ * drag/resize). Merges with the stored record and
+ * reuses creation validation; tail anchor and
+ * lettering text are untouched.
+ */
+export async function updateBalloon(
+  root: string,
+  balloonId: string,
+  patch: Partial<Pick<BalloonInput, "kind" | "shape" | "x" | "y" | "width" | "height">>
+): Promise<Balloon> {
+  requireProject(root);
+  if (typeof balloonId !== "string" || balloonId.trim() === "") {
+    throw new BalloonError("INVALID_ARGUMENTS", "balloonId must not be empty");
+  }
+  const now = new Date().toISOString();
+  return enqueueWrite(async () => {
+    const { db } = openProjectDatabase(root);
+    try {
+      const current = db.prepare("SELECT * FROM balloons WHERE balloon_id = ?").get(balloonId) as Record<string, unknown> | undefined;
+      if (!current) throw new BalloonError("NOT_FOUND", `No balloon with id: ${balloonId}`);
+      const merged: BalloonInput = {
+        placementId: String(current.placement_id),
+        kind: (patch.kind ?? String(current.kind)) as BalloonKind,
+        shape: (patch.shape ?? String(current.shape)) as BalloonShape,
+        x: patch.x ?? Number(current.x),
+        y: patch.y ?? Number(current.y),
+        width: patch.width ?? Number(current.width),
+        height: patch.height ?? Number(current.height),
+      };
+      validate(merged);
+      await runWithBusyRetry(() =>
+        db.prepare("UPDATE balloons SET kind = ?, shape = ?, x = ?, y = ?, width = ?, height = ?, updated_at = ? WHERE balloon_id = ?").run(
+          merged.kind,
+          merged.shape,
+          merged.x,
+          merged.y,
+          merged.width,
+          merged.height,
+          now,
+          balloonId
+        )
+      );
+      const row = db.prepare("SELECT * FROM balloons WHERE balloon_id = ?").get(balloonId) as Record<string, unknown>;
+      return toRecord(row);
+    } finally {
+      db.close();
+    }
+  });
+}

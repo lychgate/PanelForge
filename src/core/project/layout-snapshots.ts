@@ -14,7 +14,7 @@
 
 import * as crypto from "crypto";
 import { identifyProject } from "./service";
-import { openProjectDatabase, enqueueWrite, runWithBusyRetry } from "./metadata";
+import { openProjectDatabase, enqueueWrite, runWithBusyRetry, type DatabaseLike } from "./metadata";
 
 export type LayoutSnapshot = {
   snapshotId: string;
@@ -148,12 +148,12 @@ export async function createLayoutSnapshot(root: string, input?: CreateLayoutSna
   });
 }
 
-function pageCount(db: { prepare: (s: string) => { get: (p: unknown) => Record<string, unknown> } }, snapshotId: string): number {
+function pageCount(db: DatabaseLike, snapshotId: string): number {
   const row = db.prepare("SELECT COUNT(*) AS n FROM snapshot_pages WHERE snapshot_id = ?").get(snapshotId) as Record<string, unknown>;
   return Number(row.n);
 }
 
-function toSnapshot(db: { prepare: (s: string) => { get: (p: unknown) => Record<string, unknown> } }, row: Record<string, unknown>): LayoutSnapshot {
+function toSnapshot(db: DatabaseLike, row: Record<string, unknown>): LayoutSnapshot {
   return {
     snapshotId: String(row.snapshot_id),
     name: String(row.name ?? ""),

@@ -73,6 +73,19 @@ type PanelForgeApi = {
     snapshotCreate(args: { root: string; name?: string; parentSnapshotId?: string }): Promise<ProjectResult<any>>;
     snapshotRestore(args: { root: string; snapshotId: string }): Promise<ProjectResult<any>>;
   };
+  layout: {
+    pages(args: { root: string }): Promise<ProjectResult<any>>;
+    page(args: { root: string; pageId: string }): Promise<ProjectResult<any>>;
+    place(args: { root: string; pageId: string; panelId: string; x: number; y: number; width: number; height: number }): Promise<ProjectResult<any>>;
+    updatePlacement(args: { root: string; placementId: string; x: number; y: number; width: number; height: number }): Promise<ProjectResult<any>>;
+    setBorder(args: { root: string; placementId: string; style: string; widthMm?: number; rounded?: boolean }): Promise<ProjectResult<any>>;
+    createBalloon(args: { root: string; placementId: string; kind: string; shape: string; x: number; y: number; width: number; height: number; tail?: { x: number; y: number; visible?: boolean } }): Promise<ProjectResult<any>>;
+    updateBalloon(args: { root: string; balloonId: string; x: number; y: number; width: number; height: number }): Promise<ProjectResult<any>>;
+    retargetTail(args: { root: string; balloonId: string; x: number; y: number; visible: boolean }): Promise<ProjectResult<any>>;
+    setLettering(args: { root: string; balloonId: string; text: string }): Promise<ProjectResult<any>>;
+    setSfx(args: { root: string; placementId: string; text: string; weight?: string; angle?: number; x: number; y: number; scale?: number; sfxId?: string }): Promise<ProjectResult<any>>;
+    setReadingOrder(args: { root: string; pageId: string; placementIds: string[] }): Promise<ProjectResult<any>>;
+  };
   version: Record<string, never>;
 };
 
@@ -80,12 +93,13 @@ type PanelForgeWindow = Window & { panelforge: PanelForgeApi };
 
 const win = window as unknown as PanelForgeWindow;
 
-const VIEWS = ["diagnostics", "about", "projects", "storyboard"] as const;
+const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout"] as const;
 const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   diagnostics: "Diagnostics",
   about: "About",
   projects: "Projects",
   storyboard: "Storyboard",
+  layout: "Layout",
 };
 
 const navigation = createNavigation(VIEWS, "diagnostics");
@@ -94,6 +108,7 @@ shortcuts.register("nav.diagnostics", "Go to Diagnostics view", "Alt+1");
 shortcuts.register("nav.about", "Go to About view", "Alt+2");
 shortcuts.register("nav.projects", "Go to Projects view", "Alt+3");
 shortcuts.register("nav.storyboard", "Go to Storyboard view", "Alt+4");
+shortcuts.register("nav.layout", "Go to Layout view", "Alt+5");
 
 const root = document.getElementById("root");
 const navEl = document.getElementById("app-nav");
@@ -159,6 +174,7 @@ if (root && navEl) {
     if (def.id === "nav.about") goToView("about");
     if (def.id === "nav.projects") goToView("projects");
     if (def.id === "nav.storyboard") goToView("storyboard");
+    if (def.id === "nav.layout") goToView("layout");
   });
 
   renderView();
@@ -543,5 +559,430 @@ if (root && navEl) {
   boardLoadBtn.addEventListener("click", () => {
     boardRoot = boardRootInput.value.trim() === "" ? openRoot : boardRootInput.value.trim();
     void refreshBoard();
+  });
+
+  // Layout (S8.12): hand-rolled canvas over the S8.11 SVG —
+  // page list, draggable placements/balloons/SFX, tail
+  // retarget, border picker, text edit, and reading-order
+  // list. Every pointer drag has a focusable number-input
+  // alternative; no export controls (Stage 10 owns those).
+  const layoutSection = sections.layout;
+  const layoutStatus = document.createElement("div");
+  layoutStatus.id = "layout-status";
+  layoutStatus.textContent = "layout: open a project from Projects first (Alt+3), or paste its root below.";
+  layoutSection.appendChild(layoutStatus);
+  const layoutRootInput = document.createElement("input");
+  layoutRootInput.id = "layout-root";
+  layoutRootInput.placeholder = "Project root (directory)";
+  layoutRootInput.setAttribute("aria-label", "Project root");
+  layoutSection.appendChild(layoutRootInput);
+  const layoutLoadBtn = document.createElement("button");
+  layoutLoadBtn.type = "button";
+  layoutLoadBtn.textContent = "Load pages";
+  layoutSection.appendChild(layoutLoadBtn);
+  const layoutListEl = document.createElement("div");
+  layoutListEl.id = "layout-pages";
+  layoutSection.appendChild(layoutListEl);
+  const layoutCanvasEl = document.createElement("div");
+  layoutCanvasEl.id = "layout-canvas";
+  layoutSection.appendChild(layoutCanvasEl);
+  const layoutCardEl = document.createElement("div");
+  layoutCardEl.id = "layout-page";
+  layoutSection.appendChild(layoutCardEl);
+
+  let layoutRoot: string | null = openRoot;
+  let layoutPageId: string | null = null;
+
+  function layoutFail(action: string, res: { code?: string; message?: string }): void {
+    layoutStatus.textContent = `layout ${action} failed: ${res.code ?? "error"} ${res.message ?? ""}`;
+  }
+
+  function numInput(label: string, value: number): HTMLInputElement {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.step = "1";
+    input.setAttribute("aria-label", label);
+    input.value = String(value);
+    return input;
+  }
+
+  function layoutBtn(label: string, onSave: () => Promise<void>): HTMLButtonElement {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = label;
+    btn.addEventListener("click", () => {
+      void onSave();
+    });
+    return btn;
+  }
+
+  async function refreshLayoutPage(): Promise<void> {
+    if (!layoutRoot || !layoutPageId) return;
+    const result = await win.panelforge.layout.page({ root: layoutRoot, pageId: layoutPageId });
+    if (!result.ok || !result.data) {
+      layoutFail("page", result);
+      return;
+    }
+    const details = result.data;
+    layoutCanvasEl.innerHTML = details.svg;
+    // Pointer drag: placement groups move with the mouse;
+    // keyboard users edit the same numbers in the card below.
+    const svgEl = layoutCanvasEl.querySelector("svg");
+    svgEl?.querySelectorAll("g[data-placement-id]").forEach((group) => {
+      const el = group as SVGGElement;
+      el.style.cursor = "move";
+      el.setAttribute("tabindex", "0");
+      let dragging = false;
+      let offsetX = 0;
+      let offsetY = 0;
+      let placementId = el.getAttribute("data-placement-id") ?? "";
+      el.addEventListener("mousedown", (event: MouseEvent) => {
+        dragging = true;
+        const rect = (svgEl as SVGSVGElement).getBoundingClientRect();
+        const point = svgPoint(event, svgEl as SVGSVGElement, rect);
+        offsetX = point.x;
+        offsetY = point.y;
+        event.preventDefault();
+      });
+      el.addEventListener("mousemove", (event: MouseEvent) => {
+        if (!dragging || !layoutRoot) return;
+        const rect = (svgEl as SVGSVGElement).getBoundingClientRect();
+        const point = svgPoint(event, svgEl as SVGSVGElement, rect);
+        layoutStatus.textContent = `layout: dragging ${placementId.slice(0, 8)} to ${Math.round(point.x)}, ${Math.round(point.y)} — release to save`;
+        layoutDragPreview = { placementId, x: point.x, y: point.y };
+      });
+      el.addEventListener("mouseup", () => {
+        if (!dragging || !layoutRoot) return;
+        dragging = false;
+        if (!layoutDragPreview) return;
+        const saved = layoutDragPreview;
+        layoutDragPreview = null;
+        void win.panelforge.layout
+          .updatePlacement({
+            root: layoutRoot,
+            placementId: saved.placementId,
+            x: Math.max(0, Math.round(saved.x)),
+            y: Math.max(0, Math.round(saved.y)),
+            width: Math.max(1, Math.round(Number(el.getAttribute("data-width") ?? 40))),
+            height: Math.max(1, Math.round(Number(el.getAttribute("data-height") ?? 40))),
+          })
+          .then((res) => {
+            layoutStatus.textContent = res.ok ? `saved placement ${saved.placementId.slice(0, 8)}` : `layout save placement failed: ${res.code} ${res.message}`;
+            if (res.ok) void refreshLayoutPage();
+          });
+      });
+    });
+    void renderLayoutCard(details);
+  }
+
+  let layoutDragPreview: { placementId: string; x: number; y: number } | null = null;
+
+  function svgPoint(event: MouseEvent, svg: SVGSVGElement, rect: DOMRect): { x: number; y: number } {
+    const scaleX = Number(svg.viewBox.baseVal.width) / rect.width;
+    const scaleY = Number(svg.viewBox.baseVal.height) / rect.height;
+    return { x: (event.clientX - rect.left) * scaleX, y: (event.clientY - rect.top) * scaleY };
+  }
+
+  async function renderLayoutCard(details: any): Promise<void> {
+    if (!layoutRoot || !layoutPageId) return;
+    layoutCardEl.replaceChildren();
+    const card = document.createElement("fieldset");
+    const legend = document.createElement("legend");
+    legend.textContent = `Page ${details.page.title} (${details.page.width}×${details.page.height}mm, ${details.page.format})`;
+    card.appendChild(legend);
+    const readingBox = document.createElement("div");
+    readingBox.id = "layout-reading-order";
+    readingBox.textContent = "reading order: " + details.placements.map((p: any) => p.placementId.slice(0, 8)).join(", ");
+    card.appendChild(readingBox);
+
+    for (const placement of details.placements as any[]) {
+      const fieldset = document.createElement("fieldset");
+      const title = document.createElement("legend");
+      title.textContent = `Placement ${placement.placementId.slice(0, 8)} (panel ${placement.panelId.slice(0, 8)})`;
+      fieldset.appendChild(title);
+      const xInput = numInput("Placement x", placement.x);
+      const yInput = numInput("Placement y", placement.y);
+      const wInput = numInput("Placement width", placement.width);
+      const hInput = numInput("Placement height", placement.height);
+      fieldset.appendChild(xInput);
+      fieldset.appendChild(yInput);
+      fieldset.appendChild(wInput);
+      fieldset.appendChild(hInput);
+      fieldset.appendChild(
+        layoutBtn("Save placement", async () => {
+          if (!layoutRoot) return;
+          const res = await win.panelforge.layout.updatePlacement({
+            root: layoutRoot,
+            placementId: placement.placementId,
+            x: Number(xInput.value),
+            y: Number(yInput.value),
+            width: Number(wInput.value),
+            height: Number(hInput.value),
+          });
+          layoutStatus.textContent = res.ok ? `saved placement ${placement.placementId.slice(0, 8)}` : `layout save placement failed: ${res.code} ${res.message}`;
+          if (res.ok) void refreshLayoutPage();
+        })
+      );
+
+      const borderSelect = document.createElement("select");
+      borderSelect.setAttribute("aria-label", "Border style");
+      for (const style of ["none", "thin", "bold"]) {
+        const option = document.createElement("option");
+        option.value = style;
+        option.textContent = style;
+        if ((placement.border?.style ?? "thin") === style) option.selected = true;
+        borderSelect.appendChild(option);
+      }
+      const widthInput = numInput("Border width", placement.border?.widthMm ?? 0.5);
+      const roundedBox = document.createElement("label");
+      const roundedCheck = document.createElement("input");
+      roundedCheck.type = "checkbox";
+      roundedCheck.checked = placement.border?.rounded ?? false;
+      roundedBox.textContent = "Rounded border";
+      roundedBox.appendChild(roundedCheck);
+      fieldset.appendChild(borderSelect);
+      fieldset.appendChild(widthInput);
+      fieldset.appendChild(roundedBox);
+      fieldset.appendChild(
+        layoutBtn("Save border", async () => {
+          if (!layoutRoot) return;
+          const res = await win.panelforge.layout.setBorder({
+            root: layoutRoot,
+            placementId: placement.placementId,
+            style: borderSelect.value,
+            widthMm: Number(widthInput.value),
+            rounded: roundedCheck.checked,
+          });
+          layoutStatus.textContent = res.ok ? `saved border for ${placement.placementId.slice(0, 8)}` : `layout save border failed: ${res.code} ${res.message}`;
+          if (res.ok) void refreshLayoutPage();
+        })
+      );
+
+      const balloonKind = document.createElement("select");
+      balloonKind.setAttribute("aria-label", "Balloon kind");
+      for (const kind of ["speech", "caption", "thought"]) {
+        const option = document.createElement("option");
+        option.value = kind;
+        option.textContent = kind;
+        balloonKind.appendChild(option);
+      }
+      const balloonShape = document.createElement("select");
+      balloonShape.setAttribute("aria-label", "Balloon shape");
+      for (const shape of ["ellipse", "rounded", "rect"]) {
+        const option = document.createElement("option");
+        option.value = shape;
+        option.textContent = shape;
+        balloonShape.appendChild(option);
+      }
+      const bx = numInput("Balloon x", 30);
+      const by = numInput("Balloon y", 30);
+      const bw = numInput("Balloon width", 60);
+      const bh = numInput("Balloon height", 25);
+      fieldset.appendChild(balloonKind);
+      fieldset.appendChild(balloonShape);
+      fieldset.appendChild(bx);
+      fieldset.appendChild(by);
+      fieldset.appendChild(bw);
+      fieldset.appendChild(bh);
+      fieldset.appendChild(
+        layoutBtn("Create balloon", async () => {
+          if (!layoutRoot) return;
+          const res = await win.panelforge.layout.createBalloon({
+            root: layoutRoot,
+            placementId: placement.placementId,
+            kind: balloonKind.value,
+            shape: balloonShape.value,
+            x: Number(bx.value),
+            y: Number(by.value),
+            width: Number(bw.value),
+            height: Number(bh.value),
+          });
+          layoutStatus.textContent = res.ok ? `balloon created on ${placement.placementId.slice(0, 8)}` : `layout create balloon failed: ${res.code} ${res.message}`;
+          if (res.ok) void refreshLayoutPage();
+        })
+      );
+
+      for (const balloon of placement.balloons as any[]) {
+        const row = document.createElement("div");
+        row.textContent = `Balloon ${balloon.balloonId.slice(0, 8)} (${balloon.kind}/${balloon.shape}) at ${balloon.x}, ${balloon.y}`;
+        fieldset.appendChild(row);
+        const ux = numInput("Balloon update x", balloon.x);
+        const uy = numInput("Balloon update y", balloon.y);
+        const uw = numInput("Balloon update width", balloon.width);
+        const uh = numInput("Balloon update height", balloon.height);
+        fieldset.appendChild(ux);
+        fieldset.appendChild(uy);
+        fieldset.appendChild(uw);
+        fieldset.appendChild(uh);
+        fieldset.appendChild(
+          layoutBtn("Save balloon", async () => {
+            if (!layoutRoot) return;
+            const res = await win.panelforge.layout.updateBalloon({
+              root: layoutRoot,
+              balloonId: balloon.balloonId,
+              x: Number(ux.value),
+              y: Number(uy.value),
+              width: Number(uw.value),
+              height: Number(uh.value),
+            });
+            layoutStatus.textContent = res.ok ? `saved balloon ${balloon.balloonId.slice(0, 8)}` : `layout save balloon failed: ${res.code} ${res.message}`;
+            if (res.ok) void refreshLayoutPage();
+          })
+        );
+        const tailX = numInput("Tail x", balloon.tailX ?? 0);
+        const tailY = numInput("Tail y", balloon.tailY ?? 0);
+        const tailVisible = document.createElement("label");
+        const tailCheck = document.createElement("input");
+        tailCheck.type = "checkbox";
+        tailCheck.checked = balloon.tailVisible;
+        tailVisible.textContent = "Tail visible";
+        tailVisible.appendChild(tailCheck);
+        fieldset.appendChild(tailX);
+        fieldset.appendChild(tailY);
+        fieldset.appendChild(tailVisible);
+        fieldset.appendChild(
+          layoutBtn("Retarget tail", async () => {
+            if (!layoutRoot) return;
+            const res = await win.panelforge.layout.retargetTail({
+              root: layoutRoot,
+              balloonId: balloon.balloonId,
+              x: Number(tailX.value),
+              y: Number(tailY.value),
+              visible: tailCheck.checked,
+            });
+            layoutStatus.textContent = res.ok ? `tail retargeted ${balloon.balloonId.slice(0, 8)}` : `layout retarget tail failed: ${res.code} ${res.message}`;
+            if (res.ok) void refreshLayoutPage();
+          })
+        );
+        const letterBox = textArea("Balloon text", balloon.text ?? "");
+        fieldset.appendChild(letterBox);
+        fieldset.appendChild(
+          layoutBtn("Save text", async () => {
+            if (!layoutRoot) return;
+            const res = await win.panelforge.layout.setLettering({
+              root: layoutRoot,
+              balloonId: balloon.balloonId,
+              text: letterBox.value,
+            });
+            layoutStatus.textContent = res.ok ? `saved text for ${balloon.balloonId.slice(0, 8)}` : `layout save text failed: ${res.code} ${res.message}`;
+            if (res.ok) void refreshLayoutPage();
+          })
+        );
+      }
+
+      const sfxText = document.createElement("input");
+      sfxText.placeholder = "SFX text";
+      sfxText.setAttribute("aria-label", "SFX text");
+      const sfxX = numInput("SFX x", 80);
+      const sfxY = numInput("SFX y", 80);
+      const sfxAngle = numInput("SFX angle", 0);
+      const sfxScale = document.createElement("input");
+      sfxScale.type = "number";
+      sfxScale.step = "0.1";
+      sfxScale.setAttribute("aria-label", "SFX scale");
+      sfxScale.value = "1";
+      const sfxWeight = document.createElement("select");
+      sfxWeight.setAttribute("aria-label", "SFX weight");
+      for (const weight of ["regular", "bold", "heavy"]) {
+        const option = document.createElement("option");
+        option.value = weight;
+        option.textContent = weight;
+        if (weight === "bold") option.selected = true;
+        sfxWeight.appendChild(option);
+      }
+      const sfxExisting = document.createElement("select");
+      sfxExisting.setAttribute("aria-label", "Existing SFX to edit");
+      const emptyOption = document.createElement("option");
+      emptyOption.value = "";
+      emptyOption.textContent = "(new SFX)";
+      sfxExisting.appendChild(emptyOption);
+      for (const sfx of placement.sfx as any[]) {
+        const option = document.createElement("option");
+        option.value = sfx.sfxId;
+        option.textContent = sfx.text;
+        sfxExisting.appendChild(option);
+      }
+      fieldset.appendChild(sfxText);
+      fieldset.appendChild(sfxX);
+      fieldset.appendChild(sfxY);
+      fieldset.appendChild(sfxAngle);
+      fieldset.appendChild(sfxScale);
+      fieldset.appendChild(sfxWeight);
+      fieldset.appendChild(sfxExisting);
+      fieldset.appendChild(
+        layoutBtn("Save SFX", async () => {
+          if (!layoutRoot) return;
+          const res = await win.panelforge.layout.setSfx({
+            root: layoutRoot,
+            placementId: placement.placementId,
+            text: sfxText.value,
+            weight: sfxWeight.value,
+            angle: Number(sfxAngle.value),
+            x: Number(sfxX.value),
+            y: Number(sfxY.value),
+            scale: Number(sfxScale.value),
+            sfxId: sfxExisting.value === "" ? undefined : sfxExisting.value,
+          });
+          layoutStatus.textContent = res.ok ? `saved SFX on ${placement.placementId.slice(0, 8)}` : `layout save SFX failed: ${res.code} ${res.message}`;
+          if (res.ok) void refreshLayoutPage();
+        })
+      );
+
+      const moveUp = layoutBtn("Move up", async () => {
+        if (!layoutRoot || !layoutPageId) return;
+        const ids = details.placements.map((p: any) => p.placementId);
+        const index = ids.indexOf(placement.placementId);
+        if (index <= 0) return;
+        [ids[index - 1], ids[index]] = [ids[index], ids[index - 1]];
+        const res = await win.panelforge.layout.setReadingOrder({ root: layoutRoot, pageId: layoutPageId, placementIds: ids });
+        layoutStatus.textContent = res.ok ? `reading order saved` : `layout save reading order failed: ${res.code} ${res.message}`;
+        if (res.ok) void refreshLayoutPage();
+      });
+      const moveDown = layoutBtn("Move down", async () => {
+        if (!layoutRoot || !layoutPageId) return;
+        const ids = details.placements.map((p: any) => p.placementId);
+        const index = ids.indexOf(placement.placementId);
+        if (index < 0 || index >= ids.length - 1) return;
+        [ids[index + 1], ids[index]] = [ids[index], ids[index + 1]];
+        const res = await win.panelforge.layout.setReadingOrder({ root: layoutRoot, pageId: layoutPageId, placementIds: ids });
+        layoutStatus.textContent = res.ok ? `reading order saved` : `layout save reading order failed: ${res.code} ${res.message}`;
+        if (res.ok) void refreshLayoutPage();
+      });
+      fieldset.appendChild(moveUp);
+      fieldset.appendChild(moveDown);
+      card.appendChild(fieldset);
+    }
+    layoutCardEl.appendChild(card);
+  }
+
+  async function refreshLayoutBoard(): Promise<void> {
+    if (!layoutRoot) {
+      layoutListEl.textContent = "No project root selected.";
+      return;
+    }
+    const result = await win.panelforge.layout.pages({ root: layoutRoot });
+    if (!result.ok || !result.data) {
+      layoutFail("pages", result);
+      return;
+    }
+    layoutStatus.textContent = `layout: ${result.data.pages.length} page(s)`;
+    layoutListEl.replaceChildren();
+    for (const page of result.data.pages as any[]) {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.textContent = `Page ${page.title} (${page.width}×${page.height}mm)`;
+      row.addEventListener("click", () => {
+        layoutPageId = page.pageId;
+        void refreshLayoutPage();
+      });
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(row);
+      layoutListEl.appendChild(wrapper);
+    }
+  }
+
+  layoutLoadBtn.addEventListener("click", () => {
+    layoutRoot = layoutRootInput.value.trim() === "" ? openRoot : layoutRootInput.value.trim();
+    void refreshLayoutBoard();
   });
 }

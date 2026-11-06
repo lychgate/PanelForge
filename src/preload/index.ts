@@ -1,10 +1,13 @@
-// PanelForge — preload bridge (S6.11).
+// PanelForge — preload bridge (S8.12).
 //
 // Restricted bridge: exposes a frozen API object via contextBridge.
 // - diagnostics.get() — the S0.5 diagnostic round-trip.
 // - project.* — S1.10 basic project operations (S1.3 core ops via IPC).
 // - storyboard.* — S6.11 minimal storyboard UI surface (read board,
 //   edit text/camera/instructions, snapshot create/list/restore).
+// - layout.* — S8.12 hand-rolled layout UI surface (read pages,
+//   place/move placements, borders, balloons, lettering, SFX,
+//   reading order). No export surface (Stage 10).
 // The preload wraps the approved channels and does not expose
 // ipcRenderer itself to the renderer.
 
@@ -27,6 +30,17 @@ import type {
   StoryboardCreatePanelArgs,
   StoryboardSnapshotCreateArgs,
   StoryboardSnapshotRestoreArgs,
+  LayoutRootArgs,
+  LayoutPageArgs,
+  LayoutPlaceArgs,
+  LayoutUpdatePlacementArgs,
+  LayoutSetBorderArgs,
+  LayoutCreateBalloonArgs,
+  LayoutUpdateBalloonArgs,
+  LayoutRetargetTailArgs,
+  LayoutSetLetteringArgs,
+  LayoutSetSfxArgs,
+  LayoutSetReadingOrderArgs,
 } from "../shared/types";
 
 async function invoke<T>(channel: string, args: Record<string, unknown>): Promise<IpcResult<T>> {
@@ -121,6 +135,103 @@ const api = Object.freeze({
       return invoke<any>("panelforge:storyboard.snapshot.restore", {
         root: args.root,
         snapshotId: args.snapshotId,
+      });
+    },
+  }),
+  layout: Object.freeze({
+    async pages(args: LayoutRootArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.pages", { root: args.root });
+    },
+    async page(args: LayoutPageArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.page", { root: args.root, pageId: args.pageId });
+    },
+    async place(args: LayoutPlaceArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.place", {
+        root: args.root,
+        pageId: args.pageId,
+        panelId: args.panelId,
+        x: args.x,
+        y: args.y,
+        width: args.width,
+        height: args.height,
+      });
+    },
+    async updatePlacement(args: LayoutUpdatePlacementArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.updatePlacement", {
+        root: args.root,
+        placementId: args.placementId,
+        x: args.x,
+        y: args.y,
+        width: args.width,
+        height: args.height,
+      });
+    },
+    async setBorder(args: LayoutSetBorderArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.setBorder", {
+        root: args.root,
+        placementId: args.placementId,
+        style: args.style,
+        widthMm: args.widthMm,
+        rounded: args.rounded,
+      });
+    },
+    async createBalloon(args: LayoutCreateBalloonArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.createBalloon", {
+        root: args.root,
+        placementId: args.placementId,
+        kind: args.kind,
+        shape: args.shape,
+        x: args.x,
+        y: args.y,
+        width: args.width,
+        height: args.height,
+        tail: args.tail,
+      });
+    },
+    async updateBalloon(args: LayoutUpdateBalloonArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.updateBalloon", {
+        root: args.root,
+        balloonId: args.balloonId,
+        x: args.x,
+        y: args.y,
+        width: args.width,
+        height: args.height,
+      });
+    },
+    async retargetTail(args: LayoutRetargetTailArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.retargetTail", {
+        root: args.root,
+        balloonId: args.balloonId,
+        x: args.x,
+        y: args.y,
+        visible: args.visible,
+      });
+    },
+    async setLettering(args: LayoutSetLetteringArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.setLettering", {
+        root: args.root,
+        balloonId: args.balloonId,
+        text: args.text,
+      });
+    },
+    async setSfx(args: LayoutSetSfxArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.setSfx", {
+        root: args.root,
+        placementId: args.placementId,
+        text: args.text,
+        weight: args.weight,
+        angle: args.angle,
+        x: args.x,
+        y: args.y,
+        scale: args.scale,
+        sfxId: args.sfxId,
+      });
+    },
+    async setReadingOrder(args: LayoutSetReadingOrderArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:layout.setReadingOrder", {
+        root: args.root,
+        pageId: args.pageId,
+        placementIds: args.placementIds,
       });
     },
   }),

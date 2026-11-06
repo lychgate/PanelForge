@@ -31,6 +31,17 @@ import {
   StoryboardCreatePanelArgs,
   StoryboardSnapshotCreateArgs,
   StoryboardSnapshotRestoreArgs,
+  LayoutRootArgs,
+  LayoutPageArgs,
+  LayoutPlaceArgs,
+  LayoutUpdatePlacementArgs,
+  LayoutSetBorderArgs,
+  LayoutCreateBalloonArgs,
+  LayoutUpdateBalloonArgs,
+  LayoutRetargetTailArgs,
+  LayoutSetLetteringArgs,
+  LayoutSetSfxArgs,
+  LayoutSetReadingOrderArgs,
 } from "../../shared/types";
 import { defaultLogService } from "../logging/service";
 import {
@@ -51,6 +62,13 @@ import { setText } from "../project/panel-text";
 import { setCamera } from "../project/panel-cameras";
 import { setInstructions } from "../project/panel-instructions";
 import { createSnapshot, listSnapshots, restoreSnapshot } from "../project/snapshots";
+import { listLayoutBoard, getLayoutPage } from "../project/layout-board";
+import { placePanel, updatePlacement } from "../project/placements";
+import { setBorder } from "../project/borders";
+import { createBalloon, updateBalloon, retargetTail } from "../project/balloons";
+import { setLettering } from "../project/lettering";
+import { createSfx, updateSfx } from "../project/sfx";
+import { setReadingOrder } from "../project/reading-order";
 
 export const IPC_CHANNELS = {
   diagnosticsPing: "panelforge:diagnostics.ping",
@@ -70,6 +88,17 @@ export const IPC_CHANNELS = {
   storyboardSnapshotsList: "panelforge:storyboard.snapshots.list",
   storyboardSnapshotCreate: "panelforge:storyboard.snapshot.create",
   storyboardSnapshotRestore: "panelforge:storyboard.snapshot.restore",
+  layoutPages: "panelforge:layout.pages",
+  layoutPage: "panelforge:layout.page",
+  layoutPlace: "panelforge:layout.place",
+  layoutUpdatePlacement: "panelforge:layout.updatePlacement",
+  layoutSetBorder: "panelforge:layout.setBorder",
+  layoutCreateBalloon: "panelforge:layout.createBalloon",
+  layoutUpdateBalloon: "panelforge:layout.updateBalloon",
+  layoutRetargetTail: "panelforge:layout.retargetTail",
+  layoutSetLettering: "panelforge:layout.setLettering",
+  layoutSetSfx: "panelforge:layout.setSfx",
+  layoutSetReadingOrder: "panelforge:layout.setReadingOrder",
 } as const;
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];
@@ -229,6 +258,99 @@ function isValidStoryboardSnapshotRestoreArgs(args: unknown): args is Storyboard
   return isNonEmptyString((args as { snapshotId?: unknown }).snapshotId);
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isValidLayoutRootArgs(args: unknown): args is LayoutRootArgs {
+  if (!isRecord(args)) return false;
+  return isNonEmptyString((args as { root?: unknown }).root);
+}
+
+function isValidLayoutPageArgs(args: unknown): args is LayoutPageArgs {
+  if (!isValidLayoutRootArgs(args)) return false;
+  return isNonEmptyString((args as { pageId?: unknown }).pageId);
+}
+
+function isValidLayoutPlaceArgs(args: unknown): args is LayoutPlaceArgs {
+  if (!isValidLayoutPageArgs(args)) return false;
+  const a = args as LayoutPlaceArgs;
+  return isNonEmptyString(a.panelId) && isFiniteNumber(a.x) && isFiniteNumber(a.y) && isFiniteNumber(a.width) && isFiniteNumber(a.height);
+}
+
+function isValidLayoutUpdatePlacementArgs(args: unknown): args is LayoutUpdatePlacementArgs {
+  if (!isValidLayoutRootArgs(args)) return false;
+  const a = args as LayoutUpdatePlacementArgs;
+  return isNonEmptyString(a.placementId) && isFiniteNumber(a.x) && isFiniteNumber(a.y) && isFiniteNumber(a.width) && isFiniteNumber(a.height);
+}
+
+const BORDER_STYLES = ["none", "thin", "bold"];
+const BALLOON_KINDS = ["speech", "caption", "thought"];
+const BALLOON_SHAPES = ["ellipse", "rounded", "rect"];
+const SFX_WEIGHTS = ["regular", "bold", "heavy"];
+
+function isValidLayoutSetBorderArgs(args: unknown): args is LayoutSetBorderArgs {
+  if (!isValidLayoutRootArgs(args)) return false;
+  const a = args as LayoutSetBorderArgs;
+  if (!isNonEmptyString(a.placementId)) return false;
+  if (typeof a.style !== "string" || !BORDER_STYLES.includes(a.style)) return false;
+  if (a.widthMm !== undefined && !isFiniteNumber(a.widthMm)) return false;
+  return a.rounded === undefined || typeof a.rounded === "boolean";
+}
+
+function isValidLayoutCreateBalloonArgs(args: unknown): args is LayoutCreateBalloonArgs {
+  if (!isValidLayoutRootArgs(args)) return false;
+  const a = args as LayoutCreateBalloonArgs;
+  if (!isNonEmptyString(a.placementId)) return false;
+  if (typeof a.kind !== "string" || !BALLOON_KINDS.includes(a.kind)) return false;
+  if (typeof a.shape !== "string" || !BALLOON_SHAPES.includes(a.shape)) return false;
+  if (!isFiniteNumber(a.x) || !isFiniteNumber(a.y) || !isFiniteNumber(a.width) || !isFiniteNumber(a.height)) return false;
+  if (a.tail !== undefined) {
+    if (a.tail === null || typeof a.tail !== "object") return false;
+    if (!isFiniteNumber(a.tail.x) || !isFiniteNumber(a.tail.y)) return false;
+    if (a.tail.visible !== undefined && typeof a.tail.visible !== "boolean") return false;
+  }
+  return true;
+}
+
+function isValidLayoutUpdateBalloonArgs(args: unknown): args is LayoutUpdateBalloonArgs {
+  if (!isValidLayoutRootArgs(args)) return false;
+  const a = args as LayoutUpdateBalloonArgs;
+  return isNonEmptyString(a.balloonId) && isFiniteNumber(a.x) && isFiniteNumber(a.y) && isFiniteNumber(a.width) && isFiniteNumber(a.height);
+}
+
+function isValidLayoutRetargetTailArgs(args: unknown): args is LayoutRetargetTailArgs {
+  if (!isValidLayoutRootArgs(args)) return false;
+  const a = args as LayoutRetargetTailArgs;
+  return isNonEmptyString(a.balloonId) && isFiniteNumber(a.x) && isFiniteNumber(a.y) && typeof a.visible === "boolean";
+}
+
+function isValidLayoutSetLetteringArgs(args: unknown): args is LayoutSetLetteringArgs {
+  if (!isValidLayoutRootArgs(args)) return false;
+  const a = args as LayoutSetLetteringArgs;
+  return isNonEmptyString(a.balloonId) && typeof a.text === "string";
+}
+
+function isValidLayoutSetSfxArgs(args: unknown): args is LayoutSetSfxArgs {
+  if (!isValidLayoutRootArgs(args)) return false;
+  const a = args as LayoutSetSfxArgs;
+  if (!isNonEmptyString(a.placementId)) return false;
+  if (typeof a.text !== "string" || a.text.trim() === "") return false;
+  if (!isFiniteNumber(a.x) || !isFiniteNumber(a.y)) return false;
+  if (a.weight !== undefined && (typeof a.weight !== "string" || !SFX_WEIGHTS.includes(a.weight))) return false;
+  if (a.angle !== undefined && !isFiniteNumber(a.angle)) return false;
+  if (a.scale !== undefined && !isFiniteNumber(a.scale)) return false;
+  if (a.sfxId !== undefined && !isNonEmptyString(a.sfxId)) return false;
+  return true;
+}
+
+function isValidLayoutSetReadingOrderArgs(args: unknown): args is LayoutSetReadingOrderArgs {
+  if (!isValidLayoutPageArgs(args)) return false;
+  const a = args as LayoutSetReadingOrderArgs;
+  if (!Array.isArray(a.placementIds) || a.placementIds.length === 0) return false;
+  return a.placementIds.every((id) => typeof id === "string" && id.trim() !== "");
+}
+
 const handlers: Record<
   string,
   {
@@ -369,6 +491,111 @@ const handlers: Record<
     validate: isValidStoryboardSnapshotRestoreArgs,
     handle: async (_event, args) => {
       return restoreSnapshot(args.root, args.snapshotId);
+    },
+  },
+  [IPC_CHANNELS.layoutPages]: {
+    validate: isValidLayoutRootArgs,
+    handle: async (_event, args) => {
+      return listLayoutBoard(args.root);
+    },
+  },
+  [IPC_CHANNELS.layoutPage]: {
+    validate: isValidLayoutPageArgs,
+    handle: async (_event, args) => {
+      return getLayoutPage(args.root, args.pageId);
+    },
+  },
+  [IPC_CHANNELS.layoutPlace]: {
+    validate: isValidLayoutPlaceArgs,
+    handle: async (_event, args) => {
+      return placePanel(args.root, {
+        pageId: args.pageId,
+        panelId: args.panelId,
+        x: args.x,
+        y: args.y,
+        width: args.width,
+        height: args.height,
+      });
+    },
+  },
+  [IPC_CHANNELS.layoutUpdatePlacement]: {
+    validate: isValidLayoutUpdatePlacementArgs,
+    handle: async (_event, args) => {
+      return updatePlacement(args.root, args.placementId, { x: args.x, y: args.y, width: args.width, height: args.height });
+    },
+  },
+  [IPC_CHANNELS.layoutSetBorder]: {
+    validate: isValidLayoutSetBorderArgs,
+    handle: async (_event, args) => {
+      return setBorder(args.root, {
+        placementId: args.placementId,
+        style: args.style as "none" | "thin" | "bold",
+        widthMm: args.widthMm,
+        rounded: args.rounded,
+      });
+    },
+  },
+  [IPC_CHANNELS.layoutCreateBalloon]: {
+    validate: isValidLayoutCreateBalloonArgs,
+    handle: async (_event, args) => {
+      return createBalloon(args.root, {
+        placementId: args.placementId,
+        kind: args.kind as "speech" | "caption" | "thought",
+        shape: args.shape as "ellipse" | "rounded" | "rect",
+        x: args.x,
+        y: args.y,
+        width: args.width,
+        height: args.height,
+        tail: args.tail,
+      });
+    },
+  },
+  [IPC_CHANNELS.layoutUpdateBalloon]: {
+    validate: isValidLayoutUpdateBalloonArgs,
+    handle: async (_event, args) => {
+      return updateBalloon(args.root, args.balloonId, { x: args.x, y: args.y, width: args.width, height: args.height });
+    },
+  },
+  [IPC_CHANNELS.layoutRetargetTail]: {
+    validate: isValidLayoutRetargetTailArgs,
+    handle: async (_event, args) => {
+      return retargetTail(args.root, args.balloonId, { x: args.x, y: args.y, visible: args.visible });
+    },
+  },
+  [IPC_CHANNELS.layoutSetLettering]: {
+    validate: isValidLayoutSetLetteringArgs,
+    handle: async (_event, args) => {
+      return setLettering(args.root, { balloonId: args.balloonId, text: args.text });
+    },
+  },
+  [IPC_CHANNELS.layoutSetSfx]: {
+    validate: isValidLayoutSetSfxArgs,
+    handle: async (_event, args) => {
+      if (args.sfxId !== undefined) {
+        return updateSfx(args.root, args.sfxId, {
+          text: args.text,
+          weight: args.weight as "regular" | "bold" | "heavy" | undefined,
+          angle: args.angle,
+          x: args.x,
+          y: args.y,
+          scale: args.scale,
+        });
+      }
+      return createSfx(args.root, {
+        placementId: args.placementId,
+        text: args.text,
+        weight: args.weight as "regular" | "bold" | "heavy" | undefined,
+        angle: args.angle,
+        x: args.x,
+        y: args.y,
+        scale: args.scale,
+      });
+    },
+  },
+  [IPC_CHANNELS.layoutSetReadingOrder]: {
+    validate: isValidLayoutSetReadingOrderArgs,
+    handle: async (_event, args) => {
+      return setReadingOrder(args.root, { pageId: args.pageId, placementIds: args.placementIds });
     },
   },
 };
