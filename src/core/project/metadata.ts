@@ -399,6 +399,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_location_assignments_panel ON panel_location_assignments(panel_id)",
     ],
   },
+  // S6.5: camera and shot definitions (§8.7). One camera per
+  // panel; shot type from the closed vocabulary.
+  {
+    version: 33,
+    name: "033_panel_cameras",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_cameras (camera_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), shot_type TEXT NOT NULL, angle TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_cameras_panel ON panel_cameras(panel_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
