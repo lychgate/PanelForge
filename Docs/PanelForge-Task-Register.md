@@ -476,7 +476,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Killing telemetry yields Unknown everywhere, conservative scheduling, and an explicit unavailable indicator.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.14, S2.15.
 - **Stop:** Pausing on thresholds lands in S2.17.
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit 5ef2e45)
 
 #### S2.17 Cooling Down State [SPEC]
 - **Goal:** An explicit, distinguishable thermal pause (§10.5).
@@ -936,6 +936,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S2.15 | `DISPLAY=:0 npm test` | Pass — 278 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 9 ipc + 13 security) | `tests/telemetry-adapter.test.js` (8 tests): registry order + throw/malformed normalization, validator honesty, OS/NVIDIA sampling, zero-fabrication, monitoring wiring, Resource Manager decoupling. |
 | 2026-11-05 | S2.15 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S2.15 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.16 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.16 | `npm run build` | Pass | `out/node/engines/hardware/telemetry-status.js` emitted. |
+| 2026-11-05 | S2.16 | `DISPLAY=:0 npm test` | Pass — 284 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 9 ipc + 13 security) | `tests/telemetry-failure.test.js` (6 tests): killed-telemetry verdict, present-telemetry clearing, Unknown display honesty, conservative clamp with cooling preserved, invalid-sample rejection, queue completion without telemetry. |
+| 2026-11-05 | S2.16 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.16 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.16 implemented files:** `src/engines/hardware/telemetry-status.ts` (New — `displayMetric`, `summarizeTelemetry` + `TELEMETRY_UNAVAILABLE_INDICATOR`, `resolveEffectiveProfile` (conservative clamp, cooling preserved)), `tests/telemetry-failure.test.js` (New, 6 tests). Threshold pausing stays S2.17.
 
 **S2.15 implemented files:** `src/engines/hardware/telemetry.ts` (New — `TelemetryAdapter` contract, `createTelemetryRegistry`, `createOsMemoryAdapter`, `createNvidiaAdapter` + CSV parser, `isTelemetrySample`), `src/engines/hardware/detect.ts` (`telemetryAdapters` dep; monitoring reflects registrations), `tests/telemetry-adapter.test.js` (New, 8 tests). Interface only — display semantics S2.16, thresholds S2.17.
 
@@ -1051,11 +1058,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.16 — Graceful Telemetry Failure [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.17 — Cooling Down State [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S2.15 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.16 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S2.16 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.17 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Missing telemetry displays as Unknown (never 0, no estimates), conservative scheduling defaults hold, cooldown intervals are user-configurable, unavailability is explicit, and the app stays fully usable without telemetry (§10.4).
+**Goal [SPEC]:** Cooling Down as queue + task state with soft/hard user-configurable thresholds; pauses new generation, handles active jobs safely, explains why, resumes when cooled — never claims fan/temperature control.
 
 ---
 
@@ -1109,5 +1116,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.13 complete. Acceptance verified (262 tests incl. 9 resource-profiles; batch concurrency + memory parking + cooling + custom limits). Stopped for owner review before S2.14. | [SPEC] | Crouton (S2.13 implementation) |
 | 2026-11-05 | S2.14 complete. Acceptance verified (270 tests incl. 8 hardware-detection; honest Detected/Unavailable/Unknown typing, startup step non-blocking). Stopped for owner review before S2.15. | [SPEC] | Crouton (S2.14 implementation) |
 | 2026-11-05 | S2.15 complete. Acceptance verified (278 tests incl. 8 telemetry-adapter; registry + typed sampling + monitoring wiring, Resource Manager untouched). Stopped for owner review before S2.16. | [SPEC] | Crouton (S2.15 implementation) |
+| 2026-11-05 | S2.16 complete. Acceptance verified (284 tests incl. 6 telemetry-failure; Unknown display + conservative clamp + explicit indicator + fully usable). Stopped for owner review before S2.17. | [SPEC] | Crouton (S2.16 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

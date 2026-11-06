@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.16 — Graceful Telemetry Failure (2026-11-05) — [`5ef2e45`](https://github.com/lychgate/PanelForge/commit/5ef2e45749bf74118b22b9a88d612823373b7595)
+
+**Added**
+
+- `src/engines/hardware/telemetry-status.ts` — `displayMetric`
+  (Unknown, never 0/estimates), `summarizeTelemetry` (availability
+  verdict + `Telemetry unavailable` indicator), and
+  `resolveEffectiveProfile` (concurrency clamps to 1 when telemetry is
+  unavailable; user-configured cooling interval preserved). The app
+  stays fully usable on the effective profile.
+- `tests/telemetry-failure.test.js` — 6 tests: killed-telemetry
+  verdict, present-telemetry clearing, Unknown display honesty,
+  conservative clamp with cooling preserved, invalid-sample rejection,
+  queue completion without telemetry.
+
+**Changed**
+
+- Register: S2.16 marked **Complete**; §11 next task is S2.17.
+- `Plan.md`: S2.16 checked off (2026-11-05).
+
 ### S2.15 — Telemetry Adapter Interface (2026-11-05) — [`b300085`](https://github.com/lychgate/PanelForge/commit/b300085440f52fc2d55cbd74de247941c6fb0b88)
 
 **Added**
