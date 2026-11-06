@@ -232,6 +232,30 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.4 — Negative Prompt Handling (2026-11-06) — [`41a4b7c`](https://github.com/lychgate/PanelForge/commit/41a4b7ca540b8c01940a24c9d23f038f404ee01a)
+
+**Added**
+
+- `src/core/project/negative-prompts.ts` —
+  `resolveNegativePrompt` (job negative wins — including
+  explicit empty; then style S3.11 default via explicit
+  styleId or canonical default; then empty/none; source
+  reported as `job|style|none`);
+  `savePanelNegativePrompt`/`getPanelNegativePrompt`
+  store the resolved string verbatim per panel (empty
+  stays empty); `assembleNegativeForPanel` for S7.6.
+- Migration 041 (`panel_negative_prompts` table) in
+  `src/core/project/metadata.ts`.
+- `tests/negative-prompts.test.js` — 4 tests: resolution
+  order, job override incl. explicit empty, verbatim
+  storage, migration v41.
+
+**Changed**
+
+- Register: S7.4 marked **Complete**; Stage 7 now 4 of 15;
+  §11 next eligible is S7.5.
+- `Plan.md`: S7.4 checked off (2026-11-06).
+
 ### S7.3 — Prompt Assembly (2026-11-06) — [`77b512d`](https://github.com/lychgate/PanelForge/commit/77b512d64ef1dc7a1982c2435390d28321ff69be)
 
 **Added**

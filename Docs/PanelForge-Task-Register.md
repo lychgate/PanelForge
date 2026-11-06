@@ -993,6 +993,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Negative prompt handling.
 - **Acceptance:** Jobs store/use the intended negative string; overrides beat defaults.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S7.3.
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 41a4b7c; see below)
 - **Status:** Not Started
 
 #### S7.5 Reference conditioning [SPEC]
@@ -2021,6 +2022,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S7.3 | `DISPLAY=:0 npm test` | Pass — 534 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 9 ipc + 13 security) | `tests/prompt-assembly.test.js` (4 tests): byte-identical determinism, polish/fallback behavior, exact-string storage, migration v40. |
 | 2026-11-06 | S7.3 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S7.3 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S7.4 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S7.4 | `npm run build` | Pass | `out/node/core/project/negative-prompts.js` emitted. |
+| 2026-11-06 | S7.4 | `DISPLAY=:0 npm test` | Pass — 538 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 4 negative-prompts + 9 ipc + 13 security) | `tests/negative-prompts.test.js` (4 tests): style/canonical/none resolution, job override incl. explicit empty, verbatim storage, migration v41. |
+| 2026-11-06 | S7.4 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S7.4 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S7.4 implemented files:** `src/core/project/negative-prompts.ts` (New — `resolveNegativePrompt`/`savePanelNegativePrompt`/`getPanelNegativePrompt`/`assembleNegativeForPanel`; job > style > none with source reported, verbatim per panel), `src/core/project/metadata.ts` (migration 041 panel_negative_prompts), `tests/negative-prompts.test.js` (New, 4 tests). Reference conditioning stays S7.5.
 
 **S7.3 implemented files:** `src/core/project/prompt-assembly.ts` (New — `assemblePanelPrompt`/`savePanelPrompt`/`getPanelPrompt`; deterministic brief+style+tags → exact string per panel, optional LLM polish with fallback), `src/core/project/metadata.ts` (migration 040 panel_prompts), `tests/prompt-assembly.test.js` (New, 4 tests). Negative prompts stay S7.4.
 
@@ -2361,7 +2369,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S7.2:** S7.3 — Prompt assembly (deterministic template assembly, optional LLM assist). **Status: Complete (2026-11-06, impl commit 77b512d; 534 tests incl. 4 prompt-assembly). Stage 7 now 3 of 15.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S7.3:** S7.4 — Negative prompt handling (first-class job fields). Do not begin without explicit owner authorization.
+**Next eligible after S7.3:** S7.4 — Negative prompt handling (first-class job fields). **Status: Complete (2026-11-06, impl commit 41a4b7c; 538 tests incl. 4 negative-prompts). Stage 7 now 4 of 15.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S7.4:** S7.5 — Reference conditioning (approved refs by slot; S4.8 gate). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -2481,5 +2491,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S7.1 complete. Acceptance verified (526 tests incl. 4 comfyui-client; fixture-server round-trip, health-gate refusal, envelope). Stage 7 now 1 of 14. Stopped for owner review before S7.2. | [SPEC] | Crouton (S7.1 implementation) |
 | 2026-11-06 | S7.2 complete. Acceptance verified (530 tests incl. 4 workflow-templates; round-trips + tamper/missing rejections). Stage 7 now 2 of 15. Stopped for owner review before S7.3. | [SPEC] | Crouton (S7.2 implementation) |
 | 2026-11-06 | S7.3 complete. Acceptance verified (534 tests incl. 4 prompt-assembly; byte-identical determinism, polish fallback, exact storage). Stage 7 now 3 of 15. Stopped for owner review before S7.4. | [SPEC] | Crouton (S7.3 implementation) |
+| 2026-11-06 | S7.4 complete. Acceptance verified (538 tests incl. 4 negative-prompts; job wins incl. explicit empty, verbatim). Stage 7 now 4 of 15. Stopped for owner review before S7.5. | [SPEC] | Crouton (S7.4 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
