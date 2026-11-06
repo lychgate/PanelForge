@@ -128,7 +128,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > Goal/Scope/Deliverables/Deps/Acceptance/Stop.
 
 - [x] S5.1 Location profile records (§8.5 fields + CRUD) — completed 2026-11-06
-- [ ] S5.2 Location variations (identifiable states like "Ravenholt, winter, damaged")
+- [x] S5.2 Location variations (identifiable states like "Ravenholt, winter, damaged") — completed 2026-11-06
 - [ ] S5.3 Location reference association (exterior/interior/overview/detail/day/night/weather/damaged slots)
 - [ ] S5.4 Object profile records (§8.6 fields + CRUD)
 - [ ] S5.5 Object variations (states like "OmniPad, pristine/damaged")

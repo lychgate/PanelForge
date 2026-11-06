@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.2 — Location Variations (2026-11-06) — [`3ba1b77`](https://github.com/lychgate/PanelForge/commit/3ba1b77c2ec138d29b66a8177e0978d3f2f3e25d)
+
+**Added**
+
+- `src/core/project/location-variations.ts` — variation CRUD
+  (`createVariation`/`getVariation`/`listVariations`/
+  `updateVariation`/`deleteVariation`): labels unique per
+  location (case-insensitive), per-variation overrides
+  (lighting/time of day/weather/damage states) defaulting to
+  `""` = inherit from the profile; identity stable.
+- Migration 021 (`location_variations` table + unique index)
+  in `src/core/project/metadata.ts`.
+- `tests/location-variations.test.js` — 5 tests: multiple
+  variations per location, per-location label uniqueness, FK +
+  validation, override inheritance, rename collision,
+  list/delete + migration v21.
+
+**Changed**
+
+- Register: S5.2 marked **Complete**; Stage 5 now 2 of 10;
+  §11 next eligible is S5.3.
+- `Plan.md`: S5.2 checked off (2026-11-06).
+
 ### S5.1 — Location Profile Records (2026-11-06) — [`e1e4df5`](https://github.com/lychgate/PanelForge/commit/e1e4df5575d87268ea8315400b006ef6011b9409)
 
 **Added**
