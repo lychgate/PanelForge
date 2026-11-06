@@ -119,6 +119,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS scenes (scene_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), chapter_id TEXT NOT NULL REFERENCES chapters(chapter_id), title TEXT NOT NULL, norm_start INTEGER NOT NULL, norm_end INTEGER NOT NULL, sort_order INTEGER NOT NULL, source TEXT NOT NULL, created_at TEXT NOT NULL)",
     ],
   },
+  // S3.6: entity extractions — typed candidates (character/location/
+  // object/event/chronology) with exact normalized spans + heuristic
+  // confidence; source is "deterministic" or "llm". Candidates without
+  // resolvable spans are never stored.
+  {
+    version: 7,
+    name: "007_entities",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS entities (entity_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), scene_id TEXT REFERENCES scenes(scene_id), entity_type TEXT NOT NULL, name TEXT NOT NULL, norm_start INTEGER NOT NULL, norm_end INTEGER NOT NULL, confidence REAL NOT NULL, source TEXT NOT NULL, created_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {

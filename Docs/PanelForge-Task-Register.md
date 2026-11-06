@@ -558,7 +558,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Fixture entities resolve to exact source spans; candidates without spans are rejected.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.5, S2.9.
 - **Stop:** Canonical status assignment is S3.7; Studio CRUD stays Stages 4–5.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S3.7 Canon classification [SPEC]
 - **Goal:** Canon is not speculation (§2.7).
