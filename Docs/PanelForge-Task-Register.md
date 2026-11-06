@@ -737,7 +737,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Character history.
 - **Acceptance:** A fixture lifecycle (create → version → reference → approve → bind) replays in order from history.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.1–S4.10.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 8004a63; see below)
 
 #### S4.12 Stage 4 acceptance fixture [SPEC]
 - **Goal:** End-to-end proof of Stage 4.
@@ -1322,6 +1322,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S4.10 | `DISPLAY=:0 npm test` | Pass — 415 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 9 ipc + 13 security) | `tests/version-comparison.test.js` (4 tests): slot differences + effective field diffs named exactly, approval states + identical-clean, cross-character/unknown rejections, zero mutation. |
 | 2026-11-06 | S4.10 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S4.10 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S4.11 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S4.11 | `npm run build` | Pass | `out/node/core/project/history.js` emitted. |
+| 2026-11-06 | S4.11 | `DISPLAY=:0 npm test` | Pass — 418 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 9 ipc + 13 security) | `tests/history.test.js` (3 tests): full lifecycle replay, validation, append-only + cascade + migration v19. |
+| 2026-11-06 | S4.11 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S4.11 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S4.11 implemented files:** `src/core/project/history.ts` (New — `recordEvent`/`listHistoryByCharacter`/`listHistoryByVersion`, append-only), `src/core/project/metadata.ts` (migration 019 character_history with character cascade), `tests/history.test.js` (New, 3 tests). The fixture stage-gate stays S4.12.
 
 **S4.10 implemented files:** `src/core/project/version-comparison.ts` (New — `compareVersions`, read-only), `tests/version-comparison.test.js` (New, 4 tests). History stays S4.11.
 
@@ -1547,7 +1554,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S4.9:** S4.10 — Reference comparison (slot-by-slot + field diffs, read-only). **Status: Complete (2026-11-06, impl commit 824dfe9; 415 tests incl. 4 version-comparison). Stage 4 now 10 of 12.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S4.10:** S4.11 — Character history (append-only lifecycle replay). Do not begin without explicit owner authorization.
+**Next eligible after S4.10:** S4.11 — Character history (append-only lifecycle replay). **Status: Complete (2026-11-06, impl commit 8004a63; 418 tests incl. 3 history). Stage 4 now 11 of 12.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S4.11:** S4.12 — Stage 4 acceptance fixture (create → versions → references → tiers → approve → bind → gate). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1633,5 +1642,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S4.8 complete. Acceptance verified (407 tests incl. 5 approval; binding gate, recorded rationale, later-rejection warn). Stage 4 now 8 of 12. Stopped for owner review before S4.9. | [SPEC] | Crouton (S4.8 implementation) |
 | 2026-11-06 | S4.9 complete. Acceptance verified (411 tests incl. 4 generation-requests; store/replace, validation, zero provider traffic by construction). Stage 4 now 9 of 12. Stopped for owner review before S4.10. | [SPEC] | Crouton (S4.9 implementation) |
 | 2026-11-06 | S4.10 complete. Acceptance verified (415 tests incl. 4 version-comparison; slot/field diffs exact, identical-clean, read-only). Stage 4 now 10 of 12. Stopped for owner review before S4.11. | [SPEC] | Crouton (S4.10 implementation) |
+| 2026-11-06 | S4.11 complete. Acceptance verified (418 tests incl. 3 history; fixture lifecycle replays in order, append-only with character cascade). Stage 4 now 11 of 12. Stopped for owner review before S4.12. | [SPEC] | Crouton (S4.11 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

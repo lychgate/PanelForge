@@ -7,6 +7,24 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.11 — Character History (2026-11-06) — [`8004a63`](https://github.com/lychgate/PanelForge/commit/8004a63b5ba8024da50dccda568ab9ecfccf26fd)
+
+**Added**
+
+- `src/core/project/history.ts` — append-only
+  (`recordEvent`/`listHistoryByCharacter`/`listHistoryByVersion`)
+  with event kinds covering the full lifecycle.
+- Migration 019 (`character_history`, cascade on character
+  delete) in `src/core/project/metadata.ts`.
+- `tests/history.test.js` — 3 tests: fixture lifecycle replays
+  in order, validation, append-only + cascade + migration v19.
+
+**Changed**
+
+- Register: S4.11 marked **Complete**; Stage 4 now 11 of 12;
+  §11 next eligible is S4.12.
+- `Plan.md`: S4.11 checked off (2026-11-06).
+
 ### S4.10 — Reference Comparison (2026-11-06) — [`824dfe9`](https://github.com/lychgate/PanelForge/commit/824dfe9281061a255be46c04f15d47eb2364a82b)
 
 **Added**
