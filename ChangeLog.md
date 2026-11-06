@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.9 — Generation-Request Records (2026-11-06) — [`90a3a6e`](https://github.com/lychgate/PanelForge/commit/90a3a6eac9cbac972b296ec8c704358d1b8f2615)
+
+**Added**
+
+- `src/core/project/generation-requests.ts` — request-side
+  only: `createGenerationRequest` (provider/prompt validation
+  against the Stage 2 contract shape, one request per
+  (version, slot), recreate replaces) / `getGenerationRequest` /
+  `listGenerationRequestsByVersion` / `attachResultAsset`
+  (fulfilled link for Stage 7). No provider imports, no network.
+- Migration 018 (`generation_requests` table) in
+  `src/core/project/metadata.ts`.
+- `tests/generation-requests.test.js` — 4 tests: store/replace,
+  typed validation + built-service import scan proving zero
+  provider traffic, result attach, slot-order listing +
+  migration v18.
+
+**Changed**
+
+- Register: S4.9 marked **Complete**; Stage 4 now 9 of 12; §11 next
+  eligible is S4.10.
+- `Plan.md`: S4.9 checked off (2026-11-06).
+
 ### S4.8 — Generation Approval (2026-11-06) — [`b9cc8d2`](https://github.com/lychgate/PanelForge/commit/b9cc8d241c9a3d1db60940cb27bc0d35dc8ddd5b)
 
 **Added**

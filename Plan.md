@@ -111,7 +111,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S4.6 Entity → character bridge (explicit create-from-entity; source span link; never auto-create) — completed 2026-11-06
 - [x] S4.7 Character version binding (panel_id opaque until Stage 6; one exact version; wrong-version warnings) — completed 2026-11-06
 - [x] S4.8 Generation approval (pending/approved/rejected gate on binding) — completed 2026-11-06
-- [ ] S4.9 Generation-request records (request shape + validation only; zero provider calls)
+- [x] S4.9 Generation-request records (request shape + validation only; zero provider calls) — completed 2026-11-06
 - [ ] S4.10 Reference comparison (slot-by-slot + field diffs, read-only)
 - [ ] S4.11 Character history (append-only lifecycle replay)
 - [ ] S4.12 Stage 4 acceptance fixture (create → versions → references → tiers → approve → bind → gate)
