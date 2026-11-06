@@ -61,7 +61,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S2.11 Provider Health Checks — completed 2026-11-05
 - [x] S2.12 Mock Provider Testing — completed 2026-11-05
 - [x] S2.13 Resource Profiles — completed 2026-11-05
-- [ ] S2.14 Hardware Detection
+- [x] S2.14 Hardware Detection — completed 2026-11-05
 - [ ] S2.15 Telemetry Adapter Interface
 - [ ] S2.16 Graceful Telemetry Failure
 - [ ] S2.17 Cooling Down State

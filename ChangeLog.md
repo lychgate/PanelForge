@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.14 — Hardware Detection (2026-11-05) — [`b35afbb`](https://github.com/lychgate/PanelForge/commit/b35afbbc432eb57cfc9a81bebd074905cc96ce5e)
+
+**Added**
+
+- `src/engines/hardware/detect.ts` — `detectHardware()` with injectable
+  probes: RAM/CPU via `os`, GPU via `nvidia-smi`, LM Studio/ComfyUI
+  health probes, monitoring `unknown` until S2.15. Every signal is
+  Detected/Unavailable/Unknown with `value` present only when detected
+  (never 0, never fabricated); `isHardwareSnapshot` enforces the rule.
+- Startup step `hardware-detection` in `src/main/index.ts` (logs the
+  detected count; failures never block the window).
+- `tests/hardware-detection.test.js` — 8 tests: honest typing, absent
+  vs ambiguous branches, zero-RAM/empty-CPU degradation, validator
+  rejection, non-blocking startup wiring.
+
+**Changed**
+
+- Register: S2.14 marked **Complete**; §11 next task is S2.15.
+- `Plan.md`: S2.14 checked off (2026-11-05).
+
 ### S2.13 — Resource Profiles (2026-11-05) — [`0438158`](https://github.com/lychgate/PanelForge/commit/0438158577adf7d1333b6c2d60100f06121e08c7)
 
 **Added**

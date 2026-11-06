@@ -458,7 +458,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Each signal reports exactly one of Detected/Unavailable/Unknown; absence is never shown as zero.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.13.
 - **Stop:** Stays detection only — scheduling decisions land in S2.13/S2.17.
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit b35afbb)
 
 #### S2.15 Telemetry Adapter Interface [SPEC]
 - **Goal:** A stable boundary for optional hardware metrics.
@@ -926,6 +926,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S2.13 | `DISPLAY=:0 npm test` | Pass — 262 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 9 ipc + 13 security) | `tests/resource-profiles.test.js` (9 tests): preset shapes, unknown/limit rejections, custom limits, oversize detection, parallel-vs-sequential overlap, memory parking, cooling separation, profile stamping, no-overclock guard. |
 | 2026-11-05 | S2.13 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S2.13 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.14 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.14 | `npm run build` | Pass | `out/node/engines/hardware/detect.js` emitted. |
+| 2026-11-05 | S2.14 | `DISPLAY=:0 npm test` | Pass — 270 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 9 ipc + 13 security) | `tests/hardware-detection.test.js` (8 tests): honest Detected/Unavailable/Unknown typing across all seven signals, absent vs ambiguous branches, zero-RAM/empty-CPU degradation, validator rejection, non-blocking startup wiring. |
+| 2026-11-05 | S2.14 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.14 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.14 implemented files:** `src/engines/hardware/detect.ts` (New — `detectHardware` with injectable os/nvidia-smi/local-service probes; signals `gpuModel`, `vramBytes`, `ramBytes`, `cpu`, `imageBackends`, `modelServices`, `monitoring`; value-only-when-detected rule; `isHardwareSnapshot` validator), `src/main/index.ts` (`hardware-detection` startup step, non-blocking), `tests/hardware-detection.test.js` (New, 8 tests). Detection only — no scheduling decisions.
 
 **S2.13 implemented files:** `src/engines/tasks/resources.ts` (New — `resolveResourceProfile` + `RESOURCE_PROFILES` (Safe 1×1024/cooling 3000, Balanced 1×2048, Performance 2×4096, Custom validated 1..4 concurrency/8192 dims/60000 ms cooling), `isOversizedForProfile`, `createProfileQueue` (batch concurrency, waiting-for-resources parking, cooling pauses, `params.resourceProfile` stamping)), `tests/resource-profiles.test.js` (New, 9 tests). Hardware inputs arrive S2.14–S2.16.
 
@@ -1037,11 +1044,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.14 — Hardware Detection [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.15 — Telemetry Adapter Interface [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S2.13 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.14 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S2.14 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.15 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Startup hardware detection (GPU/VRAM/RAM/CPU/backends/services/monitoring) with every signal typed Detected/Unavailable/Unknown — never 0, never fabricated.
+**Goal [SPEC]:** A stable adapter boundary for optional hardware metrics (temperature, VRAM, etc.), metrics typed Detected/Unavailable/Unknown per S2.14; adapters addable per-platform without touching the Resource Manager.
 
 ---
 
@@ -1093,5 +1100,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.11 complete. Acceptance verified (243 tests incl. 8 provider-health; unhealthy reports + gated no-dispatch). Stopped for owner review before S2.12. | [SPEC] | Crouton (S2.11 implementation) |
 | 2026-11-05 | S2.12 complete. Acceptance verified (253 tests incl. 10 mock-provider; full create→recover acceptance against mocks, zero production wiring). Stopped for owner review before S2.13. | [SPEC] | Crouton (S2.12 implementation) |
 | 2026-11-05 | S2.13 complete. Acceptance verified (262 tests incl. 9 resource-profiles; batch concurrency + memory parking + cooling + custom limits). Stopped for owner review before S2.14. | [SPEC] | Crouton (S2.13 implementation) |
+| 2026-11-05 | S2.14 complete. Acceptance verified (270 tests incl. 8 hardware-detection; honest Detected/Unavailable/Unknown typing, startup step non-blocking). Stopped for owner review before S2.15. | [SPEC] | Crouton (S2.14 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

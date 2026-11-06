@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (262 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio+comfyui+provider-health+mock-provider+resource-profiles)
+npm test           # runs Vitest (270 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio+comfyui+provider-health+mock-provider+resource-profiles+hardware-detection)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -167,7 +167,9 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S2.13 — Resource Profiles:** complete (Safe/Balanced/Performance/Custom queue concurrency + memory policy constrains the executor; oversized tasks park instead of dispatching).
 
-**Next (awaiting owner authorization): S2.14 — Hardware Detection**, the fourteenth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
+- **S2.14 — Hardware Detection:** complete (startup probe of GPU/VRAM/RAM/CPU/backends/services/monitoring, each signal typed Detected/Unavailable/Unknown).
+
+**Next (awaiting owner authorization): S2.15 — Telemetry Adapter Interface**, the fifteenth of 18 Stage 2 tasks (infra only; see `Docs/PanelForge-Task-Register.md` §4D).
 
 ## Known limitations (end of Stage 0)
 
