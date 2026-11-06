@@ -232,6 +232,24 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.14 — Stage 8 Acceptance Fixture (2026-11-06) — [`cc326a9`](https://github.com/lychgate/PanelForge/commit/cc326a94126ee2ae6f601f5c16bf66e02d930712)
+
+**Added**
+
+- `tests/stage8-fixture.test.js` — 1 gate test:
+  traditional + webtoon pages assembled from
+  Stage 6/7 panels → balloons/SFX/lettering →
+  SVG both formats → snapshot/branch/restore
+  byte-identical, with artwork SHA-256 pinned
+  throughout and lettering editable.
+
+**Changed**
+
+- Register: S8.14 marked **Complete**; Stage 8 now 14 of 14
+  (**GATE PASSES**); next eligible is Stage 9 (Continuity
+  and QA) awaiting authorization.
+- `Plan.md`: S8.14 checked off (2026-11-06).
+
 ### S8.13 — Traceability (2026-11-06) — [`50094df`](https://github.com/lychgate/PanelForge/commit/50094dfa07682b794c8c9186ff22973886190384)
 
 **Added**
