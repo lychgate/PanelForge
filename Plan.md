@@ -93,8 +93,6 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 ## Stage 4 — Character Studio
 
-## Stage 4 — Character Studio
-
 > Expanded planning 2026-11-06 (owner-authorized expansion, awaiting task-level
 > approval): 12 micro-tasks S4.1–S4.12, spine first (profile CRUD → version
 > records → reference association → completeness tiers/MVRS), then entity
