@@ -232,6 +232,24 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.15 — Stage 7 Acceptance Fixture (2026-11-06) — [`52e9bca`](https://github.com/lychgate/PanelForge/commit/52e9bcaed632fc47ffb283373a3bd0d7128b473d)
+
+**Added**
+
+- `tests/stage7-fixture.test.js` — 1 gate test: full
+  pipeline (prompt assembled → conditioned →
+  generated → variations → inpaint/outpaint →
+  compare → approve → restore), provenance complete
+  for all 5 versions, history retained (5 versions),
+  engine detection green.
+
+**Changed**
+
+- Register: S7.15 marked **Complete**; **Stage 7 gate
+  passes (15 of 15)**; next eligible is Stage 8 (S8.1)
+  after owner authorization.
+- `Plan.md`: S7.15 checked off (2026-11-06); Stage 7 complete.
+
 ### S7.14 — Engine Provisioning (2026-11-06) — [`23794a1`](https://github.com/lychgate/PanelForge/commit/23794a142e154fa7bbaf9ca8fb1bd16917e972f0)
 
 **Added**
