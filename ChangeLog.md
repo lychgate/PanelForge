@@ -7,6 +7,28 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.13 — Resource Profiles (2026-11-05) — [`0438158`](https://github.com/lychgate/PanelForge/commit/0438158577adf7d1333b6c2d60100f06121e08c7)
+
+**Added**
+
+- `src/engines/tasks/resources.ts` — Safe/Balanced/Performance/Custom
+  resource profiles (§10.2) with `resolveResourceProfile` validation
+  (typed `ResourceError`), `isOversizedForProfile`, and
+  `createProfileQueue` enforcement: per-batch `queueConcurrency`,
+  oversized tasks parked to `waiting-for-resources`, `coolingIntervalMs`
+  between batches, and `params.resourceProfile` stamping for the S2.7
+  progress view. No overclock/fan/power control; detection/telemetry
+  inputs stay S2.14–S2.16.
+- `tests/resource-profiles.test.js` — 9 tests: preset shapes, unknown
+  profile/limit rejections, custom limits with balanced fallbacks,
+  oversize detection, parallel-vs-sequential overlap, memory parking,
+  cooling separation, profile stamping, no-overclock source guard.
+
+**Changed**
+
+- Register: S2.13 marked **Complete**; §11 next task is S2.14.
+- `Plan.md`: S2.13 checked off (2026-11-05).
+
 ### S2.12 — Mock Provider Testing (2026-11-05) — [`4812845`](https://github.com/lychgate/PanelForge/commit/48128454127a3c42ed120db0761ca1c14d7783ea)
 
 **Added**
