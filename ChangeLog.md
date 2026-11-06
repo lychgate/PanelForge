@@ -232,6 +232,29 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.3 — Prompt Assembly (2026-11-06) — [`77b512d`](https://github.com/lychgate/PanelForge/commit/77b512d64ef1dc7a1982c2435390d28321ff69be)
+
+**Added**
+
+- `src/core/project/prompt-assembly.ts` —
+  `assemblePanelPrompt` (S6.9 instructions + S3.11 style
+  fields + reference tags → deterministic string in fixed
+  order) with optional LM Studio polish hook (assist only;
+  any failure/empty output falls back to the deterministic
+  string); `savePanelPrompt`/`getPanelPrompt` store the
+  exact string verbatim per panel.
+- Migration 040 (`panel_prompts` table) in
+  `src/core/project/metadata.ts`.
+- `tests/prompt-assembly.test.js` — 4 tests: byte-identical
+  determinism, polish + fallback behavior, exact-string
+  storage, migration v40.
+
+**Changed**
+
+- Register: S7.3 marked **Complete**; Stage 7 now 3 of 15;
+  §11 next eligible is S7.4.
+- `Plan.md`: S7.3 checked off (2026-11-06).
+
 ### S7.2 — Workflow Templates (2026-11-06) — [`3e715ed`](https://github.com/lychgate/PanelForge/commit/3e715edc2540ce82ab34b3e1fd3d6806083bfd6b)
 
 **Added**

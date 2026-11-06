@@ -179,7 +179,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 - [x] S7.1 ComfyUI workflow integration (submit → poll → harvest; Small GPU honored) — completed 2026-11-06; Stage 7 now 1 of 14
 - [x] S7.2 Workflow templates (project files under `workflows/`, hash-verified registry) — completed 2026-11-06; Stage 7 now 2 of 15
-- [ ] S7.3 Prompt assembly (templates from S6.9 + style + reference tags; optional LM Studio polish)
+- [x] S7.3 Prompt assembly (templates from S6.9 + style + reference tags; optional LM Studio polish) — completed 2026-11-06; Stage 7 now 3 of 15
 - [ ] S7.4 Negative prompt handling (per-job + style defaults, job wins)
 - [ ] S7.5 Reference conditioning (approved refs by slot; unapproved refuse)
 - [ ] S7.6 Individual panel generation (engine: request → ComfyUI → asset → artwork row; never overwrite)
