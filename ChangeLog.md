@@ -206,6 +206,26 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.2 — Storyboard Panel Records (2026-11-06) — [`5413cb4`](https://github.com/lychgate/PanelForge/commit/5413cb474c0bd64c166e6b791f9a6c13c176b5ca)
+
+**Added**
+
+- `src/core/project/storyboard-panels.ts` — panel CRUD
+  (`createPanel`/`getPanel`/`listPanels`/`movePanel`/
+  `deletePanel`): sort-order append, transactional reorder,
+  identity stable. No artwork attached yet.
+- Migration 030 (`storyboard_panels` table) in
+  `src/core/project/metadata.ts`.
+- `tests/storyboard-panels.test.js` — 4 tests: create in sort
+  order, typed rejections, reorder persists, list/delete +
+  migration v30.
+
+**Changed**
+
+- Register: S6.2 marked **Complete**; Stage 6 now 2 of 13;
+  §11 next eligible is S6.3.
+- `Plan.md`: S6.2 checked off (2026-11-06).
+
 ### S6.1 — Storyboard Scene Records (2026-11-06) — [`d15e40e`](https://github.com/lychgate/PanelForge/commit/d15e40e7e3f7b1df7689bde9586294a881575de2)
 
 **Added**

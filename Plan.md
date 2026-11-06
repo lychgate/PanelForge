@@ -151,7 +151,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > `Docs/PanelForge-Task-Register.md` §4E Stage 6 for full per-task spec.
 
 - [x] S6.1 Scene records (source chain via S3.5; wrap, never rewrite, extraction scenes) — completed 2026-11-06
-- [ ] S6.2 Panel records (editable sequences with no artwork; reorder persists)
+- [x] S6.2 Panel records (editable sequences with no artwork; reorder persists) — completed 2026-11-06
 - [ ] S6.3 Character and version assignment (S4.7 opaque IDs become real FKs; approved-only gate)
 - [ ] S6.4 Location assignment (exact location + optional variation per panel)
 - [ ] S6.5 Camera and shot definitions (closed vocab + free-text angle)
