@@ -562,6 +562,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS panel_approved_artwork (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), artwork_id TEXT NOT NULL REFERENCES panel_artwork(artwork_id), updated_at TEXT NOT NULL)",
     ],
   },
+  // S8.1: layout page records.
+  {
+    version: 50,
+    name: "050_pages",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS pages (page_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), title TEXT NOT NULL, format TEXT NOT NULL, width REAL NOT NULL, height REAL NOT NULL, margin REAL NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
