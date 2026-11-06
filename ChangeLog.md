@@ -206,6 +206,26 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.7 — Dialogue, Captions, Actions, and Expressions (2026-11-06) — [`d7ddd99`](https://github.com/lychgate/PanelForge/commit/d7ddd99ee7466f5cd08c2275e9c6c8e4ebcc27eb)
+
+**Added**
+
+- `src/core/project/panel-text.ts` — one text block per panel
+  (`setText`/`getText`): dialogue, captions, actions, and
+  expressions; setting again replaces the whole block; empty
+  panels stay valid (no text required).
+- Migration 035 (`panel_text` table) in
+  `src/core/project/metadata.ts`.
+- `tests/panel-text.test.js` — 4 tests: all four blocks,
+  replace whole block, unknown-panel/non-string rejections,
+  empty panel valid + migration v35.
+
+**Changed**
+
+- Register: S6.7 marked **Complete**; Stage 6 now 7 of 13;
+  §11 next eligible is S6.8.
+- `Plan.md`: S6.7 checked off (2026-11-06).
+
 ### S6.6 — Character Positioning (2026-11-06) — [`bf193cb`](https://github.com/lychgate/PanelForge/commit/bf193cb3811426ace83a6b974d3f2bf8b796f8c7)
 
 **Added**
