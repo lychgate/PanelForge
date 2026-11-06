@@ -531,7 +531,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A *-fixture manuscript segments into expected chapters with exact spans; segmentation never alters source text.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2.
 - **Stop:** AI-driven segmentation is out of scope.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S3.4 Scene extraction [SPEC]
 - **Goal:** Deterministic scene segmentation.

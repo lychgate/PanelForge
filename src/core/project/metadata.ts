@@ -99,6 +99,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS normalization (manuscript_id TEXT PRIMARY KEY REFERENCES manuscripts(manuscript_id), normalized_text TEXT NOT NULL, offset_map TEXT NOT NULL, created_at TEXT NOT NULL)",
     ],
   },
+  // S3.3: deterministic chapter segmentation. Each row records one
+  // chapter's normalized span (norm_start/norm_end) + title + order;
+  // source bytes resolve via the S3.2 offset map (never stored twice).
+  {
+    version: 5,
+    name: "005_chapters",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS chapters (chapter_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), title TEXT NOT NULL, norm_start INTEGER NOT NULL, norm_end INTEGER NOT NULL, sort_order INTEGER NOT NULL, created_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
