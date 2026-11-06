@@ -184,6 +184,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_character_versions_label ON character_versions(character_id, label_key)",
     ],
   },
+  // S4.3: reference asset association (§8.4). Registry assets
+  // bound to a version under one slot kind; an asset may serve any
+  // number of versions/slots.
+  {
+    version: 13,
+    name: "013_character_version_references",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS character_version_references (reference_id TEXT PRIMARY KEY, version_id TEXT NOT NULL REFERENCES character_versions(version_id), asset_id TEXT NOT NULL, slot TEXT NOT NULL, created_at TEXT NOT NULL)",
+      "CREATE INDEX IF NOT EXISTS idx_character_version_references_version ON character_version_references(version_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
