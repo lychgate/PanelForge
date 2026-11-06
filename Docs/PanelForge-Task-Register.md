@@ -449,7 +449,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Selecting a profile constrains queue concurrency + memory behavior; Custom exposes configurable limits.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.3, S2.14.
 - **Stop:** Profile enforcement consumes detection/telemetry (S2.14–S2.16) — policy lands here, inputs there.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S2.14 Hardware Detection [SPEC]
 - **Goal:** Know the machine's capability.
