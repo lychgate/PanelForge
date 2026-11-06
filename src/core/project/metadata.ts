@@ -420,6 +420,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_positions_assignment ON panel_positions(assignment_id)",
     ],
   },
+  // S6.7: dialogue, captions, actions, expressions (§8.7).
+  // One text block per panel.
+  {
+    version: 35,
+    name: "035_panel_text",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_text (text_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), dialogue TEXT NOT NULL, captions TEXT NOT NULL, actions TEXT NOT NULL, expressions TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_text_panel ON panel_text(panel_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
