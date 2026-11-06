@@ -1098,7 +1098,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Page records.
 - **Acceptance:** Pages persist and list per manuscript; invalid formats reject typed.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.2, S7.15 (approved artwork exists).
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 5ff6329; see below)
 
 #### S8.2 Panel placement [SPEC]
 - **Goal:** Place storyboard panels (approved artwork slots) on pages.
@@ -2081,6 +2081,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S7.15 | `DISPLAY=:0 npm test` | Pass — 572 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 4 negative-prompts + 4 reference-conditioning + 3 panel-generation + 3 variations + 4 inpaint + 3 outpaint + 3 aspect-ratios + 5 comparison + 2 provenance + 3 artwork-approval + 3 engine-provisioning + 1 stage7-fixture + 9 ipc + 13 security) | `tests/stage7-fixture.test.js` (1 test): full pipeline generate→vary→inpaint→outpaint→compare→approve→restore; provenance complete for all 5 versions; history retained; engine detection green. |
 | 2026-11-06 | S7.15 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S7.15 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S8.1 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S8.1 | `npm run build` | Pass | `out/node/core/project/pages.js` emitted. |
+| 2026-11-06 | S8.1 | `DISPLAY=:0 npm test` | Pass — 576 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 4 negative-prompts + 4 reference-conditioning + 3 panel-generation + 3 variations + 4 inpaint + 3 outpaint + 3 aspect-ratios + 5 comparison + 2 provenance + 3 artwork-approval + 3 engine-provisioning + 1 stage7-fixture + 4 pages + 9 ipc + 13 security) | `tests/pages.test.js` (4 tests): per-manuscript CRUD round-trips (both formats), update/delete, typed invalid inputs, migration v50. |
+| 2026-11-06 | S8.1 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S8.1 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S8.1 implemented files:** `src/core/project/pages.ts` (New — `createPage`/`updatePage`/`deletePage`/`getPage`/`listPages`; formats traditional|webtoon, mm sizes validated), `src/core/project/metadata.ts` (migration 050 pages), `tests/pages.test.js` (New, 4 tests). Placement stays S8.2.
 
 **S7.15 implemented files:** `tests/stage7-fixture.test.js` (New, 1 gate test). **Stage 7 gate: PASSES (15/15).** Stage 8 awaits owner authorization.
 
@@ -2469,7 +2476,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S7.14:** S7.15 — Stage 7 acceptance fixture (brief → artwork → approve; approved work preserved). **Status: Complete (2026-11-06, impl commit 52e9bca; 572 tests incl. 1 stage7-fixture). Stage 7 now 15 of 15 — GATE PASSES.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S7.15:** Stage 8 — Comic Layout Studio (S8.1 Page records, §4E Stage 8 expanded plan). Do not begin without explicit owner authorization.
+**Next eligible after S7.15:** Stage 8 — Comic Layout Studio (S8.1 Page records, §4E Stage 8 expanded plan). **Status: Complete (2026-11-06, impl commit 5ff6329; 576 tests incl. 4 pages). Stage 8 now 1 of 14.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8.1:** S8.2 — Panel placement (approved artwork slots, mm geometry). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -2601,5 +2610,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S7.13 complete. Acceptance verified (568 tests incl. 3 artwork-approval; restore returns earlier version, later remain). Stage 7 now 13 of 15. Stopped for owner review before S7.14. | [SPEC] | Crouton (S7.13 implementation) |
 | 2026-11-06 | S7.14 complete. Acceptance verified (571 tests incl. 3 engine-provisioning; detect-in-place, decline typed, bundled install). Stage 7 now 14 of 15. Stopped for owner review before S7.15. | [SPEC] | Crouton (S7.14 implementation) |
 | 2026-11-06 | S7.15 complete. Acceptance verified (572 tests incl. 1 stage7-fixture; full pipeline, provenance complete, history retained). Stage 7 gate passes 15/15. Stopped for owner review before Stage 8. | [SPEC] | Crouton (S7.15 implementation) |
+| 2026-11-06 | S8.1 complete. Acceptance verified (576 tests incl. 4 pages; per-manuscript CRUD, typed invalids). Stage 8 now 1 of 14. Stopped for owner review before S8.2. | [SPEC] | Crouton (S8.1 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
