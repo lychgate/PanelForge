@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.8 — DOCX Import (2026-11-05) — [`248dd2a`](https://github.com/lychgate/PanelForge/commit/248dd2a33ab03d5101ccdc3ebe395b5c20950d11)
+
+**Added**
+
+- `src/core/project/docx-import.ts` — zero-new-dependency reader
+  (Node `zlib` ZIP inflate + XML tokenizer): `readZipEntries`,
+  `extractDocumentXml` (paragraphs, Heading1–3 → markdown markers,
+  tabs/breaks), `importDocxManuscript` (original preserved via S3.1,
+  normalization persisted via S3.2). Tracked changes/comments out of
+  scope.
+- `tests/docx-import.test.js` — 5 tests: stored/deflated ZIP +
+  corrupt rejection, twin match, entities + tabs/breaks, preservation
+  + normalization, missing-document/source rejection.
+
+**Changed**
+
+- Register: S3.8 marked **Complete**; §11 next eligible is S3.9.
+- `Plan.md`: S3.8 checked off (2026-11-05).
+
 ### S3.7 — Canon Classification (2026-11-05) — [`9cb65dd`](https://github.com/lychgate/PanelForge/commit/9cb65ddc3af27049cb8d953c6180c1e917cd33ee)
 
 **Added**

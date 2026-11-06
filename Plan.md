@@ -83,7 +83,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S3.5 Source relationships (chapter→scene→span links with offset verification) — completed 2026-11-05
 - [x] S3.6 Entity extraction framework (characters/locations/objects/events/chronology) — completed 2026-11-05
 - [x] S3.7 Canon classification (explicit / interpretation / suggestion / unknown; anti-fabrication) — completed 2026-11-05
-- [ ] S3.8 DOCX import (parser dependency)
+- [x] S3.8 DOCX import (parser dependency) — completed 2026-11-05
 - [ ] S3.9 EPUB import (parser dependency)
 - [ ] S3.10 PDF import (text extraction; OCR deferred as Unknown)
 - [ ] S3.11 Art Style Manager (CRUD + canonical default)

@@ -580,6 +580,8 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 
 **Parser decision (owner, 2026-11-05):** zero-new-dependency reader (Node `zlib` ZIP + XML tokenizer) is the smallest pure-JS surface — no new dependency installed.
 
+**Status:** **Complete** (2026-11-05 — acceptance verified; impl commit 248dd2a; see below)
+
 #### S3.9 EPUB import [SPEC]
 - **Goal:** EPUB manuscripts import.
 - **Scope:** EPUB spine order → normalized text with offset map; original .epub preserved.
@@ -1120,6 +1122,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S3.7 | `DISPLAY=:0 npm test` | Pass — 332 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 9 ipc + 13 security) | `tests/canon.test.js` (5 tests): suggestion quarantine + promotion, direct explicit, unknown non-promotable, contradiction → unknown, missing-id rejection. |
 | 2026-11-05 | S3.7 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S3.7 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S3.8 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S3.8 | `npm run build` | Pass | `out/node/core/project/docx-import.js` emitted. |
+| 2026-11-05 | S3.8 | `DISPLAY=:0 npm test` | Pass — 337 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 9 ipc + 13 security) | `tests/docx-import.test.js` (5 tests): stored/deflated ZIP + corrupt rejection, twin match with heading markers, entities + tabs/breaks, original preservation + normalization, missing-document/source rejection. |
+| 2026-11-05 | S3.8 | `npm run check` | Pass | Baseline + IPC guard green (no new deps — zero-dependency parser). |
+| 2026-11-05 | S3.8 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S3.8 implemented files:** `src/core/project/docx-import.ts` (New — zero-dependency ZIP reader + `extractDocumentXml` + `importDocxManuscript`; document.xml paragraphs/headings/tabs/breaks), `tests/docx-import.test.js` (New, 5 tests). Tracked changes/comments out of scope.
 
 **S3.7 implemented files:** `src/core/project/canon.ts` (New — `classifyEntity` (upsert + conflict-to-unknown), `promoteToCanon` (rationale-required), `canonQuery` (explicit-only), `listCanon`), `src/core/project/metadata.ts` (migration 008 canon table), `tests/canon.test.js` (New, 5 tests). Continuity scoring stays Stage 9.
 
@@ -1275,7 +1284,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S3.6:** S3.7 — Canon classification (explicit / interpretation / suggestion / unknown; anti-fabrication). **Status: Complete (2026-11-05, impl commit 9cb65dd; 332 tests incl. 5 canon).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.7:** S3.8 — DOCX import (parser dependency; smallest pure-JS surface per owner decision). Do not begin without explicit owner authorization.
+**Next eligible after S3.7:** S3.8 — DOCX import (parser dependency; smallest pure-JS surface per owner decision). **Status: Complete (2026-11-05, impl commit 248dd2a; 337 tests incl. 5 docx-import).** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S3.8:** S3.9 — EPUB import. Do not begin without explicit owner authorization.
 
 ---
 
@@ -1341,5 +1352,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S3.5 complete. Acceptance verified (322 tests incl. 5 relationships; traversal lands on exact source text; tampering detected). Stopped for owner review before S3.6. | [SPEC] | Crouton (S3.5 implementation) |
 | 2026-11-05 | S3.6 complete. Acceptance verified (327 tests incl. 5 entities; exact spans, hallucinated quotes rejected). Stopped for owner review before S3.7. | [SPEC] | Crouton (S3.6 implementation) |
 | 2026-11-05 | S3.7 complete. Acceptance verified (332 tests incl. 5 canon; suggestion quarantine + promotion; contradictions unknown, never merged). Stopped for owner review before S3.8. | [SPEC] | Crouton (S3.7 implementation) |
+| 2026-11-05 | S3.8 complete. Acceptance verified (337 tests incl. 5 docx-import; twin-verified, originals preserved, zero new dependencies). Stopped for owner review before S3.9. | [SPEC] | Crouton (S3.8 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
