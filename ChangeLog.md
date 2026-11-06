@@ -7,6 +7,23 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.5 — Source Relationships (2026-11-05) — [`6828c83`](https://github.com/lychgate/PanelForge/commit/6828c8368fbeebf83ca2e6166a9cfb8a68548c60)
+
+**Added**
+
+- `src/core/project/relationships.ts` — `traverseFromScene`
+  (scene → chapter → manuscript → normalized slice → original bytes)
+  and `verifySourceChain` (re-derived comparison, tiling + containment
+  checks, S3.2 map resolution). FK joins + re-verification; no new
+  tables. Entity linkage stays S3.6.
+- `tests/relationships.test.js` — 5 tests: traversal exactness, CRLF
+  bytes, span-tamper + escape detection, override verification.
+
+**Changed**
+
+- Register: S3.5 marked **Complete**; §11 next eligible is S3.6.
+- `Plan.md`: S3.5 checked off (2026-11-05).
+
 ### S3.4 — Scene Extraction (2026-11-05) — [`8c4a205`](https://github.com/lychgate/PanelForge/commit/8c4a205f9551d3552d60a3bb5d16a4ce2f8e4ba9)
 
 **Added**
