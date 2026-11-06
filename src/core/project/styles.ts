@@ -312,7 +312,11 @@ export async function deleteStyle(root: string, styleId: string): Promise<void> 
           throw new StyleError("INVALID_STATE", "Cannot delete the canonical default — set another default first");
         }
       }
-      await runWithBusyRetry(() => db.prepare("DELETE FROM styles WHERE style_id = ?").run(styleId));
+      // S3.13: variants bound to this style go with it (FK guard).
+      await runWithBusyRetry(() => {
+        db.prepare("DELETE FROM style_variants WHERE style_id = ?").run(styleId);
+        db.prepare("DELETE FROM styles WHERE style_id = ?").run(styleId);
+      });
     } finally {
       db.close();
     }

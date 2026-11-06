@@ -150,6 +150,19 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_styles_single_default ON styles(is_default) WHERE is_default = 1",
     ],
   },
+  // S3.13: style variants + priority resolution (§9.1/§9.2). A variant
+  // binds one style profile to a scope (panel/character/scene/project)
+  // with a deterministic priority (lower wins) and a lock strength.
+  // Panel/character records themselves stay Stages 4/6; scope refs
+  // are opaque IDs until then.
+  {
+    version: 10,
+    name: "010_style_variants",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS style_variants (variant_id TEXT PRIMARY KEY, style_id TEXT NOT NULL REFERENCES styles(style_id), scope TEXT NOT NULL, scope_ref TEXT NOT NULL, priority INTEGER NOT NULL, lock_strength TEXT NOT NULL, created_at TEXT NOT NULL)",
+      "CREATE INDEX IF NOT EXISTS idx_style_variants_style ON style_variants(style_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {

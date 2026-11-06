@@ -627,7 +627,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A contested scene resolves to the same winner every time; lock strength + conflicts are visible; styles remain guidance, not guarantees.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11–S3.12.
 - **Stop:** Panel instructions themselves stay Stage 6.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-06 — authorized by owner; implementing)
 
 #### S3.14 Stage 3 acceptance fixture [SPEC]
 - **Goal:** End-to-end proof of Stage 3.
