@@ -7,6 +7,23 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.10 — Stage 5 Acceptance Fixture (2026-11-06) — [`14d307b`](https://github.com/lychgate/PanelForge/commit/14d307b0e75aa026a898b8859e5d29455b07ac10)
+
+**Added**
+
+- `tests/stage5-fixture.test.js` — 2 acceptance tests running
+  fixture location + object through the whole studio (entity →
+  bridge → variations → references → request records → history
+  replay), with separate request tracks per studio; a second
+  place proves the same gates.
+
+**Changed**
+
+- Register: S5.10 marked **Complete**; Stage 5 gate passes (10
+  of 10); next stage (Stage 6 Storyboard) begins only after
+  owner authorization of S6.1.
+- `Plan.md`: S5.10 checked off (2026-11-06); Stage 5 complete.
+
 ### S5.9 — Studio Asset History (2026-11-06) — [`c424beb`](https://github.com/lychgate/PanelForge/commit/c424beb75f6184cd12aeb276d45e63ca572054ec)
 
 **Added**
