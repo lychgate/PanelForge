@@ -232,7 +232,7 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
-### S7.2 — Workflow Templates (2026-11-06) — [`3e715ed`](https://github.com/lychgate/PanelForge/commit/3e715ed723b78984d4c2ede782c36b57ec59d04b7)
+### S7.2 — Workflow Templates (2026-11-06) — [`3e715ed`](https://github.com/lychgate/PanelForge/commit/3e715edc2540ce82ab34b3e1fd3d6806083bfd6b)
 
 **Added**
 
