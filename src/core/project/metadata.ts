@@ -587,6 +587,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS placement_borders (placement_id TEXT PRIMARY KEY REFERENCES page_panels(placement_id), style TEXT NOT NULL, width_mm REAL NOT NULL, rounded INTEGER NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S8.6: balloons with tail anchors.
+  {
+    version: 53,
+    name: "053_balloons",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS balloons (balloon_id TEXT PRIMARY KEY, placement_id TEXT NOT NULL REFERENCES page_panels(placement_id), kind TEXT NOT NULL, shape TEXT NOT NULL, x REAL NOT NULL, y REAL NOT NULL, width REAL NOT NULL, height REAL NOT NULL, tail_x REAL, tail_y REAL, tail_visible INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
