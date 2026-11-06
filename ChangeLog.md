@@ -206,6 +206,28 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.1 — Storyboard Scene Records (2026-11-06) — [`d15e40e`](https://github.com/lychgate/PanelForge/commit/d15e40e7e3f7b1df7689bde9586294a881575de2)
+
+**Added**
+
+- `src/core/project/storyboard-scenes.ts` — storyboard scene
+  CRUD (`createScene`/`getScene`/`listScenes`/`updateScene`/
+  `deleteScene`) wrapping manuscript + chapter + extraction
+  scene links (FK-validated); narrative purpose; identity
+  stable. Wraps Stage 3 scenes, never rewrites them.
+- Migration 029 (`storyboard_scenes` table) in
+  `src/core/project/metadata.ts`.
+- `tests/storyboard-scenes.test.js` — 5 tests: source-chain
+  wrap, defaults, FK validation, partial-update identity
+  stability with extraction untouched, list/delete +
+  migration v29.
+
+**Changed**
+
+- Register: S6.1 marked **Complete**; Stage 6 now 1 of 13;
+  §11 next eligible is S6.2.
+- `Plan.md`: S6.1 checked off (2026-11-06).
+
 ### Stage 7 Planning — Art Studio Expansion (2026-11-06)
 
 **Changed**
