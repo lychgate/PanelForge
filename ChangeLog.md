@@ -232,6 +232,28 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.5 — Reference Conditioning (2026-11-06) — [`712c2cb`](https://github.com/lychgate/PanelForge/commit/712c2cb816c97b2ab564d802427ea92aa4a6dbf4)
+
+**Added**
+
+- `src/core/project/reference-conditioning.ts` —
+  `setConditioning`/`getConditioning`: character /
+  location / object slots resolved to exact reference
+  asset IDs (S4.3/S5.3/S5.6); character versions gated
+  on S4.8 approval (`NOT_APPROVED` when pending/rejected);
+  unattached panels return null (unconditioned).
+- Migration 042 (`panel_conditioning` table) in
+  `src/core/project/metadata.ts`.
+- `tests/reference-conditioning.test.js` — 4 tests: exact
+  asset IDs by slot, approval gate, unconditioned, unknown
+  slots/versions, migration v42.
+
+**Changed**
+
+- Register: S7.5 marked **Complete**; Stage 7 now 5 of 15;
+  §11 next eligible is S7.6.
+- `Plan.md`: S7.5 checked off (2026-11-06).
+
 ### S7.4 — Negative Prompt Handling (2026-11-06) — [`41a4b7c`](https://github.com/lychgate/PanelForge/commit/41a4b7ca540b8c01940a24c9d23f038f404ee01a)
 
 **Added**
