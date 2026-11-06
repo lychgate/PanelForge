@@ -1170,7 +1170,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Layout snapshots.
 - **Acceptance:** Layout dump before snapshot equals dump after restore; branched edits leave parent intact.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.1–S8.9, S6.10 pattern.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit a838268; see below)
 
 #### S8.11 SVG page render [SPEC]
 - **Goal:** Deterministic vector pages from records.
@@ -2126,6 +2126,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S8.9 | `DISPLAY=:0 npm test` | Pass — 602 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 4 negative-prompts + 4 reference-conditioning + 3 panel-generation + 3 variations + 4 inpaint + 3 outpaint + 3 aspect-ratios + 5 comparison + 2 provenance + 3 artwork-approval + 3 engine-provisioning + 1 stage7-fixture + 4 pages + 4 placements + 3 layout-templates + 3 webtoon + 3 borders + 4 balloons + 3 lettering + 3 sfx + 3 reading-order + 9 ipc + 13 security) | `tests/reading-order.test.js` (3 tests): fallback default, explicit reverse reads back, move without geometry/z change, foreign-page rejects, migration v56. |
 | 2026-11-06 | S8.9 | `npm run check` | Pass | Baseline + IPC guard green (runtime/engines gitignored). |
 | 2026-11-06 | S8.9 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S8.10 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S8.10 | `npm run build` | Pass | `out/node/core/project/layout-snapshots.js` emitted. |
+| 2026-11-06 | S8.10 | `DISPLAY=:0 npm test` | Pass — 605 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 4 negative-prompts + 4 reference-conditioning + 3 panel-generation + 3 variations + 4 inpaint + 3 outpaint + 3 aspect-ratios + 5 comparison + 2 provenance + 3 artwork-approval + 3 engine-provisioning + 1 stage7-fixture + 4 pages + 4 placements + 3 layout-templates + 3 webtoon + 3 borders + 4 balloons + 3 lettering + 3 sfx + 3 reading-order + 3 layout-snapshots + 9 ipc + 13 security) | `tests/layout-snapshots.test.js` (3 tests): byte-identical restore (live dump hash), branch lineage leaves parent intact, typed rejections, migration v57. |
+| 2026-11-06 | S8.10 | `npm run check` | Pass | Baseline + IPC guard green (runtime/engines gitignored). |
+| 2026-11-06 | S8.10 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S8.10 implemented files:** `src/core/project/layout-snapshots.ts` (New — `createLayoutSnapshot`/`listLayoutSnapshots`/`getLayoutSnapshot`/`restoreLayoutSnapshot`; full copies of pages + placements + borders + balloons + SFX + reading order, parent lineage), `src/core/project/metadata.ts` (migration 057 layout snapshot tables), `tests/layout-snapshots.test.js` (New, 3 tests, fixture rows). SVG rendering stays S8.11.
 
 **S8.9 implemented files:** `src/core/project/reading-order.ts` (New — `setReadingOrder`/`getReadingOrder`/`moveInReadingOrder`; explicit per-page order, default fallback), `src/core/project/metadata.ts` (migration 056 reading_order), `tests/reading-order.test.js` (New, 3 tests, fixture rows). Snapshots stay S8.10.
 
@@ -2538,7 +2545,21 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S8.2:** S8.3 — Traditional layout templates (grid presets, gutters). **Status: Complete (2026-11-06, impl commit 075b8fd; 583 tests incl. 3 layout-templates). Stage 8 now 3 of 14.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S8.3:** S8.4 — Webtoon / vertical layout (continuous scroll geometry). Do not begin without explicit owner authorization.
+**Next eligible after S8.3:** S8.4 — Webtoon / vertical layout (continuous scroll geometry). **Status: Complete (2026-11-06, 586 tests incl. 3 webtoon; see §10). Stage 8 now 4 of 14.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8.4:** S8.5 — Border controls (thin/bold/none presets, mm widths). **Status: Complete (2026-11-06, 589 tests incl. 3 borders; see §10). Stage 8 now 5 of 14.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8.5:** S8.6 — Balloon shapes and tails (speech/caption/thought + anchors). **Status: Complete (2026-11-06, 593 tests incl. 4 balloons; see §10). Stage 8 now 6 of 14.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8.6:** S8.7 — Dialogue/caption editing (overlay text only). **Status: Complete (2026-11-06, 596 tests incl. 3 lettering; see §10). Stage 8 now 7 of 14.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8.7:** S8.8 — Sound effects (SFX vector lettering records). **Status: Complete (2026-11-06, 599 tests incl. 3 sfx; see §10). Stage 8 now 8 of 14.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8.8:** S8.9 — Reading order (explicit per-page order). **Status: Complete (2026-11-06, impl commit d46532b; 602 tests incl. 3 reading-order). Stage 8 now 9 of 14.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8.9:** S8.10 — Layout snapshots (full copies, parent lineage). **Status: Complete (2026-11-06, impl commit a838268; 605 tests incl. 3 layout-snapshots). Stage 8 now 10 of 14.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8.10:** S8.11 — SVG page render (deterministic vector composition). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -2679,5 +2700,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S8.7 complete. Acceptance verified (596 tests incl. 3 lettering; text round-trips, artwork untouched). Stage 8 now 7 of 14. Stopped for owner review before S8.8. | [SPEC] | Crouton (S8.7 implementation) |
 | 2026-11-06 | S8.8 complete. Acceptance verified (599 tests incl. 3 sfx; text/angle persist, artwork untouched). Stage 8 now 8 of 14. Stopped for owner review before S8.9. | [SPEC] | Crouton (S8.8 implementation) |
 | 2026-11-06 | S8.9 complete. Acceptance verified (602 tests incl. 3 reading-order; explicit order reads back, move preserves geometry). Stage 8 now 9 of 14. Stopped for owner review before S8.10. | [SPEC] | Crouton (S8.9 implementation) |
+| 2026-11-06 | S8.10 complete. Acceptance verified (605 tests incl. 3 layout-snapshots; byte-identical restore, branch lineage intact). Stage 8 now 10 of 14. Stopped for owner review before S8.11. | [SPEC] | Crouton (S8.10 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

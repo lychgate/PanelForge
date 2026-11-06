@@ -232,6 +232,30 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.10 — Layout Snapshots (2026-11-06) — [`a838268`](https://github.com/lychgate/PanelForge/commit/a838268ce0c261b0485ce657ce7135f6006f5bc8)
+
+**Added**
+
+- `src/core/project/layout-snapshots.ts` —
+  `createLayoutSnapshot`/`listLayoutSnapshots`/
+  `getLayoutSnapshot`/`restoreLayoutSnapshot`:
+  full copies of pages + placements + borders +
+  balloons + SFX + reading order with parent
+  lineage; restore replaces live layout; snapshots
+  immutable (no update/delete API).
+- Migration 057 (layout snapshot tables) in
+  `src/core/project/metadata.ts`.
+- `tests/layout-snapshots.test.js` — 3 tests:
+  byte-identical restore (live dump hash), branch
+  lineage leaves parent intact, typed rejections,
+  migration v57.
+
+**Changed**
+
+- Register: S8.10 marked **Complete**; Stage 8 now 10 of 14;
+  §11 next eligible is S8.11.
+- `Plan.md`: S8.10 checked off (2026-11-06).
+
 ### S8.9 — Reading Order (2026-11-06) — [`d46532b`](https://github.com/lychgate/PanelForge/commit/d46532b9a2c0156baedb023df9129cb21df2bf78)
 
 **Added**

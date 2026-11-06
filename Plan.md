@@ -206,7 +206,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S8.7 Dialogue/caption editing (overlay text only, artwork byte-identical) — completed 2026-11-06; Stage 8 now 7 of 14
 - [x] S8.8 Sound effects (SFX vector lettering records) — completed 2026-11-06; Stage 8 now 8 of 14
 - [x] S8.9 Reading order (explicit per-page order) — completed 2026-11-06; Stage 8 now 9 of 14
-- [ ] S8.10 Layout snapshots (full copies, parent lineage)
+- [x] S8.10 Layout snapshots (full copies, parent lineage) — completed 2026-11-06; Stage 8 now 10 of 14
 - [ ] S8.11 SVG page render (deterministic vector composition)
 - [ ] S8.12 Layout UI — hand-rolled canvas (drag/resize, keyboard alternatives, no export buttons)
 - [ ] S8.13 Traceability (pages → storyboard panels + versions)
