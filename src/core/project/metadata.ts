@@ -603,6 +603,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "ALTER TABLE balloons ADD COLUMN text TEXT NOT NULL DEFAULT ''",
     ],
   },
+  // S8.8: SFX lettering records.
+  {
+    version: 55,
+    name: "055_sfx",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS sfx (sfx_id TEXT PRIMARY KEY, placement_id TEXT NOT NULL REFERENCES page_panels(placement_id), text TEXT NOT NULL, weight TEXT NOT NULL, angle REAL NOT NULL, x REAL NOT NULL, y REAL NOT NULL, scale REAL NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
