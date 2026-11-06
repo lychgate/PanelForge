@@ -510,6 +510,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_artwork_version ON panel_artwork(panel_id, version_no)",
     ],
   },
+  // S7.7: variation job links on artwork rows.
+  {
+    version: 44,
+    name: "044_artwork_jobs",
+    statements: [
+      "ALTER TABLE panel_artwork ADD COLUMN job_id TEXT",
+      "ALTER TABLE panel_artwork ADD COLUMN variant_index INTEGER",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
