@@ -232,6 +232,30 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.11 — SVG Page Render (2026-11-06) — [`512631e`](https://github.com/lychgate/PanelForge/commit/512631ecccd9aa777c036ad7f389f0523a3f2840)
+
+**Added**
+
+- `src/core/project/svg-render.ts` —
+  `renderPageSvg`/`buildPageSvg`/`wrapText`:
+  deterministic SVG from page records; artwork
+  by reference (`href` = asset relative path),
+  borders, balloon shapes + tails, wrapped
+  balloon text, rotated SFX; placements in
+  reading order. Pure builder: identical records
+  give byte-identical SVG. Read-only, no migration.
+- `tests/svg-render.test.js` — 3 tests:
+  byte-identical render with artwork hash pinned,
+  borders + reading-order DOM order + empty page
+  + pure-builder determinism, XML escaping +
+  typed `NOT_FOUND`.
+
+**Changed**
+
+- Register: S8.11 marked **Complete**; Stage 8 now 11 of 14;
+  §11 next eligible is S8.12.
+- `Plan.md`: S8.11 checked off (2026-11-06).
+
 ### S8.10 — Layout Snapshots (2026-11-06) — [`a838268`](https://github.com/lychgate/PanelForge/commit/a838268ce0c261b0485ce657ce7135f6006f5bc8)
 
 **Added**
