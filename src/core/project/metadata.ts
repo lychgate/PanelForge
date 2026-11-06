@@ -269,6 +269,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS locations (location_id TEXT PRIMARY KEY, name TEXT NOT NULL, architecture TEXT NOT NULL, geography TEXT NOT NULL, layout TEXT NOT NULL, lighting TEXT NOT NULL, time_of_day TEXT NOT NULL, weather TEXT NOT NULL, materials TEXT NOT NULL, color_palette TEXT NOT NULL, damage_states TEXT NOT NULL, historical_variations TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S5.2: location variations (§8.5). Labels unique per
+  // location via normalized label_key; per-variation overrides
+  // default to "" = inherit from the profile.
+  {
+    version: 21,
+    name: "021_location_variations",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS location_variations (variation_id TEXT PRIMARY KEY, location_id TEXT NOT NULL REFERENCES locations(location_id), label TEXT NOT NULL, label_key TEXT NOT NULL, lighting TEXT NOT NULL, time_of_day TEXT NOT NULL, weather TEXT NOT NULL, damage_states TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_location_variations_label ON location_variations(location_id, label_key)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
