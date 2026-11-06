@@ -155,7 +155,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S6.3 Character and version assignment (S4.7 opaque IDs become real FKs; approved-only gate) — completed 2026-11-06
 - [x] S6.4 Location assignment (exact location + optional variation per panel) — completed 2026-11-06
 - [x] S6.5 Camera and shot definitions (closed vocab + free-text angle) — completed 2026-11-06
-- [ ] S6.6 Character positioning (foreground/midground/background + left/center/right guidance only)
+- [x] S6.6 Character positioning (foreground/midground/background + left/center/right guidance only) — completed 2026-11-06
 - [ ] S6.7 Dialogue, captions, actions, and expressions (editable line rows)
 - [ ] S6.8 Scene style overrides (S3.13 resolveStyle consumer; default fallback)
 - [ ] S6.9 Panel instructions (generation-ready text for Stage 7)

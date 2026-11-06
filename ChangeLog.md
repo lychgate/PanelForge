@@ -206,6 +206,27 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.6 — Character Positioning (2026-11-06) — [`bf193cb`](https://github.com/lychgate/PanelForge/commit/bf193cb3811426ace83a6b974d3f2bf8b796f8c7)
+
+**Added**
+
+- `src/core/project/panel-positions.ts` — per-assignment
+  placement guidance (`setPosition`/`getPosition`/
+  `listPositionsByPanel`): depth (foreground/midground/
+  background) + horizontal (left/center/right) + note.
+  Guidance only (§8.7), never a placement promise.
+- Migration 034 (`panel_positions` table) in
+  `src/core/project/metadata.ts`.
+- `tests/panel-positions.test.js` — 4 tests: placement per
+  assignment, replace, typed rejections, list-by-panel +
+  migration v34.
+
+**Changed**
+
+- Register: S6.6 marked **Complete**; Stage 6 now 6 of 13;
+  §11 next eligible is S6.7.
+- `Plan.md`: S6.6 checked off (2026-11-06).
+
 ### S6.5 — Camera and Shot Definitions (2026-11-06) — [`bc9cf47`](https://github.com/lychgate/PanelForge/commit/bc9cf475ebd1609aeb9a4c54cbb64e699a954fcd)
 
 **Added**
