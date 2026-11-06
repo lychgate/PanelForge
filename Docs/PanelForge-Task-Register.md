@@ -877,7 +877,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Location assignment.
 - **Acceptance:** A panel identifies its exact location (and variation when set); reassignment replaces cleanly.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.2, S6.2.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit fb0d9f3; see below)
 
 #### S6.5 Camera and shot definitions [SPEC]
 - **Goal:** Camera guidance per panel.
@@ -1720,6 +1720,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S6.3 | `DISPLAY=:0 npm test` | Pass — 480 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 9 ipc + 13 security) | `tests/panel-assignments.test.js` (5 tests): exact-version pinning on real panel rows, multi-character independence, typed rejections + approved-only gate, bound-panel delete guard, migration v31. |
 | 2026-11-06 | S6.3 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S6.3 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S6.4 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S6.4 | `npm run build` | Pass | `out/node/core/project/panel-location-assignments.js` emitted. |
+| 2026-11-06 | S6.4 | `DISPLAY=:0 npm test` | Pass — 484 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 9 ipc + 13 security) | `tests/panel-location-assignments.test.js` (4 tests): exact location + variation pinning, cross-check rejects, reassign replaces, unassign + migration v32. |
+| 2026-11-06 | S6.4 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S6.4 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S6.4 implemented files:** `src/core/project/panel-location-assignments.ts` (New — `assignLocation`/`getLocationAssignment`/`unassignLocation`; one assignment per panel, variation cross-checked), `src/core/project/metadata.ts` (migration 032 panel_location_assignments), `tests/panel-location-assignments.test.js` (New, 4 tests). Camera stays S6.5.
 
 **S6.3 implemented files:** `src/core/project/panel-assignments.ts` (New — `assignCharacter`/`getAssignment`/`listAssignmentsByPanel`/`unassignCharacter`; real panel FK, approved-only), `src/core/project/storyboard-panels.ts` (delete refuses bound panels), `src/core/project/metadata.ts` (migration 031 panel_assignments), `tests/panel-assignments.test.js` (New, 5 tests). Location assignment stays S6.4.
 
@@ -2009,7 +2016,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S6.2:** S6.3 — Character and version assignment (S4.7 opaque IDs become real FKs; approved-only gate). **Status: Complete (2026-11-06, impl commit d591362; 480 tests incl. 5 panel-assignments). Stage 6 now 3 of 13.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S6.3:** S6.4 — Location assignment (exact location + optional variation per panel). Do not begin without explicit owner authorization.
+**Next eligible after S6.3:** S6.4 — Location assignment (exact location + optional variation per panel). **Status: Complete (2026-11-06, impl commit fb0d9f3; 484 tests incl. 4 panel-location-assignments). Stage 6 now 4 of 13.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S6.4:** S6.5 — Camera and shot definitions (closed vocab + free-text angle). Do not begin without explicit owner authorization.
 **Next eligible after Stage 7 expansion:** S7.1 — ComfyUI workflow integration (see §4E Stage 7). **Status: Not Started.**
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
@@ -2114,5 +2123,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S6.1 complete. Acceptance verified (471 tests incl. 5 storyboard-scenes; source-chain wrap, extraction untouched). Stage 6 now 1 of 13. Stopped for owner review before S6.2. | [SPEC] | Crouton (S6.1 implementation) |
 | 2026-11-06 | S6.2 complete. Acceptance verified (475 tests incl. 4 storyboard-panels; sort-order append, reorder persists). Stage 6 now 2 of 13. Stopped for owner review before S6.3. | [SPEC] | Crouton (S6.2 implementation) |
 | 2026-11-06 | S6.3 complete. Acceptance verified (480 tests incl. 5 panel-assignments; exact-version pinning on real panel rows, bound-panel delete guard). Stage 6 now 3 of 13. Stopped for owner review before S6.4. | [SPEC] | Crouton (S6.3 implementation) |
+| 2026-11-06 | S6.4 complete. Acceptance verified (484 tests incl. 4 panel-location-assignments; exact location + variation pinning, cross-check rejects). Stage 6 now 4 of 13. Stopped for owner review before S6.5. | [SPEC] | Crouton (S6.4 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

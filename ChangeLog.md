@@ -206,6 +206,27 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.4 — Location Assignment (2026-11-06) — [`fb0d9f3`](https://github.com/lychgate/PanelForge/commit/fb0d9f3551efbd49cb6ba27279ceb2c9b414a0cb)
+
+**Added**
+
+- `src/core/project/panel-location-assignments.ts` —
+  assignment CRUD (`assignLocation`/`getLocationAssignment`/
+  `unassignLocation`): one location per panel, optional
+  variation cross-checked against the location; reassigning
+  replaces.
+- Migration 032 (`panel_location_assignments` table) in
+  `src/core/project/metadata.ts`.
+- `tests/panel-location-assignments.test.js` — 4 tests: exact
+  location + variation pinning, cross-check rejects,
+  reassign/unassign, migration v32.
+
+**Changed**
+
+- Register: S6.4 marked **Complete**; Stage 6 now 4 of 13;
+  §11 next eligible is S6.5.
+- `Plan.md`: S6.4 checked off (2026-11-06).
+
 ### S6.3 — Character and Version Assignment (2026-11-06) — [`d591362`](https://github.com/lychgate/PanelForge/commit/d5913624a2afe085e3851c6a43acc872ea4a9b65)
 
 **Added**
