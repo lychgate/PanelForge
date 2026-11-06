@@ -232,6 +232,28 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.4 — Webtoon / Vertical Layout (2026-11-06) — [`1aa1104`](https://github.com/lychgate/PanelForge/commit/1aa1104cce65978c39e62ca6067e13b1951a4b5f)
+
+**Added**
+
+- `src/core/project/webtoon.ts` —
+  `applyWebtoonLayout`: stacks approved panels
+  top→bottom in list order (1 per row) at adjustable
+  height, page height grows to fit; full-bleed drops
+  horizontal margins; replaces only unlabeled
+  placements.
+- `tests/webtoon.test.js` — 3 tests: vertical stack
+  in reading order with growth to 440mm,
+  traditional/empty/missing rejections, re-apply
+  replaces unlabeled only. No new migration (page
+  height via `updatePage`).
+
+**Changed**
+
+- Register: S8.4 marked **Complete**; Stage 8 now 4 of 14;
+  §11 next eligible is S8.5.
+- `Plan.md`: S8.4 checked off (2026-11-06).
+
 ### S8.3 — Traditional Layout Templates (2026-11-06) — [`075b8fd`](https://github.com/lychgate/PanelForge/commit/075b8fdbdb6b2d37c377d19ac53419798be387c7)
 
 **Added**
