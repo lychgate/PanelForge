@@ -232,6 +232,31 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.10 — Aspect Ratio Adjustment (2026-11-06) — [`aa8325f`](https://github.com/lychgate/PanelForge/commit/aa8325f0b6728d92f6887ad79d279d46845a4329)
+
+**Added**
+
+- `src/core/project/aspect-ratios.ts` —
+  `resolveAspect` (ratio validated against the style's
+  S3.11 vocabulary; dims derived area-preserving and
+  clamped to the Small GPU envelope),
+  `adjustPanelAspect` (re-dispatch = new artwork
+  version, never a resize of approved work),
+  `getPanelAspect` (stored per panel).
+- Migration 047 (`panel_aspects`) in
+  `src/core/project/metadata.ts`.
+- S7.6 engine gained backwards-compatible dims
+  passthrough in template fill.
+- `tests/aspect-ratios.test.js` — 3 tests: vocabulary
+  validation + dim derivation, ratio change dispatches
+  new dims into a new version, migration v47.
+
+**Changed**
+
+- Register: S7.10 marked **Complete**; Stage 7 now 10 of 15;
+  §11 next eligible is S7.11.
+- `Plan.md`: S7.10 checked off (2026-11-06).
+
 ### S7.9 — Outpainting (2026-11-06) — [`5a5a245`](https://github.com/lychgate/PanelForge/commit/5a5a24589faddae764fde9f32445d1cd826e26c2)
 
 **Added**
