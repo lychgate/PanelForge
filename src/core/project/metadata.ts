@@ -457,6 +457,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS snapshot_panel_character_bindings (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), binding_id TEXT NOT NULL, panel_id TEXT NOT NULL, character_id TEXT NOT NULL, version_id TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, binding_id))",
     ],
   },
+  // S6.13: OCR text copies attached to scanned-PDF manuscripts (§8.7).
+  // Indexed by source content hash so re-imports reuse saved OCR.
+  {
+    version: 38,
+    name: "038_manuscript_ocr",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS manuscript_ocr (manuscript_id TEXT PRIMARY KEY REFERENCES manuscripts(manuscript_id), source_hash TEXT NOT NULL, source_name TEXT NOT NULL, ocr_text TEXT NOT NULL, page_count INTEGER NOT NULL, engine TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_manuscript_ocr_hash ON manuscript_ocr(source_hash)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
