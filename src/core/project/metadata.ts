@@ -163,6 +163,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE INDEX IF NOT EXISTS idx_style_variants_style ON style_variants(style_id)",
     ],
   },
+  // S4.1: character profile records (§8.4). Structured-text fields
+  // (all optional except name); identity is character_id, stable
+  // across updates.
+  {
+    version: 11,
+    name: "011_characters",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS characters (character_id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL, physical_appearance TEXT NOT NULL, age TEXT NOT NULL, personality TEXT NOT NULL, clothing TEXT NOT NULL, equipment TEXT NOT NULL, distinguishing_features TEXT NOT NULL, relationships TEXT NOT NULL, timeline TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
