@@ -177,7 +177,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > files, hash-verified. See `Docs/PanelForge-Task-Register.md` §4E Stage 7
 > for full per-task spec.
 
-- [ ] S7.1 ComfyUI workflow integration (submit → poll → harvest; Small GPU honored)
+- [x] S7.1 ComfyUI workflow integration (submit → poll → harvest; Small GPU honored) — completed 2026-11-06; Stage 7 now 1 of 14
 - [ ] S7.2 Workflow templates (project files under `workflows/`, hash-verified registry)
 - [ ] S7.3 Prompt assembly (templates from S6.9 + style + reference tags; optional LM Studio polish)
 - [ ] S7.4 Negative prompt handling (per-job + style defaults, job wins)

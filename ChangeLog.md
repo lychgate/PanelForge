@@ -206,6 +206,28 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S7.1 — ComfyUI Workflow Integration (2026-11-06) — [`4edda23`](https://github.com/lychgate/PanelForge/commit/4edda237d8a8e4bade7011ceddaef8eb58be5581)
+
+**Added**
+
+- `src/engines/provider/comfyui-client.ts` — `runWorkflow`:
+  health gate (closed → typed `UNAVAILABLE`, zero
+  submissions), Small GPU envelope check (workflow dims vs
+  1024 cap → typed `ENVELOPE_EXCEEDED`, no silent
+  downscale), then exactly one adapter execution with the
+  `ProviderResult` passed through (base64 image bytes).
+- `tests/comfyui-client.test.js` — 4 tests against a
+  node:http fixture server (submit → poll → PNG bytes),
+  health-closed/unreachable typed refusals, envelope
+  refusal + typed invalid workflows. No new migration
+  (engine integration).
+
+**Changed**
+
+- Register: S7.1 marked **Complete**; Stage 7 now 1 of 14;
+  §11 next eligible is S7.2.
+- `Plan.md`: S7.1 checked off (2026-11-06).
+
 ### Stage 8 + 9 Planning — Expansion (2026-11-06)
 
 **Changed**
