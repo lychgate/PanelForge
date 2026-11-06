@@ -206,6 +206,29 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.3 — Character and Version Assignment (2026-11-06) — [`d591362`](https://github.com/lychgate/PanelForge/commit/d5913624a2afe085e3851c6a43acc872ea4a9b65)
+
+**Added**
+
+- `src/core/project/panel-assignments.ts` — assignment CRUD
+  (`assignCharacter`/`getAssignment`/`listAssignmentsByPanel`/
+  `unassignCharacter`): one approved version per
+  (panel, character) against real panel rows (S4.7 opaque IDs
+  become FKs); reassigning replaces.
+- Migration 031 (`panel_assignments` table) in
+  `src/core/project/metadata.ts`.
+- `tests/panel-assignments.test.js` — 5 tests: exact-version
+  pinning, multi-character independence, typed rejections +
+  approved-only gate, bound-panel delete guard, migration v31.
+
+**Changed**
+
+- `src/core/project/storyboard-panels.ts`: deleting a panel
+  now refuses while assigned (`BOUND_PANEL`).
+- Register: S6.3 marked **Complete**; Stage 6 now 3 of 13;
+  §11 next eligible is S6.4.
+- `Plan.md`: S6.3 checked off (2026-11-06).
+
 ### S6.2 — Storyboard Panel Records (2026-11-06) — [`5413cb4`](https://github.com/lychgate/PanelForge/commit/5413cb474c0bd64c166e6b791f9a6c13c176b5ca)
 
 **Added**
