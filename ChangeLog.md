@@ -232,6 +232,29 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.9 — Reading Order (2026-11-06) — [`d46532b`](https://github.com/lychgate/PanelForge/commit/d46532b9a2c0156baedb023df9129cb21df2bf78)
+
+**Added**
+
+- `src/core/project/reading-order.ts` —
+  `setReadingOrder`/`getReadingOrder`/
+  `moveInReadingOrder`: explicit per-page placement
+  order (validated same-page membership); unset
+  falls back to placement order; reordering never
+  moves artwork.
+- Migration 056 (`reading_order`) in
+  `src/core/project/metadata.ts`.
+- `tests/reading-order.test.js` — 3 tests: fallback
+  default, explicit reverse reads back, move without
+  geometry/z change, foreign-page rejects,
+  migration v56.
+
+**Changed**
+
+- Register: S8.9 marked **Complete**; Stage 8 now 9 of 14;
+  §11 next eligible is S8.10.
+- `Plan.md`: S8.9 checked off (2026-11-06).
+
 ### S8.8 — Sound Effects (2026-11-06) — [`c0ba121`](https://github.com/lychgate/PanelForge/commit/c0ba121a4f306f99cb9b04fc3e3073742e566251)
 
 **Added**
