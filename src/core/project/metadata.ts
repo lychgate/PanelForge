@@ -440,6 +440,23 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_instructions_panel ON panel_instructions(panel_id)",
     ],
   },
+  // S6.10: storyboard snapshots + lightweight branching (§8.7).
+  // Immutable full-copy snapshots with parent lineage.
+  {
+    version: 37,
+    name: "037_snapshots",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS storyboard_snapshots (snapshot_id TEXT PRIMARY KEY, name TEXT NOT NULL, parent_snapshot_id TEXT REFERENCES storyboard_snapshots(snapshot_id), created_at TEXT NOT NULL)",
+      "CREATE TABLE IF NOT EXISTS snapshot_panels (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), panel_id TEXT NOT NULL, scene_id TEXT NOT NULL, sort_order INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, panel_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_panel_assignments (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), assignment_id TEXT NOT NULL, panel_id TEXT NOT NULL, character_id TEXT NOT NULL, version_id TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, assignment_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_panel_location_assignments (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), assignment_id TEXT NOT NULL, panel_id TEXT NOT NULL, location_id TEXT NOT NULL, variation_id TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, assignment_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_panel_cameras (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), camera_id TEXT NOT NULL, panel_id TEXT NOT NULL, shot_type TEXT NOT NULL, angle TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, camera_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_panel_positions (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), position_id TEXT NOT NULL, assignment_id TEXT NOT NULL, depth TEXT NOT NULL, horizontal TEXT NOT NULL, note TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, position_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_panel_text (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), text_id TEXT NOT NULL, panel_id TEXT NOT NULL, dialogue TEXT NOT NULL, captions TEXT NOT NULL, actions TEXT NOT NULL, expressions TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, text_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_panel_instructions (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), instruction_id TEXT NOT NULL, panel_id TEXT NOT NULL, composition_prompt TEXT NOT NULL, background_detail TEXT NOT NULL, art_direction_notes TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, instruction_id))",
+      "CREATE TABLE IF NOT EXISTS snapshot_panel_character_bindings (snapshot_id TEXT NOT NULL REFERENCES storyboard_snapshots(snapshot_id), binding_id TEXT NOT NULL, panel_id TEXT NOT NULL, character_id TEXT NOT NULL, version_id TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (snapshot_id, binding_id))",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
