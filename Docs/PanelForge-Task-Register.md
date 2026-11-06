@@ -567,7 +567,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A suggestion cannot satisfy a canon query until explicitly promoted; contradictions surface as unknown, never merged.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.6.
 - **Stop:** Continuity scoring stays Stage 9.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S3.8 DOCX import [SPEC]
 - **Goal:** MS Word manuscripts import.

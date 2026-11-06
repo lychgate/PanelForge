@@ -130,6 +130,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS entities (entity_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), scene_id TEXT REFERENCES scenes(scene_id), entity_type TEXT NOT NULL, name TEXT NOT NULL, norm_start INTEGER NOT NULL, norm_end INTEGER NOT NULL, confidence REAL NOT NULL, source TEXT NOT NULL, created_at TEXT NOT NULL)",
     ],
   },
+  // S3.7: canon classification (§2.7). Four-way status per entity;
+  // canon queries satisfy only "explicit". Promotion is always an
+  // explicit, rationale-carrying user action.
+  {
+    version: 8,
+    name: "008_canon",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS canon (canon_id TEXT PRIMARY KEY, entity_id TEXT NOT NULL REFERENCES entities(entity_id), status TEXT NOT NULL, rationale TEXT NOT NULL, classified_at TEXT NOT NULL, promoted_at TEXT)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
