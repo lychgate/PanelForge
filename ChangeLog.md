@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.14 — Stage 3 Acceptance Fixture (2026-11-06) — [`e28eb59`](https://github.com/lychgate/PanelForge/commit/e28eb599e76ba2682bb2c60889fc866e2755756c)
+
+**Added**
+
+- `tests/stage3-fixture.test.js` — 4 acceptance tests running a
+  fixture manuscript through the full Stage 3 pipeline (S3.1 import
+  → S3.2 normalization → S3.3 chapters → S3.4 scenes → S3.5
+  relationship chain → S3.6 entities → S3.7 canon explicit vs
+  suggestion/promotion → S3.11 styles applied to a scene via S3.13
+  `resolveStyle`), plus a second CRLF text proving the same
+  guarantees. Every entity span resolves to exact original bytes;
+  the preserved original is hash-verified untouched throughout.
+
+**Changed**
+
+- Register: S3.14 marked **Complete**; Stage 3 gate passes (14 of
+  14); next stage (Stage 4 Character Studio) expands only per §16.2
+  before implementation.
+- `Plan.md`: S3.14 checked off (2026-11-06); Stage 3 complete.
+
 ### S3.13 — Style Variants + Priority Resolution (2026-11-06) — [`4efddec`](https://github.com/lychgate/PanelForge/commit/4efddec433301f93ae5e71e67199524a6974fc4b)
 
 **Added**

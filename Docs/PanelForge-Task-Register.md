@@ -636,7 +636,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** The whole Stage-3 acceptance passes on the fixture; extracted info links to source; styles apply to scenes.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.1–S3.13.
 - **Stop:** Stage gate — Character Studio (S4) begins only after this passes.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit e28eb59; see below) — **Stage 3 complete (14 of 14).**
 
 Stages 4–11 — task groups [SPEC §15]
 
@@ -1158,6 +1158,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S3.13 | `DISPLAY=:0 npm test` | Pass — 363 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 9 ipc + 13 security) | `tests/style-variants.test.js` (6 tests): CRUD validation, panel>character>scene>project, deterministic winner, locked-warning + field conflicts, silent-identical + default fallback, migration v10. |
 | 2026-11-06 | S3.13 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S3.13 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S3.14 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S3.14 | `npm run build` | Pass | `out/node/core/project/*.js` emitted. |
+| 2026-11-06 | S3.14 | `DISPLAY=:0 npm test` | Pass — 367 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 9 ipc + 13 security) | `tests/stage3-fixture.test.js` (4 tests): full pipeline import→canon with originals intact, spans resolve to exact source bytes, scene style application deterministic + guidance-only, second CRLF text with same guarantees. |
+| 2026-11-06 | S3.14 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S3.14 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S3.14 implemented files:** `tests/stage3-fixture.test.js` (New, 4 tests — Stage 3 gate). No new production code; the fixture proves S3.1–S3.13 compose end-to-end with originals preserved. Character Studio (S4) begins only after owner authorization of Stage 4 expansion per §16.2.
 
 **S3.13 implemented files:** `src/core/project/style-variants.ts` (New — `createVariant`/`listVariants`/`deleteVariant` + deterministic `resolveStyle` with conflicts + lock warnings), `src/core/project/metadata.ts` (migration 010 style_variants), `src/core/project/styles.ts` (delete cascades to variants), `tests/style-variants.test.js` (New, 6 tests). Panel instructions stay Stage 6; generation stays Stage 7.
 
@@ -1337,7 +1344,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S3.12:** S3.13 — Style variants + priority resolution (§9.1/§9.2 lock strength + conflict warnings). **Status: Complete (2026-11-06, impl commit 4efddec; 363 tests incl. 6 style-variants).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.13:** S3.14 — Stage 3 acceptance fixture (import → extract → classify → style a scene). Do not begin without explicit owner authorization.
+**Next eligible after S3.13:** S3.14 — Stage 3 acceptance fixture (import → extract → classify → style a scene). **Status: Complete (2026-11-06, impl commit e28eb59; 367 tests incl. 4 stage3-fixture). Stage 3 complete (14 of 14).** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S3.14:** Stage 4 — Character Studio (expansion per §16.2 required before implementation). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1411,5 +1420,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S3.11 complete. Acceptance verified (353 tests incl. 7 art-styles; CRUD + exactly one canonical default). Stopped for owner review before S3.12. | [SPEC] | Crouton (S3.11 implementation) |
 | 2026-11-06 | S3.12 complete. Acceptance verified (357 tests incl. 4 style-persistence; round-trip copy/restore + no absolute paths). Stopped for owner review before S3.13. | [SPEC] | Crouton (S3.12 implementation) |
 | 2026-11-06 | S3.13 complete. Acceptance verified (363 tests incl. 6 style-variants; panel>character>scene>project, deterministic winner, lock + conflicts visible). Stopped for owner review before S3.14. | [SPEC] | Crouton (S3.13 implementation) |
+| 2026-11-06 | S3.14 complete. Acceptance verified (367 tests incl. 4 stage3-fixture; full pipeline import→canon→scene style, spans resolve to source, originals intact). **Stage 3 gate passes (14 of 14).** Stopped for owner review before Stage 4 expansion. | [SPEC] | Crouton (S3.14 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
