@@ -232,6 +232,30 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.11 — Side-by-Side and Approved-Reference Comparison (2026-11-06) — [`b55d66d`](https://github.com/lychgate/PanelForge/commit/b55d66d23d127a76f27db5691bc23197d5b3f6e3)
+
+**Added**
+
+- `src/core/project/comparison.ts` — read-only compare
+  (`compareTwo`, `compareCurrentVsPrevious`,
+  `compareVsApprovedPortrait`,
+  `compareVsApprovedReferences`): all four §8.8 modes
+  return exact compared pairs with sha256 pixel-identity
+  checks; approved-reference modes resolve the approved
+  package (never the latest version's references).
+- `tests/comparison.test.js` — 5 tests: four-mode pairs,
+  newer-unapproved-ignored proof, identity check,
+  typed rejections, read-only proof. No new migration
+  (read-only compare).
+
+**Changed**
+
+- Register: S7.11 marked **Complete**; Stage 7 now 11 of 15;
+  §11 next eligible is S7.12.
+- `Plan.md`: S7.11 checked off (2026-11-06).
+- Register hygiene: nine stray "Not Started" status lines
+  removed from §4E (S7.1/S7.3–S7.10 duplicated status).
+
 ### S7.10 — Aspect Ratio Adjustment (2026-11-06) — [`aa8325f`](https://github.com/lychgate/PanelForge/commit/aa8325f0b6728d92f6887ad79d279d46845a4329)
 
 **Added**

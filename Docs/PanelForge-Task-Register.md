@@ -967,7 +967,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.12–S2.13, S2.18.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 4edda23; see below)
 - **Stop:** Templates stay S7.2; prompt assembly stays S7.3.
-- **Status:** Not Started
 
 #### S7.2 Workflow templates [SPEC]
 - **Goal:** Reusable, versioned workflow definitions.
@@ -985,7 +984,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S6.9.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 77b512d; see below)
 - **Stop:** Actual dispatch stays S7.6.
-- **Status:** Not Started
 
 #### S7.4 Negative prompt handling [SPEC]
 - **Goal:** Negative prompts as first-class job fields.
@@ -994,7 +992,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Jobs store/use the intended negative string; overrides beat defaults.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S7.3.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 41a4b7c; see below)
-- **Status:** Not Started
 
 #### S7.5 Reference conditioning [SPEC]
 - **Goal:** Approved references shape the generation.
@@ -1003,7 +1000,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Conditioned jobs name their exact reference asset IDs; unapproved refs reject.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.3, S5.3, S5.6, S7.3.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 712c2cb; see below)
-- **Status:** Not Started
 
 #### S7.6 Individual panel generation [SPEC]
 - **Goal:** One panel, one job, independently regenerated.
@@ -1012,7 +1008,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A panel generates and regenerates independently; each run produces a distinct preserved version; the job's stage chain is visible.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1, S6.3, S7.1–S7.5.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit a23ab86; see below)
-- **Status:** Not Started
 
 #### S7.7 Variations [SPEC]
 - **Goal:** N candidate artworks per job.
@@ -1021,7 +1016,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** One job yields N distinct preserved versions; each varies provenance independently.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.6, S2.18.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 9c2e172; see below)
-- **Status:** Not Started
 
 #### S7.8 Inpainting [SPEC]
 - **Goal:** Repaint selected regions.
@@ -1030,7 +1024,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Coordinate regions validate (in-bounds, non-empty); repaints preserve pixels outside regions' versions via new rows.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.6.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit b57f89a; see below)
-- **Status:** Not Started
 
 #### S7.9 Outpainting [SPEC]
 - **Goal:** Extend canvas beyond the frame.
@@ -1039,7 +1032,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Extension params validate; outpaint results are distinct preserved versions.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.6.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 5a5a245; see below)
-- **Status:** Not Started
 
 #### S7.10 Aspect ratio adjustment [SPEC]
 - **Goal:** Aspect ratios that fit the layout.
@@ -1048,7 +1040,6 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Ratios validate against the style vocabulary; ratio changes produce new versions.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S7.6.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit aa8325f; see below)
-- **Status:** Not Started
 
 #### S7.11 Side-by-side and approved-reference comparison [SPEC]
 - **Goal:** Drift is visible before approval.
@@ -1056,7 +1047,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Side-by-side comparison; approved reference comparison.
 - **Acceptance:** All four §8.8 modes return exact compared pairs; approved-reference modes use the approved package, not the latest generation.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.10, S4.8, S7.6.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit b55d66d; see below)
 
 #### S7.12 Generation provenance [SPEC]
 - **Goal:** Every artwork explains how it was born.
@@ -2063,6 +2054,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S7.10 | `DISPLAY=:0 npm test` | Pass — 558 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 4 negative-prompts + 4 reference-conditioning + 3 panel-generation + 3 variations + 4 inpaint + 3 outpaint + 3 aspect-ratios + 9 ipc + 13 security) | `tests/aspect-ratios.test.js` (3 tests): vocabulary validation + area-preserving dims, ratio change = new version with new dims dispatched, migration v47. S7.6 engine gained dims passthrough (backwards compatible). |
 | 2026-11-06 | S7.10 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S7.10 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S7.11 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S7.11 | `npm run build` | Pass | `out/node/core/project/comparison.js` emitted. |
+| 2026-11-06 | S7.11 | `DISPLAY=:0 npm test` | Pass — 563 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 4 negative-prompts + 4 reference-conditioning + 3 panel-generation + 3 variations + 4 inpaint + 3 outpaint + 3 aspect-ratios + 5 comparison + 9 ipc + 13 security) | `tests/comparison.test.js` (5 tests): all four §8.8 modes return exact pairs; portrait mode uses the approved package (newer unapproved refs ignored); pixel-identity check; read-only proof. No new migration (read-only compare). |
+| 2026-11-06 | S7.11 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S7.11 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S7.11 implemented files:** `src/core/project/comparison.ts` (New — `compareTwo`/`compareCurrentVsPrevious`/`compareVsApprovedPortrait`/`compareVsApprovedReferences`; read-only, pixel-identity via sha256), `tests/comparison.test.js` (New, 5 tests). Provenance stays S7.12. (This close-out also removed nine stray "Not Started" status lines duplicated under completed S7.1/S7.3–S7.10 in §4E.)
 
 **S7.10 implemented files:** `src/core/project/aspect-ratios.ts` (New — `resolveAspect`/`adjustPanelAspect`/`getPanelAspect`; style-vocabulary validation + new-version redispatch), `src/core/project/panel-generation.ts` (dims passthrough in template fill), `src/core/project/metadata.ts` (migration 047 panel_aspects), `tests/aspect-ratios.test.js` (New, 3 tests, fixture server). Comparisons stay S7.11.
 
@@ -2431,7 +2429,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S7.9:** S7.10 — Aspect ratio adjustment (style vocabulary; new versions only). **Status: Complete (2026-11-06, impl commit aa8325f; 558 tests incl. 3 aspect-ratios). Stage 7 now 10 of 15.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S7.10:** S7.11 — Side-by-side and approved-reference comparison. Do not begin without explicit owner authorization.
+**Next eligible after S7.10:** S7.11 — Side-by-side and approved-reference comparison. **Status: Complete (2026-11-06, impl commit b55d66d; 563 tests incl. 5 comparison). Stage 7 now 11 of 15.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S7.11:** S7.12 — Generation provenance (every artwork explains its birth). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -2558,5 +2558,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S7.8 complete. Acceptance verified (552 tests incl. 4 inpaint; regions validate, repaint = new version, base preserved). Stage 7 now 8 of 15. Stopped for owner review before S7.9. | [SPEC] | Crouton (S7.8 implementation) |
 | 2026-11-06 | S7.9 complete. Acceptance verified (555 tests incl. 3 outpaint; extension params validate, outpaint = distinct version). Stage 7 now 9 of 15. Stopped for owner review before S7.10. | [SPEC] | Crouton (S7.9 implementation) |
 | 2026-11-06 | S7.10 complete. Acceptance verified (558 tests incl. 3 aspect-ratios; vocabulary validation, ratio change = new version). Stage 7 now 10 of 15. Stopped for owner review before S7.11. | [SPEC] | Crouton (S7.10 implementation) |
+| 2026-11-06 | S7.11 complete. Acceptance verified (563 tests incl. 5 comparison; all four §8.8 modes, approved package only, read-only). Stage 7 now 11 of 15. Stopped for owner review before S7.12. | [SPEC] | Crouton (S7.11 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

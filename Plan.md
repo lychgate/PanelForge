@@ -187,7 +187,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S7.8 Inpainting (coordinate regions; no mask UI) — completed 2026-11-06; Stage 7 now 8 of 15
 - [x] S7.9 Outpainting (canvas-extension params; no mask UI) — completed 2026-11-06; Stage 7 now 9 of 15
 - [x] S7.10 Aspect ratio adjustment (style vocabulary; new versions only) — completed 2026-11-06; Stage 7 now 10 of 15
-- [ ] S7.11 Side-by-side + approved-reference comparison (all four §8.8 modes)
+- [x] S7.11 Side-by-side + approved-reference comparison (all four §8.8 modes) — completed 2026-11-06; Stage 7 now 11 of 15
 - [ ] S7.12 Generation provenance (template + hash, prompt, seed, model, timestamp)
 - [ ] S7.13 Version history, approval, and restoration (restore returns pointer, never deletes)
 - [ ] S7.14 Engine provisioning (detect-or-install under runtime/engines; user installs untouched)
