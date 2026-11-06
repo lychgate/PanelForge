@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.2 — TXT/Markdown Normalization (2026-11-05) — [`bf8d427`](https://github.com/lychgate/PanelForge/commit/bf8d4274a09457ceb50c913617d4784086b2c29e)
+
+**Added**
+
+- `src/core/project/text-normalize.ts` — reversible CRLF/CR→LF folding
+  (`normalizeManuscriptBytes` with byte-exact offset map),
+  `sourceSpanFor` + `spansReconstructOriginal`, `storeNormalization`
+  (DB row + `manuscripts/processed/` mirror), `getNormalization`.
+- Migration 004 (`normalization` table) in
+  `src/core/project/metadata.ts`.
+- `tests/text-normalize.test.js` — 5 tests: exhaustive span round-trip,
+  multi-byte offsets, empty/LF passthrough, store/get + mirror, non-txt
+  rejection. Originals untouched.
+
+**Changed**
+
+- Register: S3.2 marked **Complete**; §11 next eligible is S3.3.
+- `Plan.md`: S3.2 checked off (2026-11-05).
+
 ### S3.1 — Source Document Records (2026-11-05) — [`0ca58a5`](https://github.com/lychgate/PanelForge/commit/0ca58a54869f8ff41e15874f1aace20743c4502f)
 
 **Added**

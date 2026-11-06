@@ -77,7 +77,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > per-task Goal/Scope/Deliverables/Deps/Acceptance/Stop.
 
 - [x] S3.1 Source document records (manuscript rows + asset linkage; originals preserved) — completed 2026-11-05
-- [ ] S3.2 TXT/Markdown import + normalization (hash + offset-preserving spans)
+- [x] S3.2 TXT/Markdown import + normalization (hash + offset-preserving spans) — completed 2026-11-05
 - [ ] S3.3 Chapter extraction (deterministic heading segmentation)
 - [ ] S3.4 Scene extraction (deterministic segmentation + override framework)
 - [ ] S3.5 Source relationships (chapter→scene→span links with offset verification)

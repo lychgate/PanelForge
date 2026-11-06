@@ -522,7 +522,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Splitting and joining normalized spans reconstructs source offsets exactly; originals untouched.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.1.
 - **Stop:** DOCX/EPUB/PDF stay S3.8–S3.10 (new parser deps require explicit approval).
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; impl commit bf8d427; see below)
 
 #### S3.3 Chapter extraction [SPEC]
 - **Goal:** Deterministic chapter segmentation.
@@ -1088,6 +1088,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S3.1 | `DISPLAY=:0 npm test` | Pass — 302 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 9 ipc + 13 security) | `tests/manuscripts.test.js` (5 tests): byte-for-byte import + hash, get/list round-trip, modified/missing/unreadable verify, typed rejections, migration v3. |
 | 2026-11-05 | S3.1 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S3.1 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S3.2 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S3.2 | `npm run build` | Pass | `out/node/core/project/text-normalize.js` emitted. |
+| 2026-11-05 | S3.2 | `DISPLAY=:0 npm test` | Pass — 307 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 9 ipc + 13 security) | `tests/text-normalize.test.js` (5 tests): CRLF folding with exhaustive span round-trip, multi-byte byte offsets, empty/LF passthrough, store/get + mirror round-trip, non-txt rejection. |
+| 2026-11-05 | S3.2 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S3.2 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S3.2 implemented files:** `src/core/project/text-normalize.ts` (New — `normalizeManuscriptBytes` + `sourceSpanFor` + `spansReconstructOriginal` + `storeNormalization`/`getNormalization`), `src/core/project/metadata.ts` (migration 004 normalization table), `tests/text-normalize.test.js` (New, 5 tests). Parsers stay S3.8–S3.10.
 
 **S3.1 implemented files:** `src/core/project/manuscripts.ts` (New — `importManuscript` + `getManuscript`/`listManuscripts` + `readManuscriptOriginal` + `verifyManuscript`; extension format detection), `src/core/project/metadata.ts` (migration 003 `manuscripts` table + FK to assets), `tests/manuscripts.test.js` (New, 5 tests). Normalization S3.2; parsers S3.8–S3.10.
 
@@ -1219,7 +1226,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next task:** S3.1 — Source document records (see §4E Stage 3). **Status:** Complete (2026-11-05, impl commit 0ca58a5; 302 tests incl. 5 manuscripts). One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.1:** S3.2 — TXT/Markdown import + normalization. Do not begin without explicit owner authorization.
+**Next eligible after S3.1:** S3.2 — TXT/Markdown import + normalization. **Status: Complete (2026-11-05, impl commit bf8d427; 307 tests incl. 5 text-normalize).** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S3.2:** S3.3 — Chapter extraction (deterministic heading segmentation). Do not begin without explicit owner authorization.
 
 ---
 
@@ -1277,6 +1286,8 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.17 complete. Acceptance verified (291 tests incl. 7 cooling-down; thresholds + blocked dispatch + cooperative cool-down + resume). Stopped for owner review before S2.18. | [SPEC] | Crouton (S2.17 implementation) |
 | 2026-11-05 | S2.18 complete. Acceptance verified (297 tests incl. 6 small-gpu; 1024 budget + OOM retry + approved-art guard). **Stage 2 complete (18 of 18).** | [SPEC] | Crouton (S2.18 implementation) |
 | 2026-11-05 | Stage 3 planning: expanded to S3.1–S3.14 (owner-authorized). Owner answers: Local LLM optional (deterministic spine first; Q5 image baselines nominated at S3.6 spike); decide parsers now (smallest pure-JS surface chosen before S3.8); text-layer-only PDF, no OCR (scanned → Unknown); 14 tasks approved. | [APPROVED CHANGE — owner] | Owner (Stage 3 planning) |
+| 2026-11-05 | S3.1 complete. Acceptance verified (302 tests incl. 5 manuscripts; originals preserved byte-for-byte, hash-verified, re-openable). Stopped for owner review before S3.2. | [SPEC] | Crouton (S3.1 implementation) |
+| 2026-11-05 | S3.2 complete. Acceptance verified (307 tests incl. 5 text-normalize; offset-preserving spans reconstruct exactly; originals untouched). Stopped for owner review before S3.3. | [SPEC] | Crouton (S3.2 implementation) |
 | 2026-11-05 | S3.1 complete. Acceptance verified (302 tests incl. 5 manuscripts; originals preserved byte-for-byte, hash-verified, re-openable). Stopped for owner review before S3.2. | [SPEC] | Crouton (S3.1 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
