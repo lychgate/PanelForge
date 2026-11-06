@@ -7,6 +7,28 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.5 — MVRS Tier Config (2026-11-06) — [`9af6bdc`](https://github.com/lychgate/PanelForge/commit/9af6bdcb83f8341c68b5995685b79211712d596d)
+
+**Added**
+
+- `src/core/project/tier-config.ts` — runtime-editable tier
+  config (`getTierConfig`/`setTierRequirement`/
+  `removeTierRequirement`/`resetTierConfig`).
+- Migration 014 (`completeness_tiers` rows seeded with the §8.4
+  defaults) in `src/core/project/metadata.ts`.
+- `tests/tier-config.test.js` — 5 tests: seeded §8.4 defaults,
+  same-fixture rescore on edit, reset, validation, migration v14.
+
+**Changed**
+
+- `src/core/project/completeness.ts`: scorer now reads the
+  config table, not constants. `tests/completeness.test.js`:
+  missing-order expectation updated to the config's
+  alphabetical slot order.
+- Register: S4.5 marked **Complete**; Stage 4 now 5 of 12; §11 next
+  eligible is S4.6.
+- `Plan.md`: S4.5 checked off (2026-11-06).
+
 ### S4.4 — Reference Completeness Scoring (2026-11-06) — [`988226c`](https://github.com/lychgate/PanelForge/commit/988226c2e33441f3cad9aa6d70f40c2d6ddf2541)
 
 **Added**
