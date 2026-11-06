@@ -232,6 +232,28 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.8 — Sound Effects (2026-11-06) — [`c0ba121`](https://github.com/lychgate/PanelForge/commit/c0ba121a4f306f99cb9b04fc3e3073742e566251)
+
+**Added**
+
+- `src/core/project/sfx.ts` —
+  `createSfx`/`getSfx`/`listSfx`/`updateSfx`/
+  `deleteSfx`: SFX lettering records per placement
+  (text, weight regular|bold|heavy, angle, x/y,
+  scale), validated (SVG rendering stays S8.11;
+  artwork bytes untouched).
+- Migration 055 (`sfx`) in
+  `src/core/project/metadata.ts`.
+- `tests/sfx.test.js` — 3 tests: text/angle persist
+  round-trips, artwork bytes untouched, typed
+  invalids, migration v55.
+
+**Changed**
+
+- Register: S8.8 marked **Complete**; Stage 8 now 8 of 14;
+  §11 next eligible is S8.9.
+- `Plan.md`: S8.8 checked off (2026-11-06).
+
 ### S8.7 — Dialogue/Caption Editing (2026-11-06) — [`97607fd`](https://github.com/lychgate/PanelForge/commit/97607fdcc49badce5a4732848bc7bfc5f8d10966)
 
 **Added**
