@@ -130,7 +130,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S5.1 Location profile records (§8.5 fields + CRUD) — completed 2026-11-06
 - [x] S5.2 Location variations (identifiable states like "Ravenholt, winter, damaged") — completed 2026-11-06
 - [x] S5.3 Location reference association (exterior/interior/overview/detail/day/night/weather/damaged slots) — completed 2026-11-06
-- [ ] S5.4 Object profile records (§8.6 fields + CRUD)
+- [x] S5.4 Object profile records (§8.6 fields + CRUD) — completed 2026-11-06
 - [ ] S5.5 Object variations (states like "OmniPad, pristine/damaged")
 - [ ] S5.6 Object reference association (front/side/detail/in-use/damaged slots)
 - [ ] S5.7 Entity → location/object bridge (explicit create-from-entity; link, never auto-create)

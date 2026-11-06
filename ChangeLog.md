@@ -7,7 +7,7 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
-### S5.3 — Location Reference Association (2026-11-06) — [`b8ef842`](https://github.com/lychgate/PanelForge/commit/b8ef842defc10e0c5adbeb23da061b65f6b21f4c)
+### S5.4 — Object Profile Records (2026-11-06) — [`6f470d6`](https://github.com/lychgate/PanelForge/commit/6f470d63cdb6332ca27e6f9e9bccbff04299c494)
 
 **Added**
 
