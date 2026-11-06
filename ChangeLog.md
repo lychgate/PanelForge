@@ -7,6 +7,28 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.15 — Telemetry Adapter Interface (2026-11-05) — [`b300085`](https://github.com/lychgate/PanelForge/commit/b300085440f52fc2d55cbd74de247941c6fb0b88)
+
+**Added**
+
+- `src/engines/hardware/telemetry.ts` — `TelemetryAdapter` contract
+  (one `sample()` method), `createTelemetryRegistry` (ordered
+  `sampleAll`; throws/malformed samples normalize to unknown), OS
+  memory and NVIDIA (`nvidia-smi` CSV, first GPU) adapters, and
+  `isTelemetrySample` validation (value-only-when-detected, numbers
+  always > 0).
+- `detectHardware` now takes `telemetryAdapters`: monitoring is
+  Detected with adapter ids, otherwise Unknown.
+- `tests/telemetry-adapter.test.js` — 8 tests: registry order,
+  throw/malformed normalization, validator honesty, OS/NVIDIA
+  sampling, zero-fabrication, monitoring wiring, Resource Manager
+  decoupling.
+
+**Changed**
+
+- Register: S2.15 marked **Complete**; §11 next task is S2.16.
+- `Plan.md`: S2.15 checked off (2026-11-05).
+
 ### S2.14 — Hardware Detection (2026-11-05) — [`b35afbb`](https://github.com/lychgate/PanelForge/commit/b35afbbc432eb57cfc9a81bebd074905cc96ce5e)
 
 **Added**
