@@ -15,7 +15,7 @@
 //   (ok + base64 image bytes) passes through unchanged.
 // - Templates stay S7.2; prompt assembly stays S7.3.
 
-import type { ProviderAdapter, ProviderResult } from "./types";
+import type { ProviderAdapter, ProviderProgress, ProviderResult } from "./types";
 import type { ResourceProfile } from "../tasks/resources";
 import { resolveSmallGpuProfile } from "../tasks/smallgpu";
 
@@ -39,6 +39,7 @@ export type RunComfyWorkflowInput = {
   taskId: string;
   workflow: Record<string, unknown>;
   profile?: ResourceProfile;
+  onProgress?: (progress: ProviderProgress) => void;
 };
 
 export type ComfyWorkflowOutput = {
@@ -110,6 +111,7 @@ export async function runWorkflow(
     taskId: input.taskId,
     taskType: "image",
     params: { workflow: input.workflow },
+    onProgress: input.onProgress,
   });
   if (!result.ok) {
     return { ok: false, code: result.code as ComfyWorkflowErrorCode, message: result.message };

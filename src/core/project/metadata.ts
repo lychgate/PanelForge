@@ -500,6 +500,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS panel_conditioning (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), character_slot TEXT, character_asset_ids TEXT, location_slot TEXT, location_asset_ids TEXT, object_slot TEXT, object_asset_ids TEXT, updated_at TEXT NOT NULL)",
     ],
   },
+  // S7.6: panel generations + artwork versions.
+  {
+    version: 43,
+    name: "043_panel_generations",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_generations (generation_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), template_name TEXT NOT NULL, prompt TEXT NOT NULL, negative_prompt TEXT NOT NULL, conditioning TEXT NOT NULL, status TEXT NOT NULL, stage TEXT NOT NULL, error_code TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE TABLE IF NOT EXISTS panel_artwork (artwork_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), generation_id TEXT NOT NULL REFERENCES panel_generations(generation_id), version_no INTEGER NOT NULL, asset_id TEXT NOT NULL REFERENCES assets(asset_id), created_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_artwork_version ON panel_artwork(panel_id, version_no)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
