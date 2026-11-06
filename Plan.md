@@ -93,7 +93,30 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 ## Stage 4 — Character Studio
 
-- [ ] Stage 4 — not started
+## Stage 4 — Character Studio
+
+> Expanded planning 2026-11-06 (owner-authorized expansion, awaiting task-level
+> approval): 12 micro-tasks S4.1–S4.12, spine first (profile CRUD → version
+> records → reference association → completeness tiers/MVRS), then entity
+> bridge (link, never auto-create), version binding (opaque panel_id until
+> Stage 6), approval, generation-request records (records+approval only — no
+> live generation; ComfyUI execution stays Stage 7), comparison + history,
+> acceptance fixture last. Infra only — no model provisioning. See
+> `Docs/PanelForge-Task-Register.md` §4E Stage 4 for full per-task
+> Goal/Scope/Deliverables/Deps/Acceptance/Stop.
+
+- [ ] S4.1 Character profile records (§8.4 fields + CRUD)
+- [ ] S4.2 Character version records (independently identifiable labels)
+- [ ] S4.3 Reference asset association (portrait/front/side/rear/expression/pose/clothing/equipment slots)
+- [ ] S4.4 Reference completeness scoring (Basic / Recommended / Full tiers, missing-slot warnings)
+- [ ] S4.5 Minimum Viable Reference Set config (tiers editable, defaults = §8.4)
+- [ ] S4.6 Entity → character bridge (explicit create-from-entity; source span link; never auto-create)
+- [ ] S4.7 Character version binding (panel_id opaque until Stage 6; one exact version; wrong-version warnings)
+- [ ] S4.8 Generation approval (pending/approved/rejected gate on binding)
+- [ ] S4.9 Generation-request records (request shape + validation only; zero provider calls)
+- [ ] S4.10 Reference comparison (slot-by-slot + field diffs, read-only)
+- [ ] S4.11 Character history (append-only lifecycle replay)
+- [ ] S4.12 Stage 4 acceptance fixture (create → versions → references → tiers → approve → bind → gate)
 
 ## Stage 5 — Location and Object Studio
 

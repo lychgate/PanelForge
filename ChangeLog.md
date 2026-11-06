@@ -7,6 +7,23 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### Stage 4 Planning — Character Studio Expansion (2026-11-06)
+
+**Changed**
+
+- Register §4E: Stage 4 expanded to 12 micro-tasks S4.1–S4.12
+  (owner-authorized planning), spine first: profile CRUD, version
+  records, reference association, completeness tiers + MVRS config,
+  entity bridge, version binding, approval, generation-request
+  records, comparison + history, acceptance fixture last.
+- Owner decisions (2026-11-06): records + approval only (no live
+  generation; ComfyUI execution stays Stage 7); entity bridge links,
+  never auto-creates; panel binding table now with opaque panel_id
+  (Stage 6 populates panel records).
+- `Plan.md`: Stage 4 task list added (all Not Started).
+- **No implementation yet** — S4.1 must not begin without explicit
+  owner authorization.
+
 ### S3.14 — Stage 3 Acceptance Fixture (2026-11-06) — [`e28eb59`](https://github.com/lychgate/PanelForge/commit/e28eb599e76ba2682bb2c60889fc866e2755756c)
 
 **Added**

@@ -638,10 +638,119 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Stop:** Stage gate — Character Studio (S4) begins only after this passes.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit e28eb59; see below) — **Stage 3 complete (14 of 14).**
 
-Stages 4–11 — task groups [SPEC §15]
+**Stage 4 — Character Studio: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
+
+> Goal [SPEC]: Character profiles, visual references, version management.
+> Stage acceptance [SPEC]: multiple visual versions; every panel identifies exact version; incomplete references produce actionable warnings.
+> Structure [RECOMMENDATION]: 12 micro-tasks S4.1–S4.12, spine first (profile CRUD → version records → reference association → completeness tiers/MVRS), then entity bridge (link, never auto-create), version binding (panel_id opaque until Stage 6), approval, generation-request records, comparison + history, acceptance fixture last. Infra only — no live generation (owner decision 2026-11-06: records + approval gate only; real ComfyUI generation invoked by Stage 7), no model provisioning.
+
+#### S4.1 Character profile records [SPEC]
+- **Goal:** Durable character profiles.
+- **Scope:** `characters` table + CRUD; fields per §8.4 (name, description, physical appearance, age, personality, clothing, equipment, distinguishing features, relationships, timeline — structured text fields, all optional except name); timestamps; validation rejects empty names.
+- **Deliverables [SPEC]:** Character profile CRUD.
+- **Acceptance:** Profiles create, read back, update, delete with typed errors; name validation.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.1 (project store).
+- **Stop:** Versions stay S4.2; references stay S4.3.
+- **Status:** Not Started
+
+#### S4.2 Character version records [SPEC]
+- **Goal:** Independently identifiable visual versions per character.
+- **Scope:** `character_versions` table; version label (e.g. "Robert, age 7"), normalized label key, per-version field overrides (appearance/age/clothing at minimum); slug/label uniqueness per character; delete rules (version with binding or approved references refuses or cascades explicitly — decide at implementation, default refuse).
+- **Deliverables [SPEC]:** Character version records.
+- **Acceptance:** One character holds multiple versions; labels unique per character; foreign keys enforce character ownership.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.1.
+- **Stop:** References stay S4.3; binding stays S4.7.
+- **Status:** Not Started
+
+#### S4.3 Reference asset association [SPEC]
+- **Goal:** Link registry assets to a version with a role.
+- **Scope:** `character_version_references` table; slot kinds: portrait, front, side, rear, expression, pose, clothing, equipment (per §8.4 generation options); validated against S1.5 asset registry; maintained-record count per slot visible for S4.4.
+- **Deliverables [SPEC]:** Reference asset association.
+- **Acceptance:** Assets associate to versions by slot; unknown assets rejected; slot queries return exact sets.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.2, S1.5.
+- **Stop:** Completeness scoring stays S4.4.
+- **Status:** Not Started
+
+#### S4.4 Reference completeness scoring [SPEC]
+- **Goal:** Every version measured against its tier, with actionable warnings.
+- **Scope:** Deterministic scorer over S4.3 associations: Basic (≥1 reference), Recommended (portrait + front + ≥1 expression), Full (portrait + front/side/rear + multiple expressions + poses + clothing/equipment where applicable); returns tier-by-tier pass/missing with the exact missing slot kinds (warnings name what to add).
+- **Deliverables [SPEC]:** Reference completeness scoring.
+- **Acceptance:** Fixture versions score per tier; incomplete versions list missing slots explicitly; complete versions pass silently.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.3.
+- **Stop:** Tier config stays S4.5.
+- **Status:** Not Started
+
+#### S4.5 Minimum Viable Reference Set config [SPEC]
+- **Goal:** Tiers are configurable, not hard-coded.
+- **Scope:** Tier definitions stored as config rows (slot-kind requirements per tier) editable at runtime; scorer in S4.4 reads config, not constants; defaults match §8.4.
+- **Deliverables [SPEC]:** Minimum Viable Reference Set.
+- **Acceptance:** Changing a tier's requirements changes scoring on the same fixture; defaults equal §8.4.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.4.
+- **Stop:** Per-character-type overrides stay out of scope (spec: "may vary" — deferred).
+- **Status:** Not Started
+
+#### S4.6 Entity → character bridge [SPEC]
+- **Goal:** Profiles trace to their Stage 3 mentions, never auto-created.
+- **Scope:** Explicit "create profile from entity" action: copies entity name, records `source_entity_id` + manuscript/scene/span link (S3.5 chain); profile fields beyond name start explicitly empty (no fabrication per S3.7); duplicate creation from the same entity rejected.
+- **Deliverables [SPEC]:** (group: profile creation support)
+- **Acceptance:** A profile created from an entity keeps a resolvable link to its source span; an entity never spawns two profiles; fields outside the name are empty until the owner fills them.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.6, S4.1.
+- **Status:** Not Started
+
+#### S4.7 Character version binding [SPEC]
+- **Goal:** Every panel can identify the exact version it uses.
+- **Scope:** `panel_character_bindings` table: panel_id (opaque ID until Stage 6 panel records exist, mirroring S3.13 scope_ref convention) + character_version_id; one binding per (panel, character) pair; wrong-version warning helper (bound version's age/appearance vs panel's stated era — helper returns mismatch candidates for Stage 6/9 to call).
+- **Deliverables [SPEC]:** Character version binding.
+- **Acceptance:** A binding returns the exact version ID; rebinding replaces; version deletion while bound is refused; mismatch helper flags age conflicts on fixture data.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.2.
+- **Stop:** Panel records stay Stage 6; continuity checks stay Stage 9.
+- **Status:** Not Started
+
+#### S4.8 Generation approval [SPEC]
+- **Goal:** Approval status gates what can bind.
+- **Scope:** Per-version approval state (pending / approved / rejected) with approver rationale + timestamp; only approved versions may be newly bound in S4.7 (existing bindings survive a later rejection but warn); approved work is never silently replaced (S1-era ownership guardrail).
+- **Deliverables [SPEC]:** Generation approval.
+- **Acceptance:** Rejected/pending versions cannot be bound; approval decisions are recorded; existing bindings on a later-rejected version warn.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.2, S4.7.
+- **Status:** Not Started
+
+#### S4.9 Generation-request records [SPEC]
+- **Goal:** Stage 4 records generation requests; it never generates.
+- **Scope:** `generation_requests` table (character/version/slot prompt inputs + result asset link when one exists); validation of request shape against Stage 2 provider contracts (comfyui/lmstudio adapters consume this shape later); no execution, no model calls in this task.
+- **Deliverables [SPEC]:** (group: character reference generation — request side only, per owner decision 2026-11-06)
+- **Acceptance:** Requests validate/store/list; malformed requests rejected; zero provider calls made.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.3, S2.13.
+- **Stop:** Live ComfyUI execution stays Stage 7.
+- **Status:** Not Started
+
+#### S4.10 Reference comparison [SPEC]
+- **Goal:** Side-by-side version compare before approval.
+- **Scope:** Read-only compare of two versions of one character: slot-by-slot reference sets, approval states, field diffs; no mutation.
+- **Deliverables [SPEC]:** Reference comparison.
+- **Acceptance:** Comparison names slot differences and field diffs exactly; identical versions compare clean.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.2–S4.4.
+- **Status:** Not Started
+
+#### S4.11 Character history [SPEC]
+- **Goal:** Every change to a character/version is traceable.
+- **Scope:** Append-only history rows (created/updated/approved/rejected/bound/rebound) with timestamps and actor payload; queryable per character and per version; history never edited or deleted (except with the character).
+- **Deliverables [SPEC]:** Character history.
+- **Acceptance:** A fixture lifecycle (create → version → reference → approve → bind) replays in order from history.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.1–S4.10.
+- **Status:** Not Started
+
+#### S4.12 Stage 4 acceptance fixture [SPEC]
+- **Goal:** End-to-end proof of Stage 4.
+- **Scope:** Fixture character (from a Stage 3 entity + manual profile) → multiple versions → references → completeness tiers → approval → binding → comparison → history; incomplete references warn with missing slots; originals/approved work untouched throughout.
+- **Deliverables [SPEC]:** Stage 4 fixture.
+- **Acceptance:** The whole Stage-4 acceptance passes on the fixture; every panel binding identifies an exact approved version; incomplete references produce actionable warnings.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.1–S4.11.
+- **Stop:** Stage gate — Location and Object Studio (S5) begins only after this passes.
+- **Status:** Not Started
+
+Stages 5–11 — task groups [SPEC §15]
 
 All groups: **Completeness Incomplete; Status Needs Clarification.** Each must be expanded per §16.2 before implementation.
-- **Stage 4 — Character Studio.** Goal: Character profiles, visual references, version management. Acceptance: multiple visual versions; every panel identifies exact version; incomplete references produce actionable warnings. Groups: CRUD, version records, reference association, completeness scoring (§8.4 tiers), minimum viable reference set, generation, approval, binding, comparison, history.
 - **Stage 5 — Location and Object Studio.** Goal: Reusable visual references. Acceptance: locations/objects independently created/edited/referenced/regenerated. Groups: location profiles/variations, object profiles/variations, asset history, generation integration.
 - **Stage 6 — Storyboard Studio.** Goal: Scenes → editable panel sequences. Acceptance: storyboard editable without artwork; every panel identifies source scene + character versions; storyboard changes don't silently modify approved artwork. Groups: scene/panel records, character/version/location assignment, camera/shot, positioning, dialogue/captions, style overrides, panel instructions, snapshots, lightweight branching, composition review.
 - **Stage 7 — Art Studio.** Goal: Generate/review/compare/approve individual artworks. Acceptance: independent generation/regeneration; history retained; approved work preserved; provenance stored. Groups: ComfyUI workflow integration/templates, prompt/negative/reference conditioning, individual generation, variations, inpaint/outpaint, side-by-side and approved-reference comparison (§8.8), provenance (§12), version history, approval/restoration, dependency tracking (§11.5).
@@ -1346,7 +1455,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S3.13:** S3.14 — Stage 3 acceptance fixture (import → extract → classify → style a scene). **Status: Complete (2026-11-06, impl commit e28eb59; 367 tests incl. 4 stage3-fixture). Stage 3 complete (14 of 14).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.14:** Stage 4 — Character Studio (expansion per §16.2 required before implementation). Do not begin without explicit owner authorization.
+**Next eligible after S3.14:** Stage 4 — Character Studio, **EXPANDED to S4.1–S4.12 (owner-authorized planning 2026-11-06; owner answers: records+approval only, link-never-create, binding table now — see §12)**. Do not begin S4.1 implementation without explicit owner authorization of S4.1. One-task-at-a-time (approved) stops here.
+
+**Next eligible after Stage 4 expansion:** S4.1 — Character profile records (see §4E Stage 4). **Status: Not Started.**
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1421,5 +1532,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S3.12 complete. Acceptance verified (357 tests incl. 4 style-persistence; round-trip copy/restore + no absolute paths). Stopped for owner review before S3.13. | [SPEC] | Crouton (S3.12 implementation) |
 | 2026-11-06 | S3.13 complete. Acceptance verified (363 tests incl. 6 style-variants; panel>character>scene>project, deterministic winner, lock + conflicts visible). Stopped for owner review before S3.14. | [SPEC] | Crouton (S3.13 implementation) |
 | 2026-11-06 | S3.14 complete. Acceptance verified (367 tests incl. 4 stage3-fixture; full pipeline import→canon→scene style, spans resolve to source, originals intact). **Stage 3 gate passes (14 of 14).** Stopped for owner review before Stage 4 expansion. | [SPEC] | Crouton (S3.14 implementation) |
+| 2026-11-06 | Stage 4 planning: expanded to S4.1–S4.12 (owner-authorized). Owner answers: records+approval only (no live generation; ComfyUI execution stays Stage 7); entity bridge links, never auto-creates; panel binding table now (opaque panel_id, Stage 6 populates). 12 tasks approved for planning; **do not begin S4.1 without explicit owner authorization.** | [APPROVED CHANGE — owner] | Crouton (Stage 4 planning) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
