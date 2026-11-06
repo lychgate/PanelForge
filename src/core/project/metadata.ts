@@ -250,6 +250,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_generation_requests_slot ON generation_requests(version_id, slot)",
     ],
   },
+  // S4.11: character history (§8.4). Append-only — rows deleted
+  // only with their character (FK cascade).
+  {
+    version: 19,
+    name: "019_character_history",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS character_history (history_id TEXT PRIMARY KEY, character_id TEXT NOT NULL REFERENCES characters(character_id) ON DELETE CASCADE, version_id TEXT REFERENCES character_versions(version_id), event TEXT NOT NULL, detail TEXT NOT NULL, created_at TEXT NOT NULL)",
+      "CREATE INDEX IF NOT EXISTS idx_character_history_character ON character_history(character_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
