@@ -195,7 +195,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 ## Stage 8 — Comic Layout Studio (expanded 2026-11-06: S8.1–S8.14)
 
-> Owner decisions: SVG vector-first pages (raster at Stage 10); lettering as overlay records, baked at export; React framework for the layout canvas; PDF library pdfkit.
+> Owner decisions: SVG vector-first pages (raster at Stage 10); lettering as overlay records, baked at export; hand-rolled HTML/CSS + TypeScript UI (owner 2026-11-06: no framework — consistent with S6.11); PDF library pdfkit.
 
 - [ ] S8.1 Page records (format traditional|webtoon, size, margin)
 - [ ] S8.2 Panel placement (mm geometry, artwork by asset reference)
@@ -208,7 +208,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [ ] S8.9 Reading order (explicit per-page order)
 - [ ] S8.10 Layout snapshots (full copies, parent lineage)
 - [ ] S8.11 SVG page render (deterministic vector composition)
-- [ ] S8.12 Layout UI — React canvas (drag/resize, keyboard alternatives, no export buttons)
+- [ ] S8.12 Layout UI — hand-rolled canvas (drag/resize, keyboard alternatives, no export buttons)
 - [ ] S8.13 Traceability (pages → storyboard panels + versions)
 - [ ] S8.14 Stage 8 acceptance fixture (both formats, lettering editable, artwork untouched)
 

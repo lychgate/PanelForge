@@ -13,8 +13,8 @@ deferral (below).
 > `src/core/ipc/registry.ts`). The IPC guard in `scripts/check.js`
 > enforces that `ipcMain` lives only in the registry and
 > `ipcRenderer` only in preload. CSP remains deferred until the UI
-> framework + asset-loader work (framework now chosen: React for the
-> Stage 8 canvas; final policy still pending — see §4 and register D3).
+> asset-loader work (owner 2026-11-06: no framework — hand-rolled
+> HTML/CSS stays; final policy still pending — see §4 and register D3).
 
 ## 1. webPreferences baseline (verified by tests)
 

@@ -1088,7 +1088,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 
 > Goal [SPEC]: Assemble approved artwork into finished pages.
 > Stage acceptance [SPEC]: page assembled without modifying original artwork; dialogue/captions editable; traditional + vertical formats work.
-> Owner decisions (2026-11-06): pages are composed as SVG vector first (raster only at Stage 10 export); balloons/SFX are overlay records, baked into raster only at Stage 10 (SPEC §8.9: text not baked into artwork); layout UI introduces a lightweight framework (React) for the canvas drag/zoom work, ending the hand-rolled era from S6.11; PDF library **pdfkit** chosen early (§14) for Stage 10.
+> Owner decisions (2026-11-06): pages are composed as SVG vector first (raster only at Stage 10 export); balloons/SFX are overlay records, baked into raster only at Stage 10 (SPEC §8.9: text not baked into artwork); layout UI stays hand-rolled HTML/CSS + TypeScript (owner 2026-11-06: no framework — editable by anyone, consistent with S6.11); PDF library **pdfkit** chosen early (§14) for Stage 10.
 > Spine-first: records + vector composition before interactive canvas.
 
 #### S8.1 Page records [SPEC]
@@ -1179,9 +1179,9 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.2–S8.9.
 - **Status:** Not Started
 
-#### S8.12 Layout UI (React canvas) [SPEC]
+#### S8.12 Layout UI (hand-rolled canvas) [SPEC]
 - **Goal:** Read/edit pages interactively with artwork.
-- **Scope:** React renderer surface: page list, canvas with drag/resize placement + balloon/SFX position, tail retarget, border picker, text edit, reading-order list; keyboard-navigable alternatives for every pointer action; new IPC channels (S0.4 allowlist); no export buttons (Stage 10).
+- **Scope:** Hand-rolled renderer surface (HTML/CSS/TypeScript, same approach as S6.11 — no framework): page list, canvas with drag/resize placement + balloon/SFX position, tail retarget, border picker, text edit, reading-order list; keyboard-navigable alternatives for every pointer action; new IPC channels (S0.4 allowlist); no export buttons (Stage 10).
 - **Deliverables [SPEC]:** Layout UI surface.
 - **Acceptance:** A page edits fully without opening the filesystem; artwork hashes unchanged.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.1–S8.11.
@@ -1293,7 +1293,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 
 #### S9.11 QA review UI [SPEC]
 - **Goal:** Read warnings and suppress without leaving the studio.
-- **Scope:** Renderer review surface (extends S8.12 React canvas host): warning list grouped by severity, scene/panel links, suppress/unsuppress; checks are read-only (never rewrite data).
+- **Scope:** Renderer review surface (extends S8.12 hand-rolled canvas host): warning list grouped by severity, scene/panel links, suppress/unsuppress; checks are read-only (never rewrite data).
 - **Deliverables [SPEC]:** QA review surface.
 - **Acceptance:** Warnings viewable + suppressible; data unchanged by review.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S9.8–S9.10.
@@ -1358,7 +1358,7 @@ Dependencies below are **[RECOMMENDATION]** inferred from spec ordering where [S
 | 23 | S1.11 | S1.1–S1.10 | Sample created/copied/reopened/backed up/restored/verified — **STOP GATE** |
 | 24+ | Stage 2+ | Spec gates above | Expand groups to per-task spec (Goal/Deliverables/Acceptance/Deps/Stop) before any code; then follow spec order |
 | 25 | S7.1–S7.15 (planned) | S6.13 gate | Live ComfyUI execution + detect-or-install provisioning; each task needs owner authorization |
-| 26 | S8.1–S8.14 (planned) | S7.15 gate | Layout records + SVG-first pages; React canvas; no export (Stage 10) |
+| 26 | S8.1–S8.14 (planned) | S7.15 gate | Layout records + SVG-first pages; hand-rolled canvas; no export (Stage 10) |
 | 27 | S9.1–S9.12 (planned) | S8.14 gate | Read-only QA checks; tunable thresholds; suppression auditable |
 
 Stage gates [SPEC]: Do not begin Character Studio or real ComfyUI integration until Stage 0 + Stage 1 are complete. Placeholders/mocks only to validate architecture (§16.5).
@@ -2458,6 +2458,7 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S6.12 complete. Acceptance verified (519 tests incl. 5 composition-review; planted gaps named + fixes, clean silent). Stage 6 now 12 of 13. Stopped for owner review before S6.13. | [SPEC] | Crouton (S6.12 implementation) |
 | 2026-11-06 | S6.13 complete. Acceptance verified (522 tests incl. 3 stage6-fixture; real chapter OCR'd once, full pipeline, artwork byte-identical). Stage 6 gate passes 13/13. Stopped for owner review before Stage 7. | [SPEC] | Crouton (S6.13 implementation) |
 | 2026-11-06 | Stages 8 + 9 expanded (S8.1–S8.14, S9.1–S9.12; owner-authorized planning). Owner decisions: SVG vector-first pages; lettering overlay, baked at export; React framework for S8 canvas; pdfkit for PDF; tunable QA thresholds. Docs audited (register §4E/§5/§12, Plan.md, README, ChangeLog, Project-Format, Security-Baseline, Shortcuts); S0/S1-era docs left as historical record. | [SPEC] | Crouton (planning) |
+| 2026-11-06 | Stage 8 amendment: React removed from all plans (owner 2026-11-06 — hand-rolled HTML/CSS + TypeScript only, consistent with S6.11; editable by anyone). S8 stage header, S8.12 scope, S9.11 host note, §5 gate row, Plan.md, and Security-Baseline note updated; historical §12/ChangeLog lines untouched. | [APPROVED CHANGE — owner] | Crouton (planning) |
 | 2026-11-06 | S7.1 complete. Acceptance verified (526 tests incl. 4 comfyui-client; fixture-server round-trip, health-gate refusal, envelope). Stage 7 now 1 of 14. Stopped for owner review before S7.2. | [SPEC] | Crouton (S7.1 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

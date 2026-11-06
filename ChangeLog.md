@@ -206,6 +206,18 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### Stage 8 Amendment — Hand-Rolled UI (2026-11-06)
+
+**Changed**
+
+- React removed from all plans (owner 2026-11-06):
+  Stage 8 layout UI stays hand-rolled HTML/CSS +
+  TypeScript, consistent with S6.11 — editable without any
+  framework expertise.
+- Register §4E (S8 header, S8.12 scope, S9.11 host, §5 row),
+  `Plan.md`, and Security-Baseline CSP note updated;
+  historical planning lines untouched.
+
 ### Stage 7 Amendment — Engine Provisioning (2026-11-06)
 
 **Changed**
