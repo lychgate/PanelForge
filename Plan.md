@@ -190,7 +190,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S7.11 Side-by-side + approved-reference comparison (all four §8.8 modes) — completed 2026-11-06; Stage 7 now 11 of 15
 - [x] S7.12 Generation provenance (template + hash, prompt, seed, model, timestamp) — completed 2026-11-06; Stage 7 now 12 of 15
 - [x] S7.13 Version history, approval, and restoration (restore returns pointer, never deletes) — completed 2026-11-06; Stage 7 now 13 of 15
-- [ ] S7.14 Engine provisioning (detect-or-install under runtime/engines; user installs untouched)
+- [x] S7.14 Engine provisioning (detect-or-install under runtime/engines; user installs untouched) — completed 2026-11-06; Stage 7 now 14 of 15
 - [ ] S7.15 Stage 7 acceptance fixture (brief → artwork → approve; approved work preserved)
 
 ## Stage 8 — Comic Layout Studio (expanded 2026-11-06: S8.1–S8.14)

@@ -232,6 +232,32 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.14 — Engine Provisioning (2026-11-06) — [`23794a1`](https://github.com/lychgate/PanelForge/commit/23794a142e154fa7bbaf9ca8fb1bd16917e972f0)
+
+**Added**
+
+- `src/engines/provider/provisioning.ts` —
+  `detectEngines`/`ensureEngine`: S2-adapter health
+  probes; reachable user installs used in place and
+  never modified (source `detected`); absent +
+  declined → typed `ENGINE_MISSING` with manual
+  instructions; confirmed install downloads into
+  `runtime/engines/<engine>` (gitignored, machine-
+  local) and records source `bundled` in
+  `registry.json`. Model/checkpoint provisioning
+  stays manual (owner choice).
+- `tests/engine-provisioning.test.js` — 3 tests:
+  detect-in-place (no install writes), decline typed
+  refusal, confirmed bundled install, all against
+  fixture servers. No new migration (machine-local
+  registry).
+
+**Changed**
+
+- Register: S7.14 marked **Complete**; Stage 7 now 14 of 15;
+  §11 next eligible is S7.15.
+- `Plan.md`: S7.14 checked off (2026-11-06).
+
 ### S7.13 — Version History, Approval, and Restoration (2026-11-06) — [`6089d2b`](https://github.com/lychgate/PanelForge/commit/6089d2bc5396878f71f12ea61116744bd106b835)
 
 **Added**
