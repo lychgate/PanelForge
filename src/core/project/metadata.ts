@@ -78,6 +78,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS assets (asset_id TEXT PRIMARY KEY, relative_path TEXT NOT NULL UNIQUE, asset_type TEXT NOT NULL, file_hash TEXT NOT NULL, file_size INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S3.1: source document records. Each row describes one imported
+  // manuscript (title, format, byte size, content hash, timestamps);
+  // the preserved original lives in the asset registry (manuscripts/
+  // original/) and is linked by asset_id. FK keeps the link honest.
+  {
+    version: 3,
+    name: "003_manuscripts",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS manuscripts (manuscript_id TEXT PRIMARY KEY, title TEXT NOT NULL, format TEXT NOT NULL, asset_id TEXT NOT NULL REFERENCES assets(asset_id), relative_path TEXT NOT NULL UNIQUE, byte_size INTEGER NOT NULL, content_hash TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {

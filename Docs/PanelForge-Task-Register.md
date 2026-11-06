@@ -513,7 +513,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Imported originals are preserved byte-for-byte, hash-verifiable, and re-openable from project storage.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.5/S1.6 (asset registry/integrity).
 - **Stop:** Text normalization stays S3.2; parsers stay S3.8–S3.10.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S3.2 TXT/Markdown import + normalization [SPEC]
 - **Goal:** Plain-text manuscripts import with offset-preserving spans.
