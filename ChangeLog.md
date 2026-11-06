@@ -206,6 +206,27 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.12 — Composition Review (2026-11-06) — [`98ff4b3`](https://github.com/lychgate/PanelForge/commit/98ff4b3b0234ede95d9891f8d1157232fca7a45c)
+
+**Added**
+
+- `src/core/project/composition-review.ts` — read-only
+  `reviewBoard`: 6 warning kinds (missing-character,
+  missing-location, unapproved-bound, era-mismatch,
+  empty-dialogue, duplicate-slot), each naming the panel
+  with an actionable fix; clean storyboards return no
+  warnings.
+- `tests/composition-review.test.js` — 5 tests: clean
+  silent, planted gaps named + fixes, revoked approval,
+  bound-vs-assigned era mismatch, duplicate slots +
+  unknown scene + read-only proof. No new migration.
+
+**Changed**
+
+- Register: S6.12 marked **Complete**; Stage 6 now 12 of 13;
+  §11 next eligible is S6.13.
+- `Plan.md`: S6.12 checked off (2026-11-06).
+
 ### S6.11 — Minimal Storyboard UI (2026-11-06) — [`0870cdf`](https://github.com/lychgate/PanelForge/commit/0870cdff8ee7e94dbc5f8ff2d9d31e7649fa655d)
 
 **Added**
