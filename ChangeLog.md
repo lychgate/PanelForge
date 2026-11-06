@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.6 — Object Reference Association (2026-11-06) — [`e21548a`](https://github.com/lychgate/PanelForge/commit/e21548a1840e02fa134fd9907ad6249c640625d1)
+
+**Added**
+
+- `src/core/project/object-references.ts` — §8.6 reference
+  association (`associateReference`/`getReference`/
+  `listReferencesByVariation`/`listReferencesBySlot`/
+  `removeReference`): S1.5-registry-validated assets bound to a
+  variation under one of five slot kinds (front, side, detail,
+  in-use, damaged); an asset may serve any number of
+  variations/slots.
+- Migration 025 (`object_references` table) in
+  `src/core/project/metadata.ts`.
+- `tests/object-references.test.js` — 5 tests: association by
+  slot with registry validation, typed rejections, all five
+  slots, multi-variation asset reuse, remove + migration v25.
+
+**Changed**
+
+- Register: S5.6 marked **Complete**; Stage 5 now 6 of 10;
+  §11 next eligible is S5.7.
+- `Plan.md`: S5.6 checked off (2026-11-06).
+
 ### S5.5 — Object Variations (2026-11-06) — [`3fe1e2b`](https://github.com/lychgate/PanelForge/commit/3fe1e2b994956232217d232473279ddf12864148)
 
 **Added**
