@@ -89,6 +89,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS manuscripts (manuscript_id TEXT PRIMARY KEY, title TEXT NOT NULL, format TEXT NOT NULL, asset_id TEXT NOT NULL REFERENCES assets(asset_id), relative_path TEXT NOT NULL UNIQUE, byte_size INTEGER NOT NULL, content_hash TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S3.2: TXT/MD normalization. One row per manuscript: the normalized
+  // text plus a JSON char-offset map (normalized index → source byte
+  // offset), so every normalized span links back to the original bytes.
+  {
+    version: 4,
+    name: "004_normalization",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS normalization (manuscript_id TEXT PRIMARY KEY REFERENCES manuscripts(manuscript_id), normalized_text TEXT NOT NULL, offset_map TEXT NOT NULL, created_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {

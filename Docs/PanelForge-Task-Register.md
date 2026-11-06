@@ -522,7 +522,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Splitting and joining normalized spans reconstructs source offsets exactly; originals untouched.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.1.
 - **Stop:** DOCX/EPUB/PDF stay S3.8–S3.10 (new parser deps require explicit approval).
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S3.3 Chapter extraction [SPEC]
 - **Goal:** Deterministic chapter segmentation.
