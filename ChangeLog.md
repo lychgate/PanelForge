@@ -232,6 +232,29 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.6 — Balloons + Tails (2026-11-06) — [`b813894`](https://github.com/lychgate/PanelForge/commit/b8138945dd5518141d6363450701c11748b6cab2)
+
+**Added**
+
+- `src/core/project/balloons.ts` —
+  `createBalloon`/`getBalloon`/`listBalloons`/
+  `retargetTail`/`deleteBalloon`/`checkBalloon`:
+  kinds speech|caption|thought, shapes
+  ellipse|rounded|rect, tail anchor + visibility;
+  `checkBalloon` warns on orphan tails (anchor
+  outside placement), never crashes.
+- Migration 053 (`balloons`) in
+  `src/core/project/metadata.ts`.
+- `tests/balloons.test.js` — 4 tests: persistence
+  with tails, retarget/delete, orphan warnings
+  (anchored silent), typed invalids, migration v53.
+
+**Changed**
+
+- Register: S8.6 marked **Complete**; Stage 8 now 6 of 14;
+  §11 next eligible is S8.7.
+- `Plan.md`: S8.6 checked off (2026-11-06).
+
 ### S8.5 — Borders (2026-11-06) — [`42cfc6c`](https://github.com/lychgate/PanelForge/commit/42cfc6c305a8f51bfb61813201d963b77b3a3030)
 
 **Added**
