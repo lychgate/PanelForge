@@ -7,6 +7,28 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.2 — Character Version Records (2026-11-06) — [`4dc3c8c`](https://github.com/lychgate/PanelForge/commit/4dc3c8cc59129729e6dd8a60abaf313bfdedb836)
+
+**Added**
+
+- `src/core/project/character-versions.ts` — §8.4 version CRUD
+  (`createVersion`/`getVersion`/`listVersions`/`updateVersion`/
+  `deleteVersion`): labels unique per character (case-insensitive),
+  per-version overrides (appearance/age/clothing) defaulting to `""`
+  = inherit from the profile; identity stable across updates.
+- Migration 012 (`character_versions` table + unique index) in
+  `src/core/project/metadata.ts`.
+- `tests/character-versions.test.js` — 5 tests: multiple versions
+  per character, per-character label uniqueness, FK + validation,
+  override inheritance, rename collision, list/delete + migration
+  v12.
+
+**Changed**
+
+- Register: S4.2 marked **Complete**; Stage 4 now 2 of 12; §11 next
+  eligible is S4.3.
+- `Plan.md`: S4.2 checked off (2026-11-06).
+
 ### S4.1 — Character Profile Records (2026-11-06) — [`ef87547`](https://github.com/lychgate/PanelForge/commit/ef875476b685ff9318df2b2b66f6f44a3144aa88)
 
 **Added**

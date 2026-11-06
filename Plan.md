@@ -104,7 +104,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > Goal/Scope/Deliverables/Deps/Acceptance/Stop.
 
 - [x] S4.1 Character profile records (§8.4 fields + CRUD) — completed 2026-11-06
-- [ ] S4.2 Character version records (independently identifiable labels)
+- [x] S4.2 Character version records (independently identifiable labels) — completed 2026-11-06
 - [ ] S4.3 Reference asset association (portrait/front/side/rear/expression/pose/clothing/equipment slots)
 - [ ] S4.4 Reference completeness scoring (Basic / Recommended / Full tiers, missing-slot warnings)
 - [ ] S4.5 Minimum Viable Reference Set config (tiers editable, defaults = §8.4)
