@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.12 — Style Profile Persistence (2026-11-06) — [`c15a1d2`](https://github.com/lychgate/PanelForge/commit/c15a1d2c8e584b4eb9728afc65e68346496f20b6)
+
+**Added**
+
+- `src/core/project/style-persistence.ts` — read-only portability
+  verification for S3.11 style profiles: `verifyStylePortability`
+  (registry lookup per reference asset, portable-path check per S1.4,
+  in-project existence), `isPortablePath` (rejects absolute paths and
+  drive letters, `/`-separated relative paths only),
+  `StylePersistenceError` for non-project roots.
+- `tests/style-persistence.test.js` — 4 tests: portability pass/fail,
+  snapshot create → restore round-trip to a new path, plain copy to
+  a new path reopens identically, no machine-specific absolute paths
+  in style rows.
+
+**Changed**
+
+- Register: S3.12 marked **Complete**; §11 next eligible is S3.13.
+- `Plan.md`: S3.12 checked off (2026-11-06).
+
 ### S3.11 — Art Style Manager (2026-11-06) — [`ecb26a6`](https://github.com/lychgate/PanelForge/commit/ecb26a603bba9d8916908fd20798aa549643434e)
 
 **Added**

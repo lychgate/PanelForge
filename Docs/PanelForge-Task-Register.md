@@ -618,7 +618,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Styles round-trip through copy/restore; no absolute paths stored.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S1.9.
 - **Stop:** Scene application is S3.13.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit c15a1d2; see below)
 
 #### S3.13 Style variants + priority resolution [SPEC]
 - **Goal:** Predictable conflict resolution (§9.1/§9.2).
@@ -1147,6 +1147,14 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S3.11 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S3.11 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
 
+| 2026-11-06 | S3.12 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S3.12 | `npm run build` | Pass | `out/node/core/project/style-persistence.js` emitted. |
+| 2026-11-06 | S3.12 | `DISPLAY=:0 npm test` | Pass — 357 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 9 ipc + 13 security) | `tests/style-persistence.test.js` (4 tests): portability pass/fail, snapshot restore round-trip, plain-copy reopen, no absolute paths in style rows. |
+| 2026-11-06 | S3.12 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S3.12 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S3.12 implemented files:** `src/core/project/style-persistence.ts` (New — `verifyStylePortability` + `isPortablePath`, read-only; unregistered/missing/non-portable reference detection), `tests/style-persistence.test.js` (New, 4 tests). Scene application stays S3.13.
+
 **S3.11 implemented files:** `src/core/project/styles.ts` (New — `createStyle`/`updateStyle`/`deleteStyle` + `setDefaultStyle` + `getStyle`/`listStyles`/`getDefaultStyle`; partial unique index for one default), `src/core/project/metadata.ts` (migration 009 styles table), `tests/art-styles.test.js` (New, 7 tests). Generation consumption stays Stage 7.
 
 **S3.10 implemented files:** `src/core/project/pdf-import.ts` (New — zero-dependency `extractPdfStreams` + `extractContentStream` + `extractPdfText` + `importPdfManuscript`; Tj/TJ + ToUnicode subset; scanned→Unknown), `tests/pdf-import.test.js` (New, 5 tests). OCR deferred by design.
@@ -1317,7 +1325,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). **Status: Complete (2026-11-06, impl commit ecb26a6; 353 tests incl. 7 art-styles).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.11:** S3.12 — Style profile persistence (project store + asset references). Do not begin without explicit owner authorization.
+**Next eligible after S3.11:** S3.12 — Style profile persistence (project store + asset references). **Status: Complete (2026-11-06, impl commit c15a1d2; 357 tests incl. 4 style-persistence).** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S3.12:** S3.13 — Style variants + priority resolution (§9.1/§9.2 lock strength + conflict warnings). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1389,5 +1399,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S3.9 complete. Acceptance verified (341 tests incl. 4 epub-import; spine-ordered, originals preserved). Stopped for owner review before S3.10. | [SPEC] | Crouton (S3.9 implementation) |
 | 2026-11-05 | S3.10 complete. Acceptance verified (346 tests incl. 5 pdf-import; twin-verified, scanned→Unknown explicit, zero new dependencies). Stopped for owner review before S3.11. | [SPEC] | Crouton (S3.10 implementation) |
 | 2026-11-06 | S3.11 complete. Acceptance verified (353 tests incl. 7 art-styles; CRUD + exactly one canonical default). Stopped for owner review before S3.12. | [SPEC] | Crouton (S3.11 implementation) |
+| 2026-11-06 | S3.12 complete. Acceptance verified (357 tests incl. 4 style-persistence; round-trip copy/restore + no absolute paths). Stopped for owner review before S3.13. | [SPEC] | Crouton (S3.12 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
