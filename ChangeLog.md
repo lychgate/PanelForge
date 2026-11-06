@@ -232,6 +232,29 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.9 — Outpainting (2026-11-06) — [`5a5a245`](https://github.com/lychgate/PanelForge/commit/5a5a24589faddae764fde9f32445d1cd826e26c2)
+
+**Added**
+
+- `src/core/project/outpaint.ts` —
+  `setOutpaintExtension`/`getOutpaintExtension`
+  (pixels-per-side validated; extended canvas must fit
+  the 1024 Small GPU envelope) and `outpaintPanel`
+  (outpaints the latest version through S7.1 into a NEW
+  version row; base row untouched).
+- Migration 046 (`panel_outpaint` + `panel_outpaints`)
+  in `src/core/project/metadata.ts`.
+- `tests/outpaint.test.js` — 3 tests: extension
+  validation round-trips, outpaint = distinct preserved
+  version, envelope breach + missing-data rejections,
+  migration v46.
+
+**Changed**
+
+- Register: S7.9 marked **Complete**; Stage 7 now 9 of 15;
+  §11 next eligible is S7.10.
+- `Plan.md`: S7.9 checked off (2026-11-06).
+
 ### S7.8 — Inpainting (2026-11-06) — [`b57f89a`](https://github.com/lychgate/PanelForge/commit/b57f89aeb088c0737580df4687541ef6ef9b7a07)
 
 **Added**
