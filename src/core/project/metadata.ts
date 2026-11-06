@@ -611,6 +611,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS sfx (sfx_id TEXT PRIMARY KEY, placement_id TEXT NOT NULL REFERENCES page_panels(placement_id), text TEXT NOT NULL, weight TEXT NOT NULL, angle REAL NOT NULL, x REAL NOT NULL, y REAL NOT NULL, scale REAL NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S8.9: explicit reading order per page.
+  {
+    version: 56,
+    name: "056_reading_order",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS reading_order (page_id TEXT PRIMARY KEY REFERENCES pages(page_id), order_json TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
