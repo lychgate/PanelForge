@@ -336,6 +336,18 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_objects_source_entity ON objects(source_entity_id) WHERE source_entity_id IS NOT NULL",
     ],
   },
+  // S5.8: generation-request records for both studios (§8.5/§8.6
+  // request side only). One shared table + subject
+  // discriminator; result_asset_id stays NULL until a Stage 7
+  // run produces an asset. No execution here.
+  {
+    version: 27,
+    name: "027_studio_generation_requests",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS studio_generation_requests (request_id TEXT PRIMARY KEY, studio TEXT NOT NULL, subject_id TEXT NOT NULL, slot TEXT NOT NULL, provider TEXT NOT NULL, prompt TEXT NOT NULL, negative_prompt TEXT NOT NULL, result_asset_id TEXT, status TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_studio_requests_subject ON studio_generation_requests(studio, subject_id, slot)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
