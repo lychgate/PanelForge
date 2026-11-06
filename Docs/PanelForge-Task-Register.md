@@ -458,7 +458,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Each signal reports exactly one of Detected/Unavailable/Unknown; absence is never shown as zero.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.13.
 - **Stop:** Stays detection only — scheduling decisions land in S2.13/S2.17.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S2.15 Telemetry Adapter Interface [SPEC]
 - **Goal:** A stable boundary for optional hardware metrics.

@@ -20,6 +20,7 @@ import { defaultDatabaseService } from "../database/service";
 import { defaultLifecycleService } from "../core/lifecycle/service";
 import { defaultTaskStore } from "../engines/tasks/store";
 import { recoverQueue } from "../engines/tasks/recovery";
+import { detectHardware } from "../engines/hardware/detect";
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -158,6 +159,31 @@ void app.whenReady().then(() => {
             })
             .catch((err: unknown) => {
               defaultLogService.logError(err, "queue recovery");
+            });
+        },
+      },
+      {
+        // S2.14: attempt hardware detection at startup (§10.1). Reports
+        // typed Detected/Unavailable/Unknown signals; failures are
+        // recorded and never block the window. No scheduling decisions
+        // are taken here (S2.13/S2.17).
+        name: "hardware-detection",
+        run: () => {
+          return detectHardware()
+            .then((snapshot) => {
+              const detected = [
+                snapshot.gpuModel,
+                snapshot.vramBytes,
+                snapshot.ramBytes,
+                snapshot.cpu,
+                snapshot.imageBackends,
+                snapshot.modelServices,
+                snapshot.monitoring,
+              ].filter((s) => s.status === "detected").length;
+              defaultLogService.info(`hardware detected (signals: ${detected}/7 detected)`);
+            })
+            .catch((err: unknown) => {
+              defaultLogService.logError(err, "hardware detection");
             });
         },
       },
