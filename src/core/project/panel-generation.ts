@@ -86,12 +86,13 @@ function toGeneration(row: Record<string, unknown>): PanelGeneration {
   };
 }
 
-/** Fill a template graph with the job's prompt/negative/seed. */
+/** Fill a template graph with the job's prompt/negative/seed/dims. */
 function fillWorkflow(
   template: Record<string, unknown>,
   prompt: string,
   negativePrompt: string,
-  seed?: number
+  seed?: number,
+  dims?: { width: number; height: number }
 ): Record<string, unknown> {
   const workflow = JSON.parse(JSON.stringify(template)) as Record<string, unknown>;
   let textNodes = 0;
@@ -103,8 +104,12 @@ function fillWorkflow(
       textNodes++;
       inputs.text = textNodes === 1 ? prompt : negativePrompt;
     }
-    if (typeof record.class_type === "string" && record.class_type.includes("KSampler") && typeof inputs.seed === "number" && seed !== undefined) {
-      inputs.seed = seed;
+    if (typeof record.class_type === "string" && record.class_type.includes("KSampler")) {
+      if (typeof inputs.seed === "number" && seed !== undefined) inputs.seed = seed;
+      if (dims) {
+        inputs.width = dims.width;
+        inputs.height = dims.height;
+      }
     }
   }
   if (textNodes === 0) {
@@ -119,7 +124,7 @@ function fillWorkflow(
  */
 export async function generatePanel(
   root: string,
-  input: { panelId: string; templateName: string; adapter: ProviderAdapter; seed?: number }
+  input: { panelId: string; templateName: string; adapter: ProviderAdapter; seed?: number; dims?: { width: number; height: number } }
 ): Promise<{ generation: PanelGeneration; artwork: PanelArtwork }> {
   requireProject(root);
   if (typeof input.panelId !== "string" || input.panelId.trim() === "") {
@@ -132,7 +137,7 @@ export async function generatePanel(
   const conditioning = await getConditioning(root, input.panelId);
   const conditioningJson = conditioning ? JSON.stringify(conditioning) : "";
   const template = await getTemplate(root, input.templateName);
-  const workflow = fillWorkflow(template.workflow, storedPrompt.prompt, negativePrompt, input.seed);
+  const workflow = fillWorkflow(template.workflow, storedPrompt.prompt, negativePrompt, input.seed, input.dims);
 
   const now = new Date().toISOString();
   const generationId = crypto.randomUUID();

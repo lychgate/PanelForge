@@ -537,6 +537,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS panel_outpaints (outpaint_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), base_artwork_id TEXT NOT NULL REFERENCES panel_artwork(artwork_id), extension_json TEXT NOT NULL, prompt TEXT NOT NULL, created_at TEXT NOT NULL)",
     ],
   },
+  // S7.10: per-panel aspect choices.
+  {
+    version: 47,
+    name: "047_panel_aspects",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_aspects (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), aspect TEXT NOT NULL, width INTEGER NOT NULL, height INTEGER NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
