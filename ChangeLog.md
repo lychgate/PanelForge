@@ -206,6 +206,30 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.10 — Storyboard Snapshots + Lightweight Branching (2026-11-06) — [`3eab400`](https://github.com/lychgate/PanelForge/commit/3eab4005aa918163ae02bb027b15c3d141a7b19a)
+
+**Added**
+
+- `src/core/project/snapshots.ts` — full-copy snapshots
+  (`createSnapshot`/`listSnapshots`/`getSnapshot`/
+  `restoreSnapshot`): panels + all assignments/details
+  (assignments, location assignments, cameras, positions,
+  text, instructions, character bindings); optional parent
+  lineage for branching; snapshots immutable (no update/
+  delete API); restore is one transactional replace.
+- Migration 037 (snapshot tables) in
+  `src/core/project/metadata.ts`.
+- `tests/snapshots.test.js` — 4 tests: byte-identical
+  restore against a live dump, branch lineage leaves the
+  parent intact, empty storyboard snapshot, typed rejections
+  + migration v37.
+
+**Changed**
+
+- Register: S6.10 marked **Complete**; Stage 6 now 10 of 13;
+  §11 next eligible is S6.11.
+- `Plan.md`: S6.10 checked off (2026-11-06).
+
 ### S6.9 — Panel Instructions (2026-11-06) — [`0176fbc`](https://github.com/lychgate/PanelForge/commit/0176fbc3ad8928aca9b0fc22c1164d1860e82574)
 
 **Added**
