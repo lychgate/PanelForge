@@ -409,6 +409,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_cameras_panel ON panel_cameras(panel_id)",
     ],
   },
+  // S6.6: character positioning (§8.7). Guidance per
+  // assignment: depth + horizontal + note. Never a placement
+  // promise.
+  {
+    version: 34,
+    name: "034_panel_positions",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_positions (position_id TEXT PRIMARY KEY, assignment_id TEXT NOT NULL REFERENCES panel_assignments(assignment_id), depth TEXT NOT NULL, horizontal TEXT NOT NULL, note TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_positions_assignment ON panel_positions(assignment_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
