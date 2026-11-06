@@ -232,6 +232,33 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.6 — Individual Panel Generation (2026-11-06) — [`a23ab86`](https://github.com/lychgate/PanelForge/commit/a23ab86102f9275912e995e4a4de38145ad9a7de)
+
+**Added**
+
+- `src/core/project/panel-generation.ts` —
+  `generatePanel` (stored S7.3 prompt + S7.4 negative +
+  S7.5 conditioning → S7.2 template fill → S7.1 dispatch
+  → result bytes → S1.5 asset import → artwork row);
+  every run appends a new version (regeneration never
+  overwrites); job stage chain visible on the generation
+  row; failures record `failed` + typed code with no
+  artwork row.
+- Migration 043 (`panel_generations` + `panel_artwork`)
+  in `src/core/project/metadata.ts`.
+- S7.1 client gained backwards-compatible `onProgress`
+  passthrough (stage chain visibility).
+- `tests/panel-generation.test.js` — 3 tests: fixture-
+  server dispatch with prompt/negative/seed injection,
+  regenerate-as-new-version, failed-dispatch honesty,
+  migration v43.
+
+**Changed**
+
+- Register: S7.6 marked **Complete**; Stage 7 now 6 of 15;
+  §11 next eligible is S7.7.
+- `Plan.md`: S7.6 checked off (2026-11-06).
+
 ### S7.5 — Reference Conditioning (2026-11-06) — [`712c2cb`](https://github.com/lychgate/PanelForge/commit/712c2cb816c97b2ab564d802427ea92aa4a6dbf4)
 
 **Added**
