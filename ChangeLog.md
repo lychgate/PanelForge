@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.11 — Art Style Manager (2026-11-06) — [`ecb26a6`](https://github.com/lychgate/PanelForge/commit/ecb26a603bba9d8916908fd20798aa549643434e)
+
+**Added**
+
+- `src/core/project/styles.ts` — §9 style profile CRUD
+  (`createStyle`/`updateStyle`/`deleteStyle`, registry-validated
+  reference images), `setDefaultStyle` (transactional atomic swap;
+  first profile auto-defaults; deleting the default requires a
+  successor), `getStyle`/`listStyles`/`getDefaultStyle`.
+- Migration 009 (`styles` table + partial unique index: at most one
+  default) in `src/core/project/metadata.ts`.
+- `tests/art-styles.test.js` — 7 tests: first-default auto, atomic
+  swaps, partial updates, delete guards, reference validation,
+  migration v9.
+
+**Changed**
+
+- Register: S3.11 marked **Complete**; §11 next eligible is S3.12.
+- `Plan.md`: S3.11 checked off (2026-11-06).
+
 ### S3.10 — PDF Import (2026-11-05) — [`c203241`](https://github.com/lychgate/PanelForge/commit/c203241126d11884fb2ad79b866bf1143052f867)
 
 **Added**

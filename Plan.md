@@ -86,7 +86,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S3.8 DOCX import (parser dependency) — completed 2026-11-05
 - [x] S3.9 EPUB import (parser dependency) — completed 2026-11-05
 - [x] S3.10 PDF import (text extraction; OCR deferred as Unknown) — completed 2026-11-05
-- [ ] S3.11 Art Style Manager (CRUD + canonical default)
+- [x] S3.11 Art Style Manager (CRUD + canonical default) — completed 2026-11-06
 - [ ] S3.12 Style profile persistence (project store + asset references)
 - [ ] S3.13 Style variants + priority resolution (§9.1/§9.2 lock strength + conflict warnings)
 - [ ] S3.14 Stage 3 acceptance fixture (import → extract → classify → style a scene)

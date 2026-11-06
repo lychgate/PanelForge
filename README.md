@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (346 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio+comfyui+provider-health+mock-provider+resource-profiles+hardware-detection+telemetry-adapter+telemetry-failure+cooling-down+small-gpu+manuscripts+text-normalize+chapters+scenes+relationships+entities+canon+docx-import+epub-import+pdf-import)
+npm test           # runs Vitest (353 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio+comfyui+provider-health+mock-provider+resource-profiles+hardware-detection+telemetry-adapter+telemetry-failure+cooling-down+small-gpu+manuscripts+text-normalize+chapters+scenes+relationships+entities+canon+docx-import+epub-import+pdf-import+art-styles)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
