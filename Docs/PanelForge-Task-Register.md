@@ -576,7 +576,9 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Fixture .docx segments match its .txt twin; originals preserved.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2 (normalized-text contract); parser selection requires owner approval (new dependency).
 - **Stop:** Tracked-changes/comment semantics are out of scope.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+
+**Parser decision (owner, 2026-11-05):** zero-new-dependency reader (Node `zlib` ZIP + XML tokenizer) is the smallest pure-JS surface — no new dependency installed.
 
 #### S3.9 EPUB import [SPEC]
 - **Goal:** EPUB manuscripts import.
