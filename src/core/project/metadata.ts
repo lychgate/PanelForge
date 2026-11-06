@@ -140,6 +140,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS canon (canon_id TEXT PRIMARY KEY, entity_id TEXT NOT NULL REFERENCES entities(entity_id), status TEXT NOT NULL, rationale TEXT NOT NULL, classified_at TEXT NOT NULL, promoted_at TEXT)",
     ],
   },
+  // S3.11: art style profiles (§9). One canonical project default
+  // enforced by a partial unique index (at most one is_default=1).
+  {
+    version: 9,
+    name: "009_styles",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS styles (style_id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL, reference_asset_ids TEXT NOT NULL, preferred_models TEXT NOT NULL, preferred_loras TEXT NOT NULL, color_palette TEXT NOT NULL, lighting TEXT NOT NULL, line_art TEXT NOT NULL, rendering_technique TEXT NOT NULL, negative_prompt TEXT NOT NULL, aspect_ratios TEXT NOT NULL, is_default INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_styles_single_default ON styles(is_default) WHERE is_default = 1",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {

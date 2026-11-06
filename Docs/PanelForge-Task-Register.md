@@ -609,7 +609,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Profiles create/edit/delete; exactly one canonical default per project.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.5 (reference assets).
 - **Stop:** Generation consumption stays Stage 7.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-06 — authorized by owner; implementing)
 
 #### S3.12 Style profile persistence [SPEC]
 - **Goal:** Styles survive restart + portability.
