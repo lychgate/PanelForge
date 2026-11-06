@@ -494,7 +494,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A small-GPU profile runs the queue within its memory budget; approved art is never silently replaced.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.13, S2.14, S2.17.
 - **Stop:** Target is practical compatibility, not a guarantee for every model/workflow (§10.3).
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit a30f908)
 
 **Stage acceptance [SPEC]:** Tasks can be created, persisted, executed, interrupted, resumed where supported, and recovered after restart. Real generation remains independently testable from UI.
 
@@ -946,6 +946,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S2.17 | `DISPLAY=:0 npm test` | Pass — 291 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 9 ipc + 13 security) | `tests/cooling-down.test.js` (7 tests): threshold tripping/unknown honesty, validation, blocked dispatch + waiting, cooperative cool-down + resume, descriptor fields, notification edges, no-control guard. |
 | 2026-11-05 | S2.17 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S2.17 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.18 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.18 | `npm run build` | Pass | `out/node/engines/tasks/smallgpu.js` emitted. |
+| 2026-11-05 | S2.18 | `DISPLAY=:0 npm test` | Pass — 297 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 9 ipc + 13 security) | `tests/small-gpu.test.js` (6 tests): envelope shape, in-budget execution with parking + release counting, OOM downsized retry, approved-image guard, minimum/unsized refusal, OOM wording match. |
+| 2026-11-05 | S2.18 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.18 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.18 implemented files:** `src/engines/tasks/smallgpu.ts` (New — `resolveSmallGpuProfile` (Safe-derived 1×1024 envelope + release), `createSmallGpuQueue` (per-execution release hook), `retryOomWithLowerResources` (halve-to-256 + cpu-fallback + approved-image refusal)), `tests/small-gpu.test.js` (New, 6 tests). **Stage 2 complete (18 of 18).**
 
 **S2.17 implemented files:** `src/engines/tasks/cooling.ts` (New — `CoolingThresholds` + `validateThresholds` + `evaluateThermal`, `describeCooling`, `createCoolingQueue` (blocked dispatch, cooperative generating→cooling-down→queued, `onCoolingChange`, `resumeCooled`)), `tests/cooling-down.test.js` (New, 7 tests). No fan/temperature/power control claimed.
 
@@ -1065,11 +1072,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.18 — Small GPU Mode [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: Stage 3 — Manuscript Analysis and Art Style Profiles [SPEC §15]
 
-**Status:** **Not Started** — S2.17 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.18 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Stage 2 Complete (18 of 18, 2026-11-05)** — S2.18 is the final Stage 2 task. Stage 3 expands only per §16.2 (task-register §4E); **do not begin Stage 3 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** First-class low-VRAM operation (GTX 1660 Ti-class target): one panel/task at a time, sequential model loading, lower-resolution drafts, optional upscaling/tiling, resource release, CPU fallback, lower-resource retries after OOM — never auto-overwriting or auto-downgrading approved images.
+**Stage acceptance [SPEC]:** Verified — tasks can be created, persisted, executed, interrupted, resumed where supported, and recovered after restart; real generation remains independently testable from UI (S2.12 mocks).
 
 ---
 
@@ -1125,5 +1132,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.15 complete. Acceptance verified (278 tests incl. 8 telemetry-adapter; registry + typed sampling + monitoring wiring, Resource Manager untouched). Stopped for owner review before S2.16. | [SPEC] | Crouton (S2.15 implementation) |
 | 2026-11-05 | S2.16 complete. Acceptance verified (284 tests incl. 6 telemetry-failure; Unknown display + conservative clamp + explicit indicator + fully usable). Stopped for owner review before S2.17. | [SPEC] | Crouton (S2.16 implementation) |
 | 2026-11-05 | S2.17 complete. Acceptance verified (291 tests incl. 7 cooling-down; thresholds + blocked dispatch + cooperative cool-down + resume). Stopped for owner review before S2.18. | [SPEC] | Crouton (S2.17 implementation) |
+| 2026-11-05 | S2.18 complete. Acceptance verified (297 tests incl. 6 small-gpu; 1024 budget + OOM retry + approved-art guard). **Stage 2 complete (18 of 18).** | [SPEC] | Crouton (S2.18 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

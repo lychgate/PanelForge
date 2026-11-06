@@ -7,6 +7,27 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.18 — Small GPU Mode (2026-11-05) — [`a30f908`](https://github.com/lychgate/PanelForge/commit/a30f908cffaa5b215420b97e4b197d0007b6de51)
+
+**Added**
+
+- `src/engines/tasks/smallgpu.ts` — GTX 1660 Ti-class envelope
+  (`resolveSmallGpuProfile`: concurrency 1, sequential model loading,
+  1024×1024 cap, conservative memory, release-after-each-task),
+  `createSmallGpuQueue` (release hook fires per execution), and
+  `retryOomWithLowerResources` (halves resolution to the 256 minimum,
+  `resourceMode: cpu-fallback`, original stays failed; refuses
+  fail-closed for approved images and minimum/unsized tasks).
+- `tests/small-gpu.test.js` — 6 tests: envelope shape, in-budget
+  execution with parking + release counting, OOM downsized retry,
+  approved-image guard, minimum/unsized refusal, OOM wording match.
+
+**Changed**
+
+- Register: S2.18 marked **Complete**; **Stage 2 complete (18 of 18)**.
+- `Plan.md`: S2.18 checked off (2026-11-05).
+- `README.md`: Stage 2 completion noted; Stage 3 expands per §16.2 only.
+
 ### S2.17 — Cooling Down State (2026-11-05) — [`edbcc3d`](https://github.com/lychgate/PanelForge/commit/edbcc3db9c10439858406e7a5265b376011da8d0)
 
 **Added**
