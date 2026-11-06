@@ -206,6 +206,26 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.5 — Camera and Shot Definitions (2026-11-06) — [`bc9cf47`](https://github.com/lychgate/PanelForge/commit/bc9cf475ebd1609aeb9a4c54cbb64e699a954fcd)
+
+**Added**
+
+- `src/core/project/panel-cameras.ts` — per-panel camera
+  (`setCamera`/`getCamera`/`listCamerasByShotType`): closed
+  shot vocabulary (close-up/medium/wide/extreme-wide) + free-
+  text angle; setting again replaces.
+- Migration 033 (`panel_cameras` table) in
+  `src/core/project/metadata.ts`.
+- `tests/panel-cameras.test.js` — 4 tests: set/replace per
+  panel, typed rejections, list-by-shot-type in panel order,
+  migration v33.
+
+**Changed**
+
+- Register: S6.5 marked **Complete**; Stage 6 now 5 of 13;
+  §11 next eligible is S6.6.
+- `Plan.md`: S6.5 checked off (2026-11-06).
+
 ### S6.4 — Location Assignment (2026-11-06) — [`fb0d9f3`](https://github.com/lychgate/PanelForge/commit/fb0d9f3551efbd49cb6ba27279ceb2c9b414a0cb)
 
 **Added**
