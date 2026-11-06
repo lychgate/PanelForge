@@ -837,7 +837,7 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | Q2 | **Approved — owner, 2026-11-05:** S0.2 must create the initial Electron window with secure defaults from its first launch. S0.3 remains responsible for verification, documentation, and security testing. | S0.2/S0.3 (no spec change) | Approved |
 | Q3 | **Decided during S0.8 (2026-11-05):** `node:sqlite` (Node built-in) — verified in plain Node and Electron's bundled Node; no new dependency. Drizzle optional later. | S0.8 | Decided |
 | Q4 | Approve splits S0.3a / S0.8a+b / S1.1a / S1.5a, or keep spec task blocks untouched? Owner direction: defer until the relevant task is close. | Sequencing only; no scope change | Deferred |
-| Q5 | Image/LLM baseline models that run on 1660 Ti 6GB. Owner direction: defer until Stage 3 planning. | Stage 3+ planning | Deferred |
+| Q5 | Image/LLM baseline models that run on 1660 Ti 6GB. Owner direction: defer until Stage 3 planning. Owner direction (2026-11-05, Stage 3 planning): LLM-assist is optional in Stage 3 (deterministic spine first, S2.9 LM Studio adapter for candidates); specific image-model baselines are nominated when S3.6 spikes the LLM contract. | Stage 3+ planning | Deferred (narrowed by owner) |
 
 ---
 
@@ -1206,7 +1206,7 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 ### Next task: Stage 3 — Manuscript Analysis and Art Style Profiles [SPEC §15]
 
-**Status:** **Stage 2 Complete (18 of 18, 2026-11-05)** — S2.18 is the final Stage 2 task. Stage 3 expands only per §16.2 (task-register §4E); **do not begin Stage 3 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Stage 2 Complete (18 of 18, 2026-11-05)** — S2.18 is the final Stage 2 task. Stage 3 expanded to S3.1–S3.14 (owner-authorized planning 2026-11-05; owner answers recorded in §12). **Do not begin Stage 3 implementation without explicit owner authorization of S3.1.** One-task-at-a-time (approved) stops here.
 
 **Stage acceptance [SPEC]:** Verified — tasks can be created, persisted, executed, interrupted, resumed where supported, and recovered after restart; real generation remains independently testable from UI (S2.12 mocks).
 
@@ -1265,5 +1265,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.16 complete. Acceptance verified (284 tests incl. 6 telemetry-failure; Unknown display + conservative clamp + explicit indicator + fully usable). Stopped for owner review before S2.17. | [SPEC] | Crouton (S2.16 implementation) |
 | 2026-11-05 | S2.17 complete. Acceptance verified (291 tests incl. 7 cooling-down; thresholds + blocked dispatch + cooperative cool-down + resume). Stopped for owner review before S2.18. | [SPEC] | Crouton (S2.17 implementation) |
 | 2026-11-05 | S2.18 complete. Acceptance verified (297 tests incl. 6 small-gpu; 1024 budget + OOM retry + approved-art guard). **Stage 2 complete (18 of 18).** | [SPEC] | Crouton (S2.18 implementation) |
+| 2026-11-05 | Stage 3 planning: expanded to S3.1–S3.14 (owner-authorized). Owner answers: Local LLM optional (deterministic spine first; Q5 image baselines nominated at S3.6 spike); decide parsers now (smallest pure-JS surface chosen before S3.8); text-layer-only PDF, no OCR (scanned → Unknown); 14 tasks approved. | [APPROVED CHANGE — owner] | Owner (Stage 3 planning) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
