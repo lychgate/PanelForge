@@ -206,6 +206,27 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.8 — Scene Style Overrides (2026-11-06) — [`237afdc`](https://github.com/lychgate/PanelForge/commit/237afdc7ebacaec7e9642c0cebcef1a7bb34771a)
+
+**Added**
+
+- `src/core/project/scene-style.ts` — scene-scoped consumer
+  over S3.13 `resolveStyle` (`setSceneStyleOverride`/
+  `listSceneOverrides`/`clearSceneStyleOverride`/
+  `resolveSceneStyle`): per-scene overrides backed by existing
+  `style_variants` (no new migration); unresolved scenes fall
+  back to the canonical default; result always guidance-only.
+- `tests/scene-style.test.js` — 5 tests: default fallback,
+  scene beats project, contested scene resolves to the same
+  winner (lower priority), set/list/clear round-trip,
+  unknown scene/style typed rejections.
+
+**Changed**
+
+- Register: S6.8 marked **Complete**; Stage 6 now 8 of 13;
+  §11 next eligible is S6.9.
+- `Plan.md`: S6.8 checked off (2026-11-06).
+
 ### S6.7 — Dialogue, Captions, Actions, and Expressions (2026-11-06) — [`d7ddd99`](https://github.com/lychgate/PanelForge/commit/d7ddd99ee7466f5cd08c2275e9c6c8e4ebcc27eb)
 
 **Added**

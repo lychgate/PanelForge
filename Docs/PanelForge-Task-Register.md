@@ -909,7 +909,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Scene style overrides.
 - **Acceptance:** A contested scene resolves to the same winner every time; no match falls back to default.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.13, S6.1.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 237afdc; see below)
 
 #### S6.9 Panel instructions [SPEC]
 - **Goal:** Generation-ready instruction text per panel.
@@ -1740,6 +1740,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S6.7 | `DISPLAY=:0 npm test` | Pass — 496 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 9 ipc + 13 security) | `tests/panel-text.test.js` (4 tests): all four blocks, replace, validation, empty-panel valid + migration v35. |
 | 2026-11-06 | S6.7 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S6.7 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S6.8 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S6.8 | `npm run build` | Pass | `out/node/core/project/scene-style.js` emitted. |
+| 2026-11-06 | S6.8 | `DISPLAY=:0 npm test` | Pass — 501 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 9 ipc + 13 security) | `tests/scene-style.test.js` (5 tests): default fallback, scene beats project, contested determinism, set/list/clear round-trip, typed rejections. No new migration (consumer of S3.13). |
+| 2026-11-06 | S6.8 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S6.8 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S6.8 implemented files:** `src/core/project/scene-style.ts` (New — `setSceneStyleOverride`/`listSceneOverrides`/`clearSceneStyleOverride`/`resolveSceneStyle`; thin scene-scoped consumer over S3.13 `resolveStyle`, guidance-only), `tests/scene-style.test.js` (New, 5 tests). No migration. Panel instructions stay S6.9.
 
 **S6.7 implemented files:** `src/core/project/panel-text.ts` (New — `setText`/`getText`; one text block per panel), `src/core/project/metadata.ts` (migration 035 panel_text), `tests/panel-text.test.js` (New, 4 tests). Style overrides stay S6.8.
 
@@ -2045,7 +2052,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S6.6:** S6.7 — Dialogue, captions, actions, and expressions (editable line rows). **Status: Complete (2026-11-06, impl commit d7ddd99; 496 tests incl. 4 panel-text). Stage 6 now 7 of 13.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S6.7:** S6.8 — Scene style overrides (S3.13 resolveStyle consumer; default fallback). Do not begin without explicit owner authorization.
+**Next eligible after S6.7:** S6.8 — Scene style overrides (S3.13 resolveStyle consumer; default fallback). **Status: Complete (2026-11-06, impl commit 237afdc; 501 tests incl. 5 scene-style). Stage 6 now 8 of 13.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S6.8:** S6.9 — Panel instructions (generation-ready text for Stage 7). Do not begin without explicit owner authorization.
 **Next eligible after Stage 7 expansion:** S7.1 — ComfyUI workflow integration (see §4E Stage 7). **Status: Not Started.**
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
@@ -2154,5 +2163,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S6.5 complete. Acceptance verified (488 tests incl. 4 panel-cameras; set/replace per panel, closed shot vocab). Stage 6 now 5 of 13. Stopped for owner review before S6.6. | [SPEC] | Crouton (S6.5 implementation) |
 | 2026-11-06 | S6.6 complete. Acceptance verified (492 tests incl. 4 panel-positions; placement per assignment, replace, list-by-panel). Stage 6 now 6 of 13. Stopped for owner review before S6.7. | [SPEC] | Crouton (S6.6 implementation) |
 | 2026-11-06 | S6.7 complete. Acceptance verified (496 tests incl. 4 panel-text; all four blocks, replace, empty valid). Stage 6 now 7 of 13. Stopped for owner review before S6.8. | [SPEC] | Crouton (S6.7 implementation) |
+| 2026-11-06 | S6.8 complete. Acceptance verified (501 tests incl. 5 scene-style; default fallback, scene beats project, contested determinism). Stage 6 now 8 of 13. Stopped for owner review before S6.9. | [SPEC] | Crouton (S6.8 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
