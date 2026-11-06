@@ -570,6 +570,15 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS pages (page_id TEXT PRIMARY KEY, manuscript_id TEXT NOT NULL REFERENCES manuscripts(manuscript_id), title TEXT NOT NULL, format TEXT NOT NULL, width REAL NOT NULL, height REAL NOT NULL, margin REAL NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S8.2: panel placements (approved-artwork slots, mm geometry).
+  {
+    version: 51,
+    name: "051_page_panels",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS page_panels (placement_id TEXT PRIMARY KEY, page_id TEXT NOT NULL REFERENCES pages(page_id), panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), asset_id TEXT NOT NULL REFERENCES assets(asset_id), artwork_id TEXT NOT NULL REFERENCES panel_artwork(artwork_id), x REAL NOT NULL, y REAL NOT NULL, width REAL NOT NULL, height REAL NOT NULL, z_order INTEGER NOT NULL, border TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_page_panels_pair ON page_panels(page_id, panel_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
