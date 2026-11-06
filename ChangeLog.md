@@ -232,6 +232,27 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.7 — Dialogue/Caption Editing (2026-11-06) — [`97607fd`](https://github.com/lychgate/PanelForge/commit/97607fdcc49badce5a4732848bc7bfc5f8d10966)
+
+**Added**
+
+- `src/core/project/lettering.ts` —
+  `setLettering`/`getLettering`: balloon overlay text
+  (dialogue/caption strings). Edits never touch
+  artwork assets or S6.7 panel text; artwork bytes
+  stay byte-identical.
+- Migration 054 (`balloons.text`) in
+  `src/core/project/metadata.ts`.
+- `tests/lettering.test.js` — 3 tests: text round-
+  trips, artwork bytes unchanged (S6.7 text
+  untouched), typed rejects, migration v54.
+
+**Changed**
+
+- Register: S8.7 marked **Complete**; Stage 8 now 7 of 14;
+  §11 next eligible is S8.8.
+- `Plan.md`: S8.7 checked off (2026-11-06).
+
 ### S8.6 — Balloons + Tails (2026-11-06) — [`b813894`](https://github.com/lychgate/PanelForge/commit/b8138945dd5518141d6363450701c11748b6cab2)
 
 **Added**

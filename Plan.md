@@ -203,7 +203,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S8.4 Webtoon / vertical layout (continuous scroll geometry) — completed 2026-11-06; Stage 8 now 4 of 14
 - [x] S8.5 Borders (presets, vector, never baked into artwork) — completed 2026-11-06; Stage 8 now 5 of 14
 - [x] S8.6 Balloons + tails (speech/caption/thought, anchors) — completed 2026-11-06; Stage 8 now 6 of 14
-- [ ] S8.7 Dialogue/caption editing (overlay text only, artwork byte-identical)
+- [x] S8.7 Dialogue/caption editing (overlay text only, artwork byte-identical) — completed 2026-11-06; Stage 8 now 7 of 14
 - [ ] S8.8 Sound effects (SFX vector lettering records)
 - [ ] S8.9 Reading order (explicit per-page order)
 - [ ] S8.10 Layout snapshots (full copies, parent lineage)
