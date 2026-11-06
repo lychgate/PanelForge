@@ -22,6 +22,7 @@ import { listArtwork } from "./panel-generation";
 import { importAsset } from "./registry";
 import { runWorkflow } from "../../engines/provider/comfyui-client";
 import type { ProviderAdapter } from "../../engines/provider/types";
+import { modelFromWorkflow } from "./provenance";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -253,6 +254,21 @@ export async function inpaintPanel(
             base.artworkId,
             JSON.stringify(regions),
             prompt,
+            new Date().toISOString()
+          );
+          db.prepare(
+            `INSERT INTO artwork_provenance (artwork_id, template_name, template_hash, prompt, negative_prompt, seed, model, provider, "references", job_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          ).run(
+            artworkId,
+            input.templateName,
+            template.hash,
+            prompt,
+            "",
+            input.seed ?? null,
+            modelFromWorkflow(template.workflow),
+            "comfyui",
+            JSON.stringify({ operation: "inpaint", baseArtworkId: base.artworkId, regions }),
+            generationId,
             new Date().toISOString()
           );
           db.exec("COMMIT");

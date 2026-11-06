@@ -545,6 +545,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS panel_aspects (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), aspect TEXT NOT NULL, width INTEGER NOT NULL, height INTEGER NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S7.12: append-only provenance ledger (never edited).
+  {
+    version: 48,
+    name: "048_artwork_provenance",
+    statements: [
+      `CREATE TABLE IF NOT EXISTS artwork_provenance (artwork_id TEXT PRIMARY KEY REFERENCES panel_artwork(artwork_id), template_name TEXT NOT NULL, template_hash TEXT NOT NULL, prompt TEXT NOT NULL, negative_prompt TEXT NOT NULL, seed INTEGER, model TEXT NOT NULL, provider TEXT NOT NULL, "references" TEXT NOT NULL, job_id TEXT NOT NULL, created_at TEXT NOT NULL)`,
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
