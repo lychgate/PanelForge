@@ -206,6 +206,35 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### S6.13 — Stage 6 Acceptance Fixture (2026-11-06) — [`d3b5de5`](https://github.com/lychgate/PanelForge/commit/d3b5de5fa5b25125a0272907a8c22bb1d735e5ec)
+
+**Added**
+
+- `src/core/project/pdf-ocr.ts` — scanned-PDF autodetect:
+  text-layer first, OCR fallback (pdftoppm render +
+  tesseract.js WASM), OCR text copy attached per manuscript
+  (`importPdfAutodetect`/`getOcrText`/`updateOcrText`);
+  re-imports reuse saved OCR by source hash; missing
+  toolchain fails typed (`OCR_UNAVAILABLE`), never stubbed.
+- Migration 038 (`manuscript_ocr` table) in
+  `src/core/project/metadata.ts`.
+- `tests/stage6-fixture.test.js` — 3 tests on the real
+  `tests/TestData` chapter: OCR once + editable/reused copy,
+  full storyboard pipeline with snapshot/branch/restore,
+  clean composition review, approved artwork byte-identical,
+  text-layer PDFs skip OCR.
+- New dependency: `tesseract.js` (OCR engine decision per
+  S6.13 planning scope) + system `pdftoppm` (poppler).
+
+**Changed**
+
+- Register: S6.13 marked **Complete**; **Stage 6 gate passes
+  (13 of 13)**; next eligible is Stage 7 (Art Studio) after
+  owner authorization.
+- `Plan.md`: S6.13 checked off (2026-11-06); Stage 6 complete.
+- `tests/TestData/README.md`: import status now points at
+  `importPdfAutodetect`.
+
 ### S6.12 — Composition Review (2026-11-06) — [`98ff4b3`](https://github.com/lychgate/PanelForge/commit/98ff4b3b0234ede95d9891f8d1157232fca7a45c)
 
 **Added**

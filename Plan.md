@@ -162,7 +162,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S6.10 Storyboard snapshots + lightweight branching (full-copy snapshots, parent lineage) — completed 2026-11-06
 - [x] S6.11 Minimal storyboard UI (read/edit without artwork; hand-rolled HTML/CSS + shortcuts; new IPC channels) — completed 2026-11-06
 - [x] S6.12 Composition review (gap/mismatch warnings naming panel + fix) — completed 2026-11-06
-- [ ] S6.13 Stage 6 acceptance fixture (storyboard a TestData chapter; approved artwork stays byte-identical)
+- [x] S6.13 Stage 6 acceptance fixture (storyboard a TestData chapter; approved artwork stays byte-identical) — completed 2026-11-06; Stage 6 gate passes 13/13
 
 ## Stage 7 — Art Studio
 

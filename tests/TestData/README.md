@@ -16,13 +16,15 @@ S6.12 composition review with real, varied input.
 
 ## Known import status (S3.10 pdf-import, verified 2026-11-06)
 
-- All 25 PDFs report `scanned` under the text-layer-only parser:
-  they are image-based exports with no extractable text layer, so
-  importing them today yields "Unknown" (no OCR in PanelForge per
-  the S3.10 decision).
+- All 25 PDFs report `scanned` under the S3.10 text-layer-only
+  parser: they are image-based exports with no extractable text
+  layer. Plain S3.10 import yields "Unknown"; use
+  `importPdfAutodetect` (`src/core/project/pdf-ocr.ts`, S6.13)
+  instead — it OCRs scanned PDFs once (pdftoppm + tesseract.js)
+  and saves an editable text copy attached to the manuscript.
 - `Epilogue.pdf` additionally fails FlateDecode inflation in the
-  zero-dependency parser. Expect `INVALID_PDF`/parse failure there
-  until the parser handles its encoding.
+  zero-dependency parser. Expect `INVALID_PDF`/parse failure
+  there until the parser handles its encoding.
 
 ## Import strategy (owner decision, 2026-11-06, for S6.13)
 
