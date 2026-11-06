@@ -232,6 +232,27 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.7 — Variations (2026-11-06) — [`9c2e172`](https://github.com/lychgate/PanelForge/commit/9c2e172ac024d7a3459f17d0eedaaaf95346f9b9)
+
+**Added**
+
+- `src/core/project/variations.ts` —
+  `generateVariations`/`listVariants`: 1..8 sequential
+  dispatches per job (Small GPU concurrency-1 honored),
+  distinct seeds, each its own generation + artwork
+  version, shared `job_id` on the artwork rows.
+- Migration 044 (artwork job columns) in
+  `src/core/project/metadata.ts`.
+- `tests/variations.test.js` — 3 tests: N distinct
+  preserved versions sharing one job, out-of-range
+  counts reject with nothing dispatched, migration v44.
+
+**Changed**
+
+- Register: S7.7 marked **Complete**; Stage 7 now 7 of 15;
+  §11 next eligible is S7.8.
+- `Plan.md`: S7.7 checked off (2026-11-06).
+
 ### S7.6 — Individual Panel Generation (2026-11-06) — [`a23ab86`](https://github.com/lychgate/PanelForge/commit/a23ab86102f9275912e995e4a4de38145ad9a7de)
 
 **Added**

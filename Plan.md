@@ -183,7 +183,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S7.4 Negative prompt handling (per-job + style defaults, job wins) — completed 2026-11-06; Stage 7 now 4 of 15
 - [x] S7.5 Reference conditioning (approved refs by slot; unapproved refuse) — completed 2026-11-06; Stage 7 now 5 of 15
 - [x] S7.6 Individual panel generation (engine: request → ComfyUI → asset → artwork row; never overwrite) — completed 2026-11-06; Stage 7 now 6 of 15
-- [ ] S7.7 Variations (N versions per job; Small GPU cap honored)
+- [x] S7.7 Variations (N versions per job; Small GPU cap honored) — completed 2026-11-06; Stage 7 now 7 of 15
 - [ ] S7.8 Inpainting (coordinate regions; no mask UI)
 - [ ] S7.9 Outpainting (canvas-extension params; no mask UI)
 - [ ] S7.10 Aspect ratio adjustment (style vocabulary; new versions only)
