@@ -173,6 +173,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS characters (character_id TEXT PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL, physical_appearance TEXT NOT NULL, age TEXT NOT NULL, personality TEXT NOT NULL, clothing TEXT NOT NULL, equipment TEXT NOT NULL, distinguishing_features TEXT NOT NULL, relationships TEXT NOT NULL, timeline TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S4.2: character version records (§8.4). Labels unique per
+  // character via normalized label_key; per-version overrides
+  // default to "" = inherit from the profile.
+  {
+    version: 12,
+    name: "012_character_versions",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS character_versions (version_id TEXT PRIMARY KEY, character_id TEXT NOT NULL REFERENCES characters(character_id), label TEXT NOT NULL, label_key TEXT NOT NULL, physical_appearance TEXT NOT NULL, age TEXT NOT NULL, clothing TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_character_versions_label ON character_versions(character_id, label_key)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
