@@ -7,6 +7,25 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.9 — Studio Asset History (2026-11-06) — [`c424beb`](https://github.com/lychgate/PanelForge/commit/c424beb75f6184cd12aeb276d45e63ca572054ec)
+
+**Added**
+
+- `src/core/project/studio-history.ts` — append-only per-studio
+  history (`recordLocationEvent`/`recordObjectEvent` +
+  profile- and variation-scoped lists, S4.11 pattern).
+- Migration 028 (`location_history` + `object_history` with
+  profile cascades) in `src/core/project/metadata.ts`.
+- `tests/studio-history.test.js` — 4 tests: lifecycle replay
+  per studio, validation, append-only + cascade + migration
+  v28.
+
+**Changed**
+
+- Register: S5.9 marked **Complete**; Stage 5 now 9 of 10;
+  §11 next eligible is S5.10.
+- `Plan.md`: S5.9 checked off (2026-11-06).
+
 ### S5.8 — Generation-Request Records (Both Studios) (2026-11-06) — [`5880660`](https://github.com/lychgate/PanelForge/commit/5880660f8f157c38c62deef8201f13dda2d19c4f)
 
 **Added**

@@ -829,7 +829,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deliverables [SPEC]:** Asset history.
 - **Acceptance:** A fixture lifecycle (create → variation → reference) replays in order.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.1–S5.8.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit c424beb; see below)
 
 #### S5.10 Stage 5 acceptance fixture [SPEC]
 - **Goal:** End-to-end proof of Stage 5.
@@ -1575,6 +1575,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S5.8 | `DISPLAY=:0 npm test` | Pass — 460 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 9 ipc + 13 security) | `tests/studio-requests.test.js` (4 tests): store/replace per (studio, variation, slot), studio isolation, table-matched subjects + zero provider traffic scan, result attach + migration v27. |
 | 2026-11-06 | S5.8 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S5.8 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S5.9 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S5.9 | `npm run build` | Pass | `out/node/core/project/studio-history.js` emitted. |
+| 2026-11-06 | S5.9 | `DISPLAY=:0 npm test` | Pass — 464 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 9 ipc + 13 security) | `tests/studio-history.test.js` (4 tests): lifecycle replay per studio, validation, append-only + cascade + migration v28. |
+| 2026-11-06 | S5.9 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S5.9 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S5.9 implemented files:** `src/core/project/studio-history.ts` (New — `recordLocationEvent`/`recordObjectEvent`/`listLocationHistory`/`listObjectHistory`/variation-scoped lists; append-only, one table per studio), `src/core/project/metadata.ts` (migration 028 location_history + object_history with profile cascades), `tests/studio-history.test.js` (New, 4 tests). The fixture stage-gate stays S5.10.
 
 **S5.8 implemented files:** `src/core/project/studio-requests.ts` (New — `createRequest`/`getRequest`/`listRequestsBySubject`/`attachResultAsset`; shared table + studio discriminator, subject validated against the matching variation table), `src/core/project/metadata.ts` (migration 027 studio_generation_requests), `tests/studio-requests.test.js` (New, 4 tests). History stays S5.9.
 
@@ -1842,7 +1849,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S5.7:** S5.8 — Generation-request records (request shape + validation only; zero provider calls). **Status: Complete (2026-11-06, impl commit 5880660; 460 tests incl. 4 studio-requests). Stage 5 now 8 of 10.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S5.8:** S5.9 — Asset history (append-only lifecycle replay for both studios). Do not begin without explicit owner authorization.
+**Next eligible after S5.8:** S5.9 — Asset history (append-only lifecycle replay for both studios). **Status: Complete (2026-11-06, impl commit c424beb; 464 tests incl. 4 studio-history). Stage 5 now 9 of 10.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S5.9:** S5.10 — Stage 5 acceptance fixture (create → variants → reference → regenerate independently). Do not begin without explicit owner authorization.
 **Next eligible after Stage 6 expansion:** S6.1 — Scene records (see §4E Stage 6). **Status: Not Started.**
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
@@ -1941,5 +1950,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S5.6 complete. Acceptance verified (450 tests incl. 5 object-references; slot association with registry validation + exact slot queries). Stage 5 now 6 of 10. Stopped for owner review before S5.7. | [SPEC] | Crouton (S5.6 implementation) |
 | 2026-11-06 | S5.7 complete. Acceptance verified (456 tests incl. 6 location-object-bridge; name-only copy, one profile per entity per studio, exact source resolution). Stage 5 now 7 of 10. Stopped for owner review before S5.8. | [SPEC] | Crouton (S5.7 implementation) |
 | 2026-11-06 | S5.8 complete. Acceptance verified (460 tests incl. 4 studio-requests; store/replace, studio isolation, zero provider traffic by construction). Stage 5 now 8 of 10. Stopped for owner review before S5.9. | [SPEC] | Crouton (S5.8 implementation) |
+| 2026-11-06 | S5.9 complete. Acceptance verified (464 tests incl. 4 studio-history; lifecycle replay per studio, append-only with profile cascade). Stage 5 now 9 of 10. Stopped for owner review before S5.10. | [SPEC] | Crouton (S5.9 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
