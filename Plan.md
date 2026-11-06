@@ -198,7 +198,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > Owner decisions: SVG vector-first pages (raster at Stage 10); lettering as overlay records, baked at export; hand-rolled HTML/CSS + TypeScript UI (owner 2026-11-06: no framework — consistent with S6.11); PDF library pdfkit.
 
 - [x] S8.1 Page records (format traditional|webtoon, size, margin) — completed 2026-11-06; Stage 8 now 1 of 14
-- [ ] S8.2 Panel placement (mm geometry, artwork by asset reference)
+- [x] S8.2 Panel placement (mm geometry, artwork by asset reference) — completed 2026-11-06; Stage 8 now 2 of 14
 - [ ] S8.3 Traditional layout templates (grid presets)
 - [ ] S8.4 Webtoon / vertical layout (continuous scroll geometry)
 - [ ] S8.5 Borders (presets, vector, never baked into artwork)

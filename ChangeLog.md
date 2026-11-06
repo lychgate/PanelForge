@@ -232,6 +232,29 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S8.2 — Panel Placement (2026-11-06) — [`2c2d51e`](https://github.com/lychgate/PanelForge/commit/2c2d51e4d32ab173ceea957318a1484327c4c7fc)
+
+**Added**
+
+- `src/core/project/placements.ts` —
+  `placePanel`/`getPlacement`/`listPlacements`/
+  `movePlacement`/`removePlacement`: placements slot
+  the panel's APPROVED artwork version (asset id
+  pinned, never copied/modified); mm geometry
+  validated inside page margins; z-order moves.
+- Migration 051 (`page_panels`) in
+  `src/core/project/metadata.ts`.
+- `tests/placements.test.js` — 4 tests: approved-slot
+  pinning, replace/move/remove with sha256-verified
+  untouched assets, NOT_APPROVED + geometry gates,
+  migration v51.
+
+**Changed**
+
+- Register: S8.2 marked **Complete**; Stage 8 now 2 of 14;
+  §11 next eligible is S8.3.
+- `Plan.md`: S8.2 checked off (2026-11-06).
+
 ### S8.1 — Page Records (2026-11-06) — [`5ff6329`](https://github.com/lychgate/PanelForge/commit/5ff632999fba24296f33713d6d59a15adba4f47b)
 
 **Added**
