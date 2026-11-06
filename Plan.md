@@ -69,7 +69,27 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 ## Stage 3 — Manuscript Analysis and Art Style Profiles
 
-- [ ] Stage 3 — not started
+> Expanded planning 2026-11-05 (owner-authorized expansion, awaiting task-level
+> approval): 14 micro-tasks S3.1–S3.14, spine first (source records + TXT/MD +
+> deterministic segmentation), then entity extraction + canon classification
+> (§2.7), then DOCX/EPUB/PDF parsers, then Art Style Manager. Infra only — no
+> generation UI. See `Docs/PanelForge-Task-Register.md` §4E Stage 3 for full
+> per-task Goal/Scope/Deliverables/Deps/Acceptance/Stop.
+
+- [ ] S3.1 Source document records (manuscript rows + asset linkage; originals preserved)
+- [ ] S3.2 TXT/Markdown import + normalization (hash + offset-preserving spans)
+- [ ] S3.3 Chapter extraction (deterministic heading segmentation)
+- [ ] S3.4 Scene extraction (deterministic segmentation + override framework)
+- [ ] S3.5 Source relationships (chapter→scene→span links with offset verification)
+- [ ] S3.6 Entity extraction framework (characters/locations/objects/events/chronology)
+- [ ] S3.7 Canon classification (explicit / interpretation / suggestion / unknown; anti-fabrication)
+- [ ] S3.8 DOCX import (parser dependency)
+- [ ] S3.9 EPUB import (parser dependency)
+- [ ] S3.10 PDF import (text extraction; OCR deferred as Unknown)
+- [ ] S3.11 Art Style Manager (CRUD + canonical default)
+- [ ] S3.12 Style profile persistence (project store + asset references)
+- [ ] S3.13 Style variants + priority resolution (§9.1/§9.2 lock strength + conflict warnings)
+- [ ] S3.14 Stage 3 acceptance fixture (import → extract → classify → style a scene)
 
 ## Stage 4 — Character Studio
 

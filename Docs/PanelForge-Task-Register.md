@@ -500,9 +500,141 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 
 ### 4E. Stages 3–11 — Task Groups [SPEC §15]
 
-All groups: **Completeness Incomplete; Status Needs Clarification.** Each must be expanded per §16.2 before implementation.
+**Stage 3 — Manuscript Analysis and Art Style Profiles: EXPANDED (owner-authorized planning 2026-11-05, awaiting task-level approval).**
 
-- **Stage 3 — Manuscript Analysis and Art Style Profiles.** Goal: Import written material, analyze it, establish visual style definitions. Acceptance: originals preserved; extracted info links to source; styles can be created/saved/applied to scenes. Groups: TXT/Markdown, DOCX, EPUB, PDF import; chapter/scene extraction; source relationships; character/location/object/event/chronology extraction; canon vs interpretation (§2.7); Art Style Manager; profile persistence; variants (§9.1); priority resolution (§9.2).
+> Goal [SPEC]: Import written material, analyze it, establish visual style definitions.
+> Stage acceptance [SPEC]: Original manuscripts remain preserved; extracted information links back to source material; art styles can be created, saved, and applied to scenes.
+> Structure [RECOMMENDATION]: 14 micro-tasks S3.1–S3.14, spine first (source records + TXT/MD + deterministic segmentation with offset-preserving links), then entity extraction + canon classification (§2.7), then DOCX/EPUB/PDF parsers, then the Art Style Manager (§9) + priority resolution (§9.2). Infra only — no generation UI, no model provisioning.
+
+#### S3.1 Source document records [SPEC]
+- **Goal:** A durable record of every imported manuscript.
+- **Scope:** `manuscripts` table + asset linkage (S1 asset registry); import metadata (title, format, byte size, content hash, timestamps).
+- **Deliverables [SPEC]:** Source document records.
+- **Acceptance:** Imported originals are preserved byte-for-byte, hash-verifiable, and re-openable from project storage.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.5/S1.6 (asset registry/integrity).
+- **Stop:** Text normalization stays S3.2; parsers stay S3.8–S3.10.
+- **Status:** Not Started
+
+#### S3.2 TXT/Markdown import + normalization [SPEC]
+- **Goal:** Plain-text manuscripts import with offset-preserving spans.
+- **Scope:** TXT/MD ingestion; normalized text stored with a char-offset map back to the original bytes (every extracted span links to source).
+- **Deliverables [SPEC]:** TXT/Markdown import.
+- **Acceptance:** Splitting and joining normalized spans reconstructs source offsets exactly; originals untouched.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.1.
+- **Stop:** DOCX/EPUB/PDF stay S3.8–S3.10 (new parser deps require explicit approval).
+- **Status:** Not Started
+
+#### S3.3 Chapter extraction [SPEC]
+- **Goal:** Deterministic chapter segmentation.
+- **Scope:** Heading-based segmentation (Markdown ATX + common TXx title patterns); each chapter records its normalized span + source offset.
+- **Deliverables [SPEC]:** Chapter extraction.
+- **Acceptance:** A *-fixture manuscript segments into expected chapters with exact spans; segmentation never alters source text.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2.
+- **Stop:** AI-driven segmentation is out of scope.
+- **Status:** Not Started
+
+#### S3.4 Scene extraction [SPEC]
+- **Goal:** Deterministic scene segmentation.
+- **Scope:** Scene-break rules (***, ###, location/time markers) with a manual-override data model; scenes link to chapters.
+- **Deliverables [SPEC]:** Scene extraction.
+- **Acceptance:** Fixture segments into expected scenes; overrides correct boundaries without changing source text.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.3.
+- **Stop:** Storyboard panels stay Stage 6.
+- **Status:** Not Started
+
+#### S3.5 Source relationships [SPEC]
+- **Goal:** Every extracted span links back to source.
+- **Scope:** chapter→scene→span join records with offset verification (extracted text === normalized[srcStart:srcEnd]).
+- **Deliverables [SPEC]:** Source text relationships.
+- **Acceptance:** A full traversal from any extraction lands on exact source text; broken offsets are impossible by construction and tested.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2–S3.4.
+- **Stop:** Entity linkage is S3.6.
+- **Status:** Not Started
+
+#### S3.6 Entity extraction framework [SPEC]
+- **Goal:** Characters/locations/objects/events/chronology extraction.
+- **Scope:** Typed extraction records (`entity type`, `name`, `span link`, `confidence`); deterministic candidates + optional LM Studio-assisted classification (S2.9 adapter); extraction never invents spans.
+- **Deliverables [SPEC]:** Character/location/object/event/chronology extraction.
+- **Acceptance:** Fixture entities resolve to exact source spans; candidates without spans are rejected.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.5, S2.9.
+- **Stop:** Canonical status assignment is S3.7; Studio CRUD stays Stages 4–5.
+- **Status:** Not Started
+
+#### S3.7 Canon classification [SPEC]
+- **Goal:** Canon is not speculation (§2.7).
+- **Scope:** Four-way classification per extraction — explicit / interpretation / AI suggestion / unknown-contradictory; suggestions never silently become facts (promotion requires explicit user action).
+- **Deliverables [SPEC]:** Canon versus interpretation classification.
+- **Acceptance:** A suggestion cannot satisfy a canon query until explicitly promoted; contradictions surface as unknown, never merged.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.6.
+- **Stop:** Continuity scoring stays Stage 9.
+- **Status:** Not Started
+
+#### S3.8 DOCX import [SPEC]
+- **Goal:** MS Word manuscripts import.
+- **Scope:** DOCX text+structure → normalized text with offset map; original .docx preserved.
+- **Deliverables [SPEC]:** DOCX import.
+- **Acceptance:** Fixture .docx segments match its .txt twin; originals preserved.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2 (normalized-text contract); parser selection requires owner approval (new dependency).
+- **Stop:** Tracked-changes/comment semantics are out of scope.
+- **Status:** Not Started
+
+#### S3.9 EPUB import [SPEC]
+- **Goal:** EPUB manuscripts import.
+- **Scope:** EPUB spine order → normalized text with offset map; original .epub preserved.
+- **Deliverables [SPEC]:** EPUB import.
+- **Acceptance:** Fixture .epub lands in spine order with exact spans.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2; parser selection requires owner approval (new dependency).
+- **Stop:** MathML/footnote fidelity is out of scope.
+- **Status:** Not Started
+
+#### S3.10 PDF import [SPEC]
+- **Goal:** PDF manuscripts import (text layer).
+- **Scope:** Extractable-text PDFs → normalized text + spans; scanned-only PDFs report text as Unknown (no OCR in Stage 3).
+- **Deliverables [SPEC]:** PDF import.
+- **Acceptance:** Fixture PDF matches its text twin; OCR absence is explicit, never silent.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2; parser selection requires owner approval (new dependency).
+- **Stop:** OCR stays deferred; scanned PDFs are Unknown by design.
+- **Status:** Not Started
+
+#### S3.11 Art Style Manager [SPEC]
+- **Goal:** Visual identity of a project (§9).
+- **Scope:** Style profile CRUD (name, description, reference images, preferred models/LoRAs, palette, lighting/line-art/rendering, negative prompts, aspect ratios) + one canonical project default.
+- **Deliverables [SPEC]:** Art Style Manager.
+- **Acceptance:** Profiles create/edit/delete; exactly one canonical default per project.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.5 (reference assets).
+- **Stop:** Generation consumption stays Stage 7.
+- **Status:** Not Started
+
+#### S3.12 Style profile persistence [SPEC]
+- **Goal:** Styles survive restart + portability.
+- **Scope:** Project-store persistence of profiles incl. asset references (S1.4 relative paths only); backup/restore covered by S1.8.
+- **Deliverables [SPEC]:** Style profile persistence.
+- **Acceptance:** Styles round-trip through copy/restore; no absolute paths stored.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S1.9.
+- **Stop:** Scene application is S3.13.
+- **Status:** Not Started
+
+#### S3.13 Style variants + priority resolution [SPEC]
+- **Goal:** Predictable conflict resolution (§9.1/§9.2).
+- **Scope:** Variant profiles; priority order panel > character > scene > project; lock-strength setting; conflicting instructions warn.
+- **Deliverables [SPEC]:** Style variants; priority resolution.
+- **Acceptance:** A contested scene resolves to the same winner every time; lock strength + conflicts are visible; styles remain guidance, not guarantees.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11–S3.12.
+- **Stop:** Panel instructions themselves stay Stage 6.
+- **Status:** Not Started
+
+#### S3.14 Stage 3 acceptance fixture [SPEC]
+- **Goal:** End-to-end proof of Stage 3.
+- **Scope:** Fixture manuscript → import → chapters/scenes → entities → canon classification → style applied to a scene; originals preserved throughout.
+- **Deliverables [SPEC]:** Stage 3 fixture.
+- **Acceptance:** The whole Stage-3 acceptance passes on the fixture; extracted info links to source; styles apply to scenes.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.1–S3.13.
+- **Stop:** Stage gate — Character Studio (S4) begins only after this passes.
+- **Status:** Not Started
+
+Stages 4–11 — task groups [SPEC §15]
+
+All groups: **Completeness Incomplete; Status Needs Clarification.** Each must be expanded per §16.2 before implementation.
 - **Stage 4 — Character Studio.** Goal: Character profiles, visual references, version management. Acceptance: multiple visual versions; every panel identifies exact version; incomplete references produce actionable warnings. Groups: CRUD, version records, reference association, completeness scoring (§8.4 tiers), minimum viable reference set, generation, approval, binding, comparison, history.
 - **Stage 5 — Location and Object Studio.** Goal: Reusable visual references. Acceptance: locations/objects independently created/edited/referenced/regenerated. Groups: location profiles/variations, object profiles/variations, asset history, generation integration.
 - **Stage 6 — Storyboard Studio.** Goal: Scenes → editable panel sequences. Acceptance: storyboard editable without artwork; every panel identifies source scene + character versions; storyboard changes don't silently modify approved artwork. Groups: scene/panel records, character/version/location assignment, camera/shot, positioning, dialogue/captions, style overrides, panel instructions, snapshots, lightweight branching, composition review.
