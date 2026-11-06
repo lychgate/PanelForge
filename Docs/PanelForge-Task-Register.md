@@ -485,7 +485,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Cooling is distinguishable from Paused/Failed/Waiting/Complete, explains why, and resumes correctly.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.4, S2.16.
 - **Stop:** PanelForge never claims to control temperature/fans/power (§10.4).
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S2.18 Small GPU Mode [SPEC]
 - **Goal:** First-class low-VRAM operation (GTX 1660 Ti-class target).
