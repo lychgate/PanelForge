@@ -467,7 +467,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Adapters can be added per-platform without touching the Resource Manager.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.14.
 - **Stop:** Failure semantics land in S2.16; thresholds land with S2.17.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S2.16 Graceful Telemetry Failure [SPEC]
 - **Goal:** Telemetry can fail without failing the app.

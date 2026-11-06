@@ -93,6 +93,8 @@ export type DetectionDeps = {
   platform?: () => string;
   runGpuProbe?: () => Promise<{ name?: string; vramBytes?: number } | null>;
   probeService?: (url: string, timeoutMs: number) => Promise<"up" | "refused" | "error">;
+  /** Registered telemetry adapters (S2.15); empty → monitoring Unknown. */
+  telemetryAdapters?: Array<{ id: string }>;
 };
 
 // ---- RAM / CPU (os module; always measurable on supported hosts) ----
@@ -235,9 +237,13 @@ async function detectServices(
   return { imageBackends: unknown(detail), modelServices: unknown(detail) };
 }
 
-// ---- Monitoring (telemetry arrives S2.15; until then: unknown) ----
+// ---- Monitoring (S2.15: registered telemetry adapters, else unknown) ----
 
-function detectMonitoring(): Signal<string[]> {
+function detectMonitoring(adapters: Array<{ id: string }> = []): Signal<string[]> {
+  const ids = adapters.map((a) => a.id).filter((id) => typeof id === "string" && id !== "");
+  if (ids.length > 0) {
+    return { status: "detected", value: ids, checkedAt: now() };
+  }
   return unknown("no telemetry adapter registered (S2.15)");
 }
 
@@ -258,7 +264,7 @@ export async function detectHardware(deps: DetectionDeps = {}): Promise<Hardware
     cpu: detectCpu(cpus),
     imageBackends: services.imageBackends,
     modelServices: services.modelServices,
-    monitoring: detectMonitoring(),
+    monitoring: detectMonitoring(deps.telemetryAdapters ?? []),
     checkedAt: now(),
   };
 }
