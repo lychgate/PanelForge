@@ -232,6 +232,31 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.8 — Inpainting (2026-11-06) — [`b57f89a`](https://github.com/lychgate/PanelForge/commit/b57f89aeb088c0737580df4687541ef6ef9b7a07)
+
+**Added**
+
+- `src/core/project/inpaint.ts` —
+  `setInpaintRegions`/`getInpaintRegions` (validated
+  coordinate rectangles: integers, positive size, non-
+  negative; canvas bounds checked against the template
+  at repaint time) and `inpaintPanel` (repaints the
+  latest artwork version through S7.1 into a NEW version
+  row; the base version stays intact; repaint recorded
+  with base + regions + prompt).
+- Migration 045 (`panel_inpaint_regions` +
+  `panel_repaints`) in
+  `src/core/project/metadata.ts`.
+- `tests/inpaint.test.js` — 4 tests: region validation
+  round-trips, repaint = new version with base preserved,
+  out-of-canvas + missing-data rejections, migration v45.
+
+**Changed**
+
+- Register: S7.8 marked **Complete**; Stage 7 now 8 of 15;
+  §11 next eligible is S7.9.
+- `Plan.md`: S7.8 checked off (2026-11-06).
+
 ### S7.7 — Variations (2026-11-06) — [`9c2e172`](https://github.com/lychgate/PanelForge/commit/9c2e172ac024d7a3459f17d0eedaaaf95346f9b9)
 
 **Added**
