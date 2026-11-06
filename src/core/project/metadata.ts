@@ -322,6 +322,20 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE INDEX IF NOT EXISTS idx_object_references_variation ON object_references(variation_id)",
     ],
   },
+  // S5.7: entity → location/object bridge (S4.6 pattern).
+  // source_entity_id (nullable, unique per table) records which
+  // Stage 3 extraction spawned a profile — one profile per
+  // entity, never auto-created.
+  {
+    version: 26,
+    name: "026_location_object_bridge",
+    statements: [
+      "ALTER TABLE locations ADD COLUMN source_entity_id TEXT",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_locations_source_entity ON locations(source_entity_id) WHERE source_entity_id IS NOT NULL",
+      "ALTER TABLE objects ADD COLUMN source_entity_id TEXT",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_objects_source_entity ON objects(source_entity_id) WHERE source_entity_id IS NOT NULL",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
