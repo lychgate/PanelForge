@@ -77,6 +77,33 @@ unchanged. Writes go through the serialized queue (WAL + foreign keys + busy
 timeout 5000, like the app database), and migrations are tracked in the
 project database's own `schema_migrations` table.
 
+## Schema evolution (migrations 001–019)
+
+The project database gains tables along with each stage (tracked in
+its own `schema_migrations` table; see `src/core/project/metadata.ts`).
+Current head: **19**.
+
+| Migrations | Contents |
+|---|---|
+| 001–002 | `projects` metadata row + S1-era store foundations |
+| 003–005 | Asset registry/integrity/backup foundations |
+| 006–008 | Manuscript records, normalization, chapters/scenes |
+| 009–010 | Art styles + style variants (S3.11/S3.13) |
+| 011 | Character profiles (S4.1) |
+| 012 | Character versions (S4.2) |
+| 013 | Version references (S4.3) |
+| 014 | Completeness tier config (S4.5) |
+| 015 | Entity bridge (`characters.source_entity_id`, S4.6) |
+| 016 | Panel bindings (S4.7) |
+| 017 | Version approval columns (S4.8) |
+| 018 | Generation requests (S4.9) |
+| 019 | Character history (S4.11) |
+
+Manuscript-side tables (Stage 3): `manuscripts`, `normalizations`,
+`chapters`, `scenes`, `entities`, `canon`. All paths stored inside
+these rows are relative with `/` separators (D7); `project.json`
+remains the format marker (v1).
+
 ## Stage 1 fixture (S1.11)
 
 The end-to-end gate exercise (`tests/stage1-fixture.test.js`): a sample

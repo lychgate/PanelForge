@@ -7,6 +7,30 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### Stages 5 + 6 Planning — Location/Object + Storyboard Expansion (2026-11-06)
+
+**Changed**
+
+- Register §4E: Stage 5 expanded to 10 micro-tasks S5.1–S5.10
+  and Stage 6 to 13 micro-tasks S6.1–S6.13 (owner-authorized
+  planning). Stage 5 answers: link-never-create seeding,
+  records-only generation. Stage 6 answers: infra first +
+  minimal hand-rolled UI second (no framework; CSP still
+  deferred), full-copy snapshots with lineage branching.
+- `Plan.md`: Stage 5 + Stage 6 task lists added (all Not
+  Started).
+- `Docs/PanelForge-Project-Format.md`: schema-evolution table
+  (migrations 001–019) added.
+- `Docs/PanelForge-Security-Baseline.md`: superseded-notes
+  banner (bridge now allowlisted; CSP still deferred).
+- `tests/TestData/`: owner's novel committed (25 PDFs,
+  ~2.6 MB) with `README.md` documenting the journal-entry
+  layout (chapters ~4–15), the all-scanned import status under
+  the S3.10 text-layer-only parser, and the Epilogue inflate
+  finding.
+- **No implementation yet** — S5.1/S6.1 must not begin without
+  explicit owner authorization.
+
 ### S4.12 — Stage 4 Acceptance Fixture (2026-11-06) — [`ac6afc9`](https://github.com/lychgate/PanelForge/commit/ac6afc9fac5e7a4f2bed5f42457671e1dcc1eaf6)
 
 **Added**

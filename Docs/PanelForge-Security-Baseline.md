@@ -6,6 +6,14 @@ these flags from the first window (Q2, owner-approved 2026-11-05); S0.3
 the baseline here**. S0.4 owns the IPC allowlist; CSP is a documented
 deferral (below).
 
+> **Superseded notes (written as S0.3, read today):** the bridge is no
+> longer empty — since S0.5 it exposes `diagnostics.get`, and the S0.4
+> allowlist now covers the 9 registered channels (see
+> `src/core/ipc/registry.ts`). The IPC guard in `scripts/check.js`
+> enforces that `ipcMain` lives only in the registry and
+> `ipcRenderer` only in preload. CSP remains deferred until the UI
+> framework choice (see §4 and register D3).
+
 ## 1. webPreferences baseline (verified by tests)
 
 | Flag | Value | Verified |

@@ -748,11 +748,214 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Stop:** Stage gate — Location and Object Studio (S5) begins only after this passes.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit ac6afc9; see below) — **Stage 4 complete (12 of 12).**
 
-Stages 5–11 — task groups [SPEC §15]
+**Stage 5 — Location and Object Studio: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
+
+> Goal [SPEC]: Reusable visual references for environments and objects.
+> Stage acceptance [SPEC]: locations/objects independently created/edited/referenced/regenerated.
+> Structure [RECOMMENDATION]: 10 micro-tasks S5.1–S5.10, spine first (location profiles → variations → references, object profiles → variations → references), then entity bridge (link, never auto-create — owner decision 2026-11-06), generation-request records (records only, S4.9 pattern), asset history (append-only, S4.11 pattern), acceptance fixture last. Infra only — no live generation (real ComfyUI execution stays Stage 7), no model provisioning.
+
+#### S5.1 Location profile records [SPEC]
+- **Goal:** Durable location profiles.
+- **Scope:** `locations` table + CRUD; fields per §8.5 (architecture, geography, interior/exterior layout, lighting, time of day, weather, materials, color palette, damage states, historical/chronological variations — structured text, name required, rest optional).
+- **Deliverables [SPEC]:** Location profiles.
+- **Acceptance:** Profiles create, read back, update, delete with typed errors; name validation.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.1 (project store).
+- **Stop:** Variations stay S5.2; references stay S5.3.
+- **Status:** Not Started
+
+#### S5.2 Location variations [SPEC]
+- **Goal:** Distinct states of one location.
+- **Scope:** `location_variations` table; label per variation (e.g. "Ravenholt, winter, damaged"), unique per location (case-insensitive); per-variation text overrides (lighting/time-of-day/weather/damage first). Identity stable.
+- **Deliverables [SPEC]:** Location variations.
+- **Acceptance:** One location holds multiple variations; labels unique per location.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.1.
+- **Stop:** References stay S5.3.
+- **Status:** Not Started
+
+#### S5.3 Location reference association [SPEC]
+- **Goal:** Link registry assets to a variation with a role.
+- **Scope:** `location_references` table; slot kinds: exterior, interior, overview, detail, day, night, weather, damaged (per §8.5); validated against S1.5 registry; exact slot queries.
+- **Deliverables [SPEC]:** Location reference management.
+- **Acceptance:** Assets associate by slot; unknown assets/slots reject; slot queries return exact sets.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.2, S1.5.
+- **Status:** Not Started
+
+#### S5.4 Object profile records [SPEC]
+- **Goal:** Durable object profiles.
+- **Scope:** `objects` table + CRUD; fields per §8.6 (name, description, dimensions, materials, appearance, damage states, category hint — name required, rest optional).
+- **Deliverables [SPEC]:** Object profiles.
+- **Acceptance:** Profiles create, read back, update, delete with typed errors; name validation.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.1.
+- **Stop:** Variations stay S5.5; references stay S5.6.
+- **Status:** Not Started
+
+#### S5.5 Object variations [SPEC]
+- **Goal:** Distinct states of one object.
+- **Scope:** `object_variations` table; label per variation (e.g. "OmniPad, pristine" / "OmniPad, damaged"), unique per object (case-insensitive); per-variation text overrides (appearance/damage first). Identity stable.
+- **Deliverables [SPEC]:** Object variations.
+- **Acceptance:** One object holds multiple variations; labels unique per object.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.4.
+- **Stop:** References stay S5.6.
+- **Status:** Not Started
+
+#### S5.6 Object reference association [SPEC]
+- **Goal:** Link registry assets to a variation with a role.
+- **Scope:** `object_references` table; slot kinds: front, side, detail, in-use, damaged; validated against S1.5 registry; exact slot queries.
+- **Deliverables [SPEC]:** Object reference management.
+- **Acceptance:** Assets associate by slot; unknown assets/slots reject; slot queries return exact sets.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.5, S1.5.
+- **Status:** Not Started
+
+#### S5.7 Entity → location/object bridge [SPEC]
+- **Goal:** Profiles trace to their Stage 3 mentions, never auto-created.
+- **Scope:** Explicit "create location/object from entity" (mirrors S4.6): copies the entity's name, records `source_entity_id`; all other fields start empty; duplicate creation rejected.
+- **Deliverables [SPEC]:** (bridge support for both studios)
+- **Acceptance:** Profiles keep resolvable links to source spans; an entity never spawns two profiles.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.6, S5.1, S5.4.
+- **Status:** Not Started
+
+#### S5.8 Generation-request records [SPEC]
+- **Goal:** Record generation requests for locations/objects; never generate here.
+- **Scope:** Extend the S4.9 shape to (variation, slot) pairs for both studios: `location_generation_requests` + `object_generation_requests` (or one shared table with a subject discriminator — decide at implementation, default shared); same validation, same zero-provider rule.
+- **Deliverables [SPEC]:** (group: generation integration — request side only)
+- **Acceptance:** Requests validate/store/list; malformed requests rejected; zero provider calls made.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.9, S2.13.
+- **Stop:** Live ComfyUI execution stays Stage 7.
+- **Status:** Not Started
+
+#### S5.9 Asset history [SPEC]
+- **Goal:** Every change to a location/object/variation is traceable.
+- **Scope:** Append-only history for both studios (mirrors S4.11): one table per studio or a shared table with subject discriminator; queryable per profile and per variation; never edited (deletion only with the profile).
+- **Deliverables [SPEC]:** Asset history.
+- **Acceptance:** A fixture lifecycle (create → variation → reference) replays in order.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.1–S5.8.
+- **Status:** Not Started
+
+#### S5.10 Stage 5 acceptance fixture [SPEC]
+- **Goal:** End-to-end proof of Stage 5.
+- **Scope:** Fixture location + object (from Stage 3 entities) → variations → references → request records → history replay; each independently created/edited/referenced.
+- **Deliverables [SPEC]:** Stage 5 fixture.
+- **Acceptance:** The whole Stage-5 acceptance passes on the fixture; variations regenerate independently (separate request/asset tracks).
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.1–S5.9.
+- **Stop:** Stage gate — Storyboard Studio (S6) begins only after this passes.
+- **Status:** Not Started
+
+**Stage 6 — Storyboard Studio: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
+
+> Goal [SPEC]: Convert scenes into editable panel sequences.
+> Stage acceptance [SPEC]: storyboard editable without artwork; every panel identifies source scene + character versions; storyboard changes don't silently modify approved artwork.
+> Structure [RECOMMENDATION]: 13 micro-tasks S6.1–S6.13, spine first (scene + panel records → assignments → camera/positioning → dialogue → style overrides → instructions → snapshots + branching → composition review), then minimal UI (owner decision 2026-11-06: hand-rolled HTML/CSS + shortcut registry, no framework; final CSP still deferred to the UI-framework choice), then acceptance fixture using `tests/TestData` from Stage 6 onward. Infra first, minimal UI second — no generation (Stage 7 owns ComfyUI execution).
+
+#### S6.1 Scene records [SPEC]
+- **Goal:** Storyboard scenes with a traceable source.
+- **Scope:** `storyboard_scenes` table: scene key, source manuscript + S3.5 chain reference (manuscript/chapter/scene spans), narrative purpose, approval-ish status; CRUD; the Stage 3 scenes table is the extraction source — storyboard scenes wrap it, never rewrite it.
+- **Deliverables [SPEC]:** Scene records.
+- **Acceptance:** Scenes create/read/update/delete with typed errors; every scene resolves its source chain.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.5.
+- **Stop:** Panels stay S6.2.
+- **Status:** Not Started
+
+#### S6.2 Panel records [SPEC]
+- **Goal:** Editable panel sequences (no artwork yet).
+- **Scope:** `storyboard_panels` table: panel key, parent scene, sort order, panel URL/identity; CRUD; reorder; delete rules (bound variants/assignments cascade explicitly or refuse — decide at implementation, default refuse when assigned).
+- **Deliverables [SPEC]:** Panel records.
+- **Acceptance:** A storyboard creates/edits/deletes/reorders panels with no artwork attached; order persists.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.1.
+- **Status:** Not Started
+
+#### S6.3 Character and version assignment [SPEC]
+- **Goal:** Panels stop using opaque IDs.
+- **Scope:** Realize S4.7: panel bindings now reference real `storyboard_panels.panel_id` rows (opaque IDs become real FKs); multi-character assignment per panel (relative placement hints at this layer); binding names the exact approved version, else refuses (S4.8 gate).
+- **Deliverables [SPEC]:** Character and version assignment.
+- **Acceptance:** Every panel identifies its source scene and assigned character versions; unapproved versions cannot bind.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.7, S4.8, S6.2.
+- **Status:** Not Started
+
+#### S6.4 Location assignment [SPEC]
+- **Goal:** Panels name their location exactly.
+- **Scope:** `panel_location_assignments`: one location + variation per panel (variation optional); exact-variation identity; unresolved location references reject.
+- **Deliverables [SPEC]:** Location assignment.
+- **Acceptance:** A panel identifies its exact location (and variation when set); reassignment replaces cleanly.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S5.2, S6.2.
+- **Status:** Not Started
+
+#### S6.5 Camera and shot definitions [SPEC]
+- **Goal:** Camera guidance per panel.
+- **Scope:** Per-panel camera angle + shot type (closed vocab: close-up/medium/wide/extreme-wide + free text angle); validated vocab; list/filter by shot type.
+- **Deliverables [SPEC]:** Camera and shot definitions.
+- **Acceptance:** Panels carry camera/shot; unknown shot types reject.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.2.
+- **Status:** Not Started
+
+#### S6.6 Character positioning [SPEC]
+- **Goal:** Composition guidance per panel.
+- **Scope:** Per-assignment position (foreground/midground/background + left/center/right hints) and relative-placement notes; the system explicitly does not promise perfect placement (§8.7) — guidance only.
+- **Deliverables [SPEC]:** Character positioning.
+- **Acceptance:** Every character assignment on a panel carries placement guidance; positioning edits persist.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.3.
+- **Status:** Not Started
+
+#### S6.7 Dialogue, captions, actions, and expressions [SPEC]
+- **Goal:** Text content per panel.
+- **Scope:** Per-panel dialogue lines, captions, action description, and expression notes; structured line rows (speaker hint optional, since character assignment is S6.3); CRUD.
+- **Deliverables [SPEC]:** Dialogue and captions.
+- **Acceptance:** Panels carry editable dialogue/captions; empty panels remain valid (planning shorthand).
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.2.
+- **Status:** Not Started
+
+#### S6.8 Scene style overrides [SPEC]
+- **Goal:** Per-scene style guidance via S3.13 resolution.
+- **Scope:** Scene-level style variant overrides resolved through `resolveStyle` (scene scope, existing S3.13 API); unresolved scenes fall back to the project default; guidance-only disclaimer preserved.
+- **Deliverables [SPEC]:** Scene style overrides.
+- **Acceptance:** A contested scene resolves to the same winner every time; no match falls back to default.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.13, S6.1.
+- **Status:** Not Started
+
+#### S6.9 Panel instructions [SPEC]
+- **Goal:** Generation-ready instruction text per panel.
+- **Scope:** Per-panel instruction record (composition prompt, background detail, art direction notes) validated as text; the future Stage 7 consumer of S6.3–S6.9 combined.
+- **Deliverables [SPEC]:** Panel instructions.
+- **Acceptance:** Panels carry instruction text; malformed input rejects with typed errors.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.1–S6.8.
+- **Status:** Not Started
+
+#### S6.10 Storyboard snapshots + lightweight branching [SPEC]
+- **Goal:** Preserve working storyboards; experiment safely; return.
+- **Scope:** Full-copy snapshots (owner decision 2026-11-06): each snapshot copies the storyboard's panels + all assignments/details at one moment; branching = snapshot lineage (parent pointer); restore replaces live panels with the snapshot's copy; snapshots never feed Stages 7–10 directly.
+- **Deliverables [SPEC]:** Storyboard snapshots; lightweight branching.
+- **Acceptance:** Snapshots preserve exactly; restore is byte-identical to the snapshot; branched edits never damage the parent snapshot.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.1–S6.9.
+- **Status:** Not Started
+
+#### S6.11 Minimal storyboard UI [SPEC]
+- **Goal:** A storyboard can be read and edited without artwork.
+- **Scope:** Renderer view: panel list per scene, assignments, camera, dialogue, instructions; edits round-trip through IPC (S0.4 allowlist pattern, new channels registered); hand-rolled HTML/CSS + the existing shortcut registry (owner decision 2026-11-06: no framework). Keyboard-navigable; no generation buttons yet.
+- **Deliverables [SPEC]:** (UI surface for all groups above)
+- **Acceptance:** A storyboard edits fully without generating artwork; every panel shows source scene + character versions; fixture on `tests/TestData` chapter.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S0.4, S0.10, S6.1–S6.10.
+- **Stop:** Generation controls stay Stage 7; final CSP stays deferred to the UI-framework choice.
+- **Status:** Not Started
+
+#### S6.12 Composition review [SPEC]
+- **Goal:** Actionable warnings before artwork exists.
+- **Scope:** Read-only review of a storyboard: panels missing character/location assignment, unapproved bound versions, era mismatches (S4.7 helper), empty dialogue on action panels, duplicate slots; warnings name the panel + the fix.
+- **Deliverables [SPEC]:** Composition review.
+- **Acceptance:** Fixture storyboards with planted gaps produce those warnings; clean storyboards pass silently.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.1–S6.11, S4.7.
+- **Status:** Not Started
+
+#### S6.13 Stage 6 acceptance fixture [SPEC]
+- **Goal:** End-to-end proof of Stage 6 on the real book.
+- **Scope:** Import one `tests/TestData` chapter (text-layer PDF or extraction note per S3.10) → storyboard it (scenes, panels, assignments, camera, dialogue, instructions) → snapshot + branch + restore → composition review; storyboard changes never touch approved artwork (character versions, style profiles, and references intact throughout).
+- **Deliverables [SPEC]:** Stage 6 fixture.
+- **Acceptance:** The whole Stage-6 acceptance passes on the fixture; every panel identifies source scene + character versions; storyboard edits leave approved artwork byte-identical.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.1–S6.12.
+- **Stop:** Stage gate — Art Studio (S7) begins only after this passes.
+- **Status:** Not Started
+
+Stages 7–11 — task groups [SPEC §15]
 
 All groups: **Completeness Incomplete; Status Needs Clarification.** Each must be expanded per §16.2 before implementation.
-- **Stage 5 — Location and Object Studio.** Goal: Reusable visual references. Acceptance: locations/objects independently created/edited/referenced/regenerated. Groups: location profiles/variations, object profiles/variations, asset history, generation integration.
-- **Stage 6 — Storyboard Studio.** Goal: Scenes → editable panel sequences. Acceptance: storyboard editable without artwork; every panel identifies source scene + character versions; storyboard changes don't silently modify approved artwork. Groups: scene/panel records, character/version/location assignment, camera/shot, positioning, dialogue/captions, style overrides, panel instructions, snapshots, lightweight branching, composition review.
 - **Stage 7 — Art Studio.** Goal: Generate/review/compare/approve individual artworks. Acceptance: independent generation/regeneration; history retained; approved work preserved; provenance stored. Groups: ComfyUI workflow integration/templates, prompt/negative/reference conditioning, individual generation, variations, inpaint/outpaint, side-by-side and approved-reference comparison (§8.8), provenance (§12), version history, approval/restoration, dependency tracking (§11.5).
 - **Stage 8 — Comic Layout Studio.** Goal: Assemble approved artwork into finished pages. Acceptance: page assembled without modifying original artwork; dialogue/captions editable; traditional + vertical formats work. Groups: page creation, traditional/webtoon layouts, placement/resizing/borders, balloon creation/positioning/tail, dialogue/caption editing, sound effects, reading order, layout snapshots. Note [SPEC §8.9]: text not baked into artwork.
 - **Stage 9 — Continuity and QA.** Goal: Detect meaningful inconsistencies. Acceptance: major inconsistencies reported; minor issues don't overwhelm; warnings identify affected scene/panel. Groups: version/age/clothing/equipment/injury/location/chronology/reference checks, severity classification (§8.10: Critical/Warning/Informational), suppression/overrides, actionable recommendations.
@@ -1565,7 +1768,10 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S4.11:** S4.12 — Stage 4 acceptance fixture (create → versions → references → tiers → approve → bind → gate). **Status: Complete (2026-11-06, impl commit ac6afc9; 420 tests incl. 2 stage4-fixture). Stage 4 complete (12 of 12).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S4.12:** Stage 5 — Location and Object Studio (expansion per §16.2 required before implementation). Do not begin without explicit owner authorization.
+**Next eligible after S4.12:** Stage 5 — Location and Object Studio, **EXPANDED to S5.1–S5.10 (owner-authorized planning 2026-11-06; owner answers: link-never-create — see §12)** — and ready for planning of Stage 6, which is also expanded **S6.1–S6.13 (owner answers: infra first, minimal UI second, no framework; full-copy snapshots — see §12)**. Do not begin S5.1 or S6.1 implementation without explicit owner authorization of that stage. One-task-at-a-time (approved) stops here.
+
+**Next eligible after Stage 5 expansion:** S5.1 — Location profile records (see §4E Stage 5). **Status: Not Started.**
+**Next eligible after Stage 6 expansion:** S6.1 — Scene records (see §4E Stage 6). **Status: Not Started.**
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1653,5 +1859,7 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S4.10 complete. Acceptance verified (415 tests incl. 4 version-comparison; slot/field diffs exact, identical-clean, read-only). Stage 4 now 10 of 12. Stopped for owner review before S4.11. | [SPEC] | Crouton (S4.10 implementation) |
 | 2026-11-06 | S4.11 complete. Acceptance verified (418 tests incl. 3 history; fixture lifecycle replays in order, append-only with character cascade). Stage 4 now 11 of 12. Stopped for owner review before S4.12. | [SPEC] | Crouton (S4.11 implementation) |
 | 2026-11-06 | S4.12 complete. Acceptance verified (420 tests incl. 2 stage4-fixture; full pipeline entity→bind→history on two characters). **Stage 4 gate passes (12 of 12).** Stopped for owner review before Stage 5 expansion. | [SPEC] | Crouton (S4.12 implementation) |
+| 2026-11-06 | Stage 5 + Stage 6 planning: expanded to S5.1–S5.10 and S6.1–S6.13 (owner-authorized). Stage 5 answers: link-never-create for entity seeding, records-only generation (S4.9 pattern). Stage 6 answers: infra first + minimal hand-rolled UI second (no framework; CSP finalization still deferred), full-copy snapshots with lineage branching. **Do not begin S5.1/S6.1 without explicit owner authorization.** | [APPROVED CHANGE — owner] | Crouton (Stage 5/6 planning) |
+| 2026-11-06 | Test data: `tests/TestData/` (owner's book — 22 chapters + epilogue + prologue, PDFs, ~2.6 MB) committed for Stage 6+ testing. Chapters 4–15 use a journal-entry layout; the rest a normal-novel layout. All 25 PDFs report `scanned` under the S3.10 text-layer-only parser (image-based, no extractable text); Epilogue additionally fails FlateDecode inflate in our parser — see `tests/TestData/README.md`. | [SPEC] | Crouton (test data) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

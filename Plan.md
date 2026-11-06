@@ -118,11 +118,51 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 ## Stage 5 — Location and Object Studio
 
-- [ ] Stage 5 — not started
+> Expanded planning 2026-11-06 (owner-authorized expansion, awaiting task-level
+> approval): 10 micro-tasks S5.1–S5.10, spine first (location profiles →
+> variations → references; object profiles → variations → references), then
+> entity bridge (link, never auto-create), generation-request records
+> (records only), asset history, acceptance fixture last. Infra only — no
+> live generation (Stage 7 owns ComfyUI execution). See
+> `Docs/PanelForge-Task-Register.md` §4E Stage 5 for full per-task
+> Goal/Scope/Deliverables/Deps/Acceptance/Stop.
+
+- [ ] S5.1 Location profile records (§8.5 fields + CRUD)
+- [ ] S5.2 Location variations (identifiable states like "Ravenholt, winter, damaged")
+- [ ] S5.3 Location reference association (exterior/interior/overview/detail/day/night/weather/damaged slots)
+- [ ] S5.4 Object profile records (§8.6 fields + CRUD)
+- [ ] S5.5 Object variations (states like "OmniPad, pristine/damaged")
+- [ ] S5.6 Object reference association (front/side/detail/in-use/damaged slots)
+- [ ] S5.7 Entity → location/object bridge (explicit create-from-entity; link, never auto-create)
+- [ ] S5.8 Generation-request records (request shape + validation only; zero provider calls)
+- [ ] S5.9 Asset history (append-only lifecycle replay)
+- [ ] S5.10 Stage 5 acceptance fixture (create → variants → reference → regenerate independently)
 
 ## Stage 6 — Storyboard Studio
 
-- [ ] Stage 6 — not started
+> Expanded planning 2026-11-06 (owner-authorized expansion, awaiting task-level
+> approval): 13 micro-tasks S6.1–S6.13, spine first (scene + panel records →
+> assignments → camera/positioning → dialogue → style overrides →
+> instructions → full-copy snapshots + lineage branching → composition
+> review), then a minimal hand-rolled UI (owner decision 2026-11-06: no
+> framework; final CSP still deferred), then the acceptance fixture on
+> `tests/TestData`. Infra first, minimal UI second — no generation
+> (Stage 7 owns ComfyUI execution). See
+> `Docs/PanelForge-Task-Register.md` §4E Stage 6 for full per-task spec.
+
+- [ ] S6.1 Scene records (source chain via S3.5; wrap, never rewrite, extraction scenes)
+- [ ] S6.2 Panel records (editable sequences with no artwork; reorder persists)
+- [ ] S6.3 Character and version assignment (S4.7 opaque IDs become real FKs; approved-only gate)
+- [ ] S6.4 Location assignment (exact location + optional variation per panel)
+- [ ] S6.5 Camera and shot definitions (closed vocab + free-text angle)
+- [ ] S6.6 Character positioning (foreground/midground/background + left/center/right guidance only)
+- [ ] S6.7 Dialogue, captions, actions, and expressions (editable line rows)
+- [ ] S6.8 Scene style overrides (S3.13 resolveStyle consumer; default fallback)
+- [ ] S6.9 Panel instructions (generation-ready text for Stage 7)
+- [ ] S6.10 Storyboard snapshots + lightweight branching (full-copy snapshots, parent lineage)
+- [ ] S6.11 Minimal storyboard UI (read/edit without artwork; hand-rolled HTML/CSS + shortcuts; new IPC channels)
+- [ ] S6.12 Composition review (gap/mismatch warnings naming panel + fix)
+- [ ] S6.13 Stage 6 acceptance fixture (storyboard a TestData chapter; approved artwork stays byte-identical)
 
 ## Stage 7 — Art Studio
 
