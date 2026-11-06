@@ -591,6 +591,8 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 
 **Parser decision (owner, 2026-11-05):** zero-new-dependency reader (reuses the S3.8 ZIP reader) — no new dependency installed.
 
+**Status:** **Complete** (2026-11-05 — acceptance verified; impl commit 0fc34d8; see below)
+
 #### S3.10 PDF import [SPEC]
 - **Goal:** PDF manuscripts import (text layer).
 - **Scope:** Extractable-text PDFs → normalized text + spans; scanned-only PDFs report text as Unknown (no OCR in Stage 3).
@@ -1127,6 +1129,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S3.8 | `DISPLAY=:0 npm test` | Pass — 337 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 9 ipc + 13 security) | `tests/docx-import.test.js` (5 tests): stored/deflated ZIP + corrupt rejection, twin match with heading markers, entities + tabs/breaks, original preservation + normalization, missing-document/source rejection. |
 | 2026-11-05 | S3.8 | `npm run check` | Pass | Baseline + IPC guard green (no new deps — zero-dependency parser). |
 | 2026-11-05 | S3.8 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S3.9 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S3.9 | `npm run build` | Pass | `out/node/core/project/epub-import.js` emitted. |
+| 2026-11-05 | S3.9 | `DISPLAY=:0 npm test` | Pass — 341 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 9 ipc + 13 security) | `tests/epub-import.test.js` (4 tests): spine order over filename order, heading extraction + script stripping, original preservation + normalization, non-EPUB rejection. |
+| 2026-11-05 | S3.9 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S3.9 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S3.9 implemented files:** `src/core/project/epub-import.ts` (New — zero-dependency spine reader + `extractXhtmlText` + `importEpubManuscript`; container→OPF→XHTML order), `tests/epub-import.test.js` (New, 4 tests). MathML/footnotes out of scope.
 
 **S3.8 implemented files:** `src/core/project/docx-import.ts` (New — zero-dependency ZIP reader + `extractDocumentXml` + `importDocxManuscript`; document.xml paragraphs/headings/tabs/breaks), `tests/docx-import.test.js` (New, 5 tests). Tracked changes/comments out of scope.
 
@@ -1286,7 +1295,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S3.7:** S3.8 — DOCX import (parser dependency; smallest pure-JS surface per owner decision). **Status: Complete (2026-11-05, impl commit 248dd2a; 337 tests incl. 5 docx-import).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.8:** S3.9 — EPUB import. Do not begin without explicit owner authorization.
+**Next eligible after S3.8:** S3.9 — EPUB import. **Status: Complete (2026-11-05, impl commit 0fc34d8; 341 tests incl. 4 epub-import).** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S3.9:** S3.10 — PDF import (text layer only; OCR deferred as Unknown per owner decision). Do not begin without explicit owner authorization.
 
 ---
 
@@ -1353,5 +1364,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S3.6 complete. Acceptance verified (327 tests incl. 5 entities; exact spans, hallucinated quotes rejected). Stopped for owner review before S3.7. | [SPEC] | Crouton (S3.6 implementation) |
 | 2026-11-05 | S3.7 complete. Acceptance verified (332 tests incl. 5 canon; suggestion quarantine + promotion; contradictions unknown, never merged). Stopped for owner review before S3.8. | [SPEC] | Crouton (S3.7 implementation) |
 | 2026-11-05 | S3.8 complete. Acceptance verified (337 tests incl. 5 docx-import; twin-verified, originals preserved, zero new dependencies). Stopped for owner review before S3.9. | [SPEC] | Crouton (S3.8 implementation) |
+| 2026-11-05 | S3.9 complete. Acceptance verified (341 tests incl. 4 epub-import; spine-ordered, originals preserved). Stopped for owner review before S3.10. | [SPEC] | Crouton (S3.9 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

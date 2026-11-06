@@ -7,6 +7,24 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.9 — EPUB Import (2026-11-05) — [`0fc34d8`](https://github.com/lychgate/PanelForge/commit/0fc34d821074df506a13ddd17a8db05aa239700e)
+
+**Added**
+
+- `src/core/project/epub-import.ts` — zero-dependency spine reader
+  (container.xml → OPF → XHTML order): `epubRootfilePath`,
+  `epubSpineOrder`, `extractXhtmlText` (h1–h6 → markers, scripts/
+  styles stripped), `extractEpubText`, `importEpubManuscript`
+  (original preserved via S3.1, normalization via S3.2). MathML/
+  footnotes out of scope.
+- `tests/epub-import.test.js` — 4 tests: spine order, heading
+  extraction, preservation + normalization, non-EPUB rejection.
+
+**Changed**
+
+- Register: S3.9 marked **Complete**; §11 next eligible is S3.10.
+- `Plan.md`: S3.9 checked off (2026-11-05).
+
 ### S3.8 — DOCX Import (2026-11-05) — [`248dd2a`](https://github.com/lychgate/PanelForge/commit/248dd2a33ab03d5101ccdc3ebe395b5c20950d11)
 
 **Added**
