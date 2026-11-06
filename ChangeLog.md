@@ -7,6 +7,26 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S3.7 — Canon Classification (2026-11-05) — [`9cb65dd`](https://github.com/lychgate/PanelForge/commit/9cb65ddc3af27049cb8d953c6180c1e917cd33ee)
+
+**Added**
+
+- `src/core/project/canon.ts` — four-way classification
+  (explicit/interpretation/suggestion/unknown) with single-row
+  upserts, `promoteToCanon` (explicit user action + rationale,
+  unknowns refuse), `canonQuery` (explicit-only — suggestions never
+  satisfy), and contradiction detection (conflicting explicit span
+  records unknown, never merged).
+- Migration 008 (`canon` table) in `src/core/project/metadata.ts`.
+- `tests/canon.test.js` — 5 tests: suggestion quarantine + promotion,
+  direct explicit, unknown non-promotable, contradiction handling,
+  missing-id rejection.
+
+**Changed**
+
+- Register: S3.7 marked **Complete**; §11 next eligible is S3.8.
+- `Plan.md`: S3.7 checked off (2026-11-05).
+
 ### S3.6 — Entity Extraction Framework (2026-11-05) — [`fa0e774`](https://github.com/lychgate/PanelForge/commit/fa0e774d8559f1940c2013a8949be2efbff1cc30)
 
 **Added**

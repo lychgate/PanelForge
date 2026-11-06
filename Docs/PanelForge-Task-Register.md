@@ -567,7 +567,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A suggestion cannot satisfy a canon query until explicitly promoted; contradictions surface as unknown, never merged.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.6.
 - **Stop:** Continuity scoring stays Stage 9.
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; impl commit 9cb65dd; see below)
 
 #### S3.8 DOCX import [SPEC]
 - **Goal:** MS Word manuscripts import.
@@ -1113,6 +1113,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S3.6 | `DISPLAY=:0 npm test` | Pass — 327 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 9 ipc + 13 security) | `tests/entities.test.js` (5 tests): deterministic exact spans, hallucinated-quote rejection, fixture store + source resolution, injected-classifier integration, missing-input rejection. |
 | 2026-11-05 | S3.6 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S3.6 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S3.7 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S3.7 | `npm run build` | Pass | `out/node/core/project/canon.js` emitted. |
+| 2026-11-05 | S3.7 | `DISPLAY=:0 npm test` | Pass — 332 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 9 ipc + 13 security) | `tests/canon.test.js` (5 tests): suggestion quarantine + promotion, direct explicit, unknown non-promotable, contradiction → unknown, missing-id rejection. |
+| 2026-11-05 | S3.7 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S3.7 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S3.7 implemented files:** `src/core/project/canon.ts` (New — `classifyEntity` (upsert + conflict-to-unknown), `promoteToCanon` (rationale-required), `canonQuery` (explicit-only), `listCanon`), `src/core/project/metadata.ts` (migration 008 canon table), `tests/canon.test.js` (New, 5 tests). Continuity scoring stays Stage 9.
 
 **S3.6 implemented files:** `src/core/project/entities.ts` (New — `deterministicCandidates` + `validateLlmProposals` + `createLmStudioClassifier` + `storeEntities`/`listEntities`), `src/core/project/metadata.ts` (migration 007 entities table), `tests/entities.test.js` (New, 5 tests). Canon assignment S3.7; Q5 LLM baseline nominated in module header (3B instruct Q4, verify on-policy).
 
@@ -1264,7 +1271,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S3.5:** S3.6 — Entity extraction framework (characters/locations/objects/events/chronology; deterministic spine, LLM optional per owner decision). **Status: Complete (2026-11-05, impl commit fa0e774; 327 tests incl. 5 entities).** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S3.6:** S3.7 — Canon classification (explicit / interpretation / suggestion / unknown; anti-fabrication). Do not begin without explicit owner authorization.
+**Next eligible after S3.6:** S3.7 — Canon classification (explicit / interpretation / suggestion / unknown; anti-fabrication). **Status: Complete (2026-11-05, impl commit 9cb65dd; 332 tests incl. 5 canon).** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S3.7:** S3.8 — DOCX import (parser dependency; smallest pure-JS surface per owner decision). Do not begin without explicit owner authorization.
 
 ---
 
@@ -1329,5 +1338,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S3.4 complete. Acceptance verified (317 tests incl. 5 scenes; scene fixture + chapter links; overrides correct boundaries without changing source text). Stopped for owner review before S3.5. | [SPEC] | Crouton (S3.4 implementation) |
 | 2026-11-05 | S3.5 complete. Acceptance verified (322 tests incl. 5 relationships; traversal lands on exact source text; tampering detected). Stopped for owner review before S3.6. | [SPEC] | Crouton (S3.5 implementation) |
 | 2026-11-05 | S3.6 complete. Acceptance verified (327 tests incl. 5 entities; exact spans, hallucinated quotes rejected). Stopped for owner review before S3.7. | [SPEC] | Crouton (S3.6 implementation) |
+| 2026-11-05 | S3.7 complete. Acceptance verified (332 tests incl. 5 canon; suggestion quarantine + promotion; contradictions unknown, never merged). Stopped for owner review before S3.8. | [SPEC] | Crouton (S3.7 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
