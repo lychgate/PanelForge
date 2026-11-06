@@ -549,7 +549,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** A full traversal from any extraction lands on exact source text; broken offsets are impossible by construction and tested.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2–S3.4.
 - **Stop:** Entity linkage is S3.6.
-- **Status:** Not Started
+- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
 
 #### S3.6 Entity extraction framework [SPEC]
 - **Goal:** Characters/locations/objects/events/chronology extraction.
