@@ -7,6 +7,31 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.7 — Character Version Binding (2026-11-06) — [`e640be4`](https://github.com/lychgate/PanelForge/commit/e640be469e959689243e712abeee46cb691f0941)
+
+**Added**
+
+- `src/core/project/version-binding.ts` — binding CRUD
+  (`bindVersion`/`getBinding`/`listBindingsByPanel`/
+  `listBindingsByCharacter`/`unbind`: one binding per
+  (panel, character) pair, panel_id opaque until Stage 6;
+  rebinding replaces) + `verifyBindingEra` (age mismatch
+  warnings).
+- Migration 016 (`panel_character_bindings`) in
+  `src/core/project/metadata.ts`.
+- `tests/version-binding.test.js` — 5 tests: exact-version
+  pinning, typed rejections, bound-version delete guard, era
+  clash/match/unbound warnings, character-scoped listing +
+  migration v16.
+
+**Changed**
+
+- `src/core/project/character-versions.ts`: deleting a version
+  now refuses while bound (`BOUND_VERSION`).
+- Register: S4.7 marked **Complete**; Stage 4 now 7 of 12; §11 next
+  eligible is S4.8.
+- `Plan.md`: S4.7 checked off (2026-11-06).
+
 ### S4.6 — Entity → Character Bridge (2026-11-06) — [`0ae0b62`](https://github.com/lychgate/PanelForge/commit/0ae0b6207ff9dde6f824989dcf28a5b038c4d134)
 
 **Added**

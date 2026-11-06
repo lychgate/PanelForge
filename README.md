@@ -24,7 +24,7 @@ npm run build      # compile TS to out/node (main/preload) + out/web (renderer) 
 npm start          # launch Electron (reads package.json "main": out/node/main/index.js)
 npm run dev        # runs typecheck + baseline check (does NOT build or launch)
 npm run typecheck  # TypeScript check for node + web projects
-npm test           # runs Vitest (397 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio+comfyui+provider-health+mock-provider+resource-profiles+hardware-detection+telemetry-adapter+telemetry-failure+cooling-down+small-gpu+manuscripts+text-normalize+chapters+scenes+relationships+entities+canon+docx-import+epub-import+pdf-import+art-styles+style-persistence+style-variants+stage3-fixture+characters+character-versions+version-references+completeness+tier-config+entity-bridge)
+npm test           # runs Vitest (402 tests across baseline/security/ipc/config/logging/database/lifecycle/shortcuts/packaging/project+metadata+operations+paths+assets+integrity+atomic+backup+portability+interface+stage1-fixture+provider-contract+task-records+task-queue+task-transitions+task-pause+task-retry+task-progress+queue-recovery+lmstudio+comfyui+provider-health+mock-provider+resource-profiles+hardware-detection+telemetry-adapter+telemetry-failure+cooling-down+small-gpu+manuscripts+text-normalize+chapters+scenes+relationships+entities+canon+docx-import+epub-import+pdf-import+art-styles+style-persistence+style-variants+stage3-fixture+characters+character-versions+version-references+completeness+tier-config+entity-bridge+version-binding)
 npm run check      # verifies baseline + IPC allowlist guard (ipcMain only in registry, ipcRenderer only in preload)
 npm run lint       # ESLint over TypeScript sources
 npm run package    # Electron Forge package → forge-out/panelforge-linux-x64/ (runnable build)
@@ -177,7 +177,7 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S2.18 — Small GPU Mode:** complete (1024-capped sequential envelope with release hooks; OOM retries downsize and fall back to CPU; approved art never replaced).
 
-**Stage 2 complete (18 of 18, 2026-11-05).** Stage acceptance — create → persist → execute → interrupt → resume → recover — passes against mocks with real adapters wired behind health gates and resource policy. **Stage 3 complete (14 of 14, 2026-11-06).** **Stage 4 (Character Studio) expanded to S4.1–S4.12 (owner-authorized planning 2026-11-06); S4.1–S4.6 complete (2026-11-06, 6 of 12), S4.7 awaits authorization**; see `Docs/PanelForge-Task-Register.md` §4E.
+**Stage 2 complete (18 of 18, 2026-11-05).** Stage acceptance — create → persist → execute → interrupt → resume → recover — passes against mocks with real adapters wired behind health gates and resource policy. **Stage 3 complete (14 of 14, 2026-11-06).** **Stage 4 (Character Studio) expanded to S4.1–S4.12 (owner-authorized planning 2026-11-06); S4.1–S4.7 complete (2026-11-06, 7 of 12), S4.8 awaits authorization**; see `Docs/PanelForge-Task-Register.md` §4E.
 
 ## Known limitations (end of Stage 0)
 
