@@ -206,6 +206,20 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### Stage 7 Amendment — Engine Provisioning (2026-11-06)
+
+**Changed**
+
+- Register §4E: S7.14 added (engine provisioning:
+  detect-or-install under `runtime/engines`; user installs
+  detected in place and never modified; LM Studio
+  guided/confirm-first; `ENGINE_MISSING` /
+  `ENGINE_INSTALL_FAILED` typed). Acceptance fixture
+  renumbered S7.14 → S7.15; S8.1/S8.2 deps and §5 rows
+  updated to S7.15.
+- `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
+- `README.md`: Stage 7 range S7.1–S7.15.
+
 ### S7.1 — ComfyUI Workflow Integration (2026-11-06) — [`4edda23`](https://github.com/lychgate/PanelForge/commit/4edda237d8a8e4bade7011ceddaef8eb58be5581)
 
 **Added**

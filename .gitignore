@@ -38,3 +38,6 @@ Thumbs.db
 *.gguf
 models/
 workflows/
+
+# Provisioned engines (S7.14: machine-local installs, never committed)
+runtime/engines/

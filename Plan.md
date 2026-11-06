@@ -167,7 +167,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 ## Stage 7 — Art Studio
 
 > Expanded planning 2026-11-06 (owner-authorized expansion, awaiting task-level
-> approval): 14 micro-tasks S7.1–S7.14, spine first (ComfyUI integration →
+> approval): 15 micro-tasks S7.1–S7.15, spine first (ComfyUI integration →
 > workflow templates → template prompt assembly with optional LLM assist →
 > negative prompts → approved-reference conditioning → individual generation
 > → variations → inpaint → outpaint → aspect ratios → comparisons →
@@ -190,7 +190,8 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [ ] S7.11 Side-by-side + approved-reference comparison (all four §8.8 modes)
 - [ ] S7.12 Generation provenance (template + hash, prompt, seed, model, timestamp)
 - [ ] S7.13 Version history, approval, and restoration (restore returns pointer, never deletes)
-- [ ] S7.14 Stage 7 acceptance fixture (brief → artwork → approve; approved work preserved)
+- [ ] S7.14 Engine provisioning (detect-or-install under runtime/engines; user installs untouched)
+- [ ] S7.15 Stage 7 acceptance fixture (brief → artwork → approve; approved work preserved)
 
 ## Stage 8 — Comic Layout Studio (expanded 2026-11-06: S8.1–S8.14)
 

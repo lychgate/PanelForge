@@ -957,7 +957,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 
 > Goal [SPEC]: Generate, review, compare, and approve individual artwork assets.
 > Stage acceptance [SPEC]: individual panels can be generated and regenerated independently; generation history is retained; approved work is preserved; workflow provenance is stored.
-> Structure [RECOMMENDATION]: 14 micro-tasks S7.1–S7.14, spine first (ComfyUI integration → workflow templates → prompt assembly (templates, optional LLM assist) → negative prompts → reference conditioning → individual generation → variations → inpaint → outpaint → aspect ratios → comparisons → provenance → version history/approval/restoration), then acceptance fixture last. First live-generation stage (owner decisions 2026-11-06: both repaint ops coordinate-based with no mask-painting UI; templates + optional LLM assist; workflow templates as portable project files, hash-verified).
+> Structure [RECOMMENDATION]: 15 micro-tasks S7.1–S7.15, spine first (ComfyUI integration → workflow templates → prompt assembly (templates, optional LLM assist) → negative prompts → reference conditioning → individual generation → variations → inpaint → outpaint → aspect ratios → comparisons → provenance → version history/approval/restoration → engine provisioning (detect-or-install)), then acceptance fixture last. First live-generation stage (owner decisions 2026-11-06: both repaint ops coordinate-based with no mask-painting UI; templates + optional LLM assist; workflow templates as portable project files, hash-verified; engines auto-install under `runtime/engines` when undetected, per addition 2026-11-06).
 
 #### S7.1 ComfyUI workflow integration [SPEC]
 - **Goal:** Submit workflows to ComfyUI and harvest results.
@@ -1066,12 +1066,21 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.8, S7.6.
 - **Status:** Not Started
 
-#### S7.14 Stage 7 acceptance fixture [SPEC]
+#### S7.14 Engine provisioning (detect-or-install) [SPEC]
+- **Goal:** Working engines are guaranteed before first generation.
+- **Scope:** Detection first (ComfyUI `/system_stats` + LM Studio models probe via the S2 adapters/health): reachable user installs are used in place and never modified or relocated. If absent: ComfyUI auto-installs (portable standalone; Linux first, Windows-compatible layout) under `runtime/engines/comfyui` (gitignored, machine-local, never inside project dirs); LM Studio absent → the user is offered guided auto-install (confirmed download to `runtime/engines/lmstudio`), never silently fetched. Engine registry records (engine, version, path, source: detected|bundled) + health re-probe after install; failures are typed (`ENGINE_MISSING`, `ENGINE_INSTALL_FAILED`) with manual-install instructions; uninstall is never automatic. Model/checkpoint provisioning stays manual (owner choice) — S7.14 installs engine only.
+- **Deliverables [SPEC]:** Engine detection + provisioning.
+- **Acceptance:** Engines absent → provisioning installs both under `runtime/engines` and health probes go green; user engine present → detected in place, unmodified; declined install → typed refusal with manual steps; project trees untouched.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.14 (provider-health), S7.1.
+- **Stop:** Generation model/checkpoint choices stay manual; template/provenance concerns stay S7.2/S7.12.
+- **Status:** Not Started
+
+#### S7.15 Stage 7 acceptance fixture [SPEC]
 - **Goal:** End-to-end proof of Stage 7.
 - **Scope:** A storyboard panel from the Stage 6 fixture flows to first artwork: prompt assembled → conditioned → generated (mock/local ComfyUI) → compared against approved refs → approved; inpaint/outpaint produce new versions; approved work preserved throughout.
 - **Deliverables [SPEC]:** Stage 7 fixture.
 - **Acceptance:** The whole Stage-7 acceptance passes on the fixture; provenance complete; history retained.
-- **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.1–S7.13.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.1–S7.14.
 - **Stop:** Stage gate — Comic Layout Studio (S8) begins only after this passes.
 - **Status:** Not Started
 
@@ -1087,7 +1096,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Scope:** `pages` (page_id, title, format traditional|webtoon, width/height, margin, created/updated). CRUD.
 - **Deliverables [SPEC]:** Page records.
 - **Acceptance:** Pages persist and list per manuscript; invalid formats reject typed.
-- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.2, S7.14 (approved artwork exists).
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S6.2, S7.15 (approved artwork exists).
 - **Status:** Not Started
 
 #### S8.2 Panel placement [SPEC]
@@ -1095,7 +1104,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Scope:** `page_panels` (placement_id, page_id, panel_id → approved artwork version slot, x/y/w/h in mm, z-order). Artwork referenced by asset id, never copied/modified. CRUD + move.
 - **Deliverables [SPEC]:** Placement records.
 - **Acceptance:** A page shows its panels in placement order; artwork assets unchanged (hash check in tests).
-- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.1, S7.14.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S8.1, S7.15.
 - **Status:** Not Started
 
 #### S8.3 Traditional layout templates [SPEC]
@@ -1348,8 +1357,8 @@ Dependencies below are **[RECOMMENDATION]** inferred from spec ordering where [S
 | 22 | S1.10 | S1.3, S0.4/S0.5 | Users manage projects without DB interaction |
 | 23 | S1.11 | S1.1–S1.10 | Sample created/copied/reopened/backed up/restored/verified — **STOP GATE** |
 | 24+ | Stage 2+ | Spec gates above | Expand groups to per-task spec (Goal/Deliverables/Acceptance/Deps/Stop) before any code; then follow spec order |
-| 25 | S7.1–S7.14 (planned) | S6.13 gate | Live ComfyUI execution; each task needs owner authorization |
-| 26 | S8.1–S8.14 (planned) | S7.14 gate | Layout records + SVG-first pages; React canvas; no export (Stage 10) |
+| 25 | S7.1–S7.15 (planned) | S6.13 gate | Live ComfyUI execution + detect-or-install provisioning; each task needs owner authorization |
+| 26 | S8.1–S8.14 (planned) | S7.15 gate | Layout records + SVG-first pages; React canvas; no export (Stage 10) |
 | 27 | S9.1–S9.12 (planned) | S8.14 gate | Read-only QA checks; tunable thresholds; suppression auditable |
 
 Stage gates [SPEC]: Do not begin Character Studio or real ComfyUI integration until Stage 0 + Stage 1 are complete. Placeholders/mocks only to validate architecture (§16.5).
@@ -2424,6 +2433,7 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | Stage 5 + Stage 6 planning: expanded to S5.1–S5.10 and S6.1–S6.13 (owner-authorized). Stage 5 answers: link-never-create for entity seeding, records-only generation (S4.9 pattern). Stage 6 answers: infra first + minimal hand-rolled UI second (no framework; CSP finalization still deferred), full-copy snapshots with lineage branching. **Do not begin S5.1/S6.1 without explicit owner authorization.** | [APPROVED CHANGE — owner] | Crouton (Stage 5/6 planning) |
 | 2026-11-06 | Test data: `tests/TestData/` (owner's book — 22 chapters + epilogue + prologue, PDFs, ~2.6 MB) committed for Stage 6+ testing. Chapters 4–15 use a journal-entry layout; the rest a normal-novel layout. All 25 PDFs report `scanned` under the S3.10 text-layer-only parser (image-based, no extractable text); Epilogue additionally fails FlateDecode inflate in our parser — see `tests/TestData/README.md`. | [SPEC] | Crouton (test data) |
 | 2026-11-06 | Stage 7 planning: expanded to S7.1–S7.14 (owner-authorized). Owner answers: both repaint ops coordinate-based (no mask UI); prompts template-assembled + optional LLM assist; workflow templates as portable project files, hash-verified. First live-generation stage. **Do not begin S7.1 without explicit owner authorization.** | [APPROVED CHANGE — owner] | Crouton (Stage 7 planning) |
+| 2026-11-06 | Stage 7 amended: S7.14 added (engine provisioning, detect-or-install under `runtime/engines`; user installs detected in place, never modified; LM Studio guided/confirm-first), acceptance fixture renumbered S7.14 → S7.15. S8.1/S8.2 deps + §5 rows updated; ChangeLog history lines untouched (historical). | [APPROVED CHANGE — owner] | Crouton (planning) |
 | 2026-11-06 | S5.1 complete. Acceptance verified (425 tests incl. 5 locations; CRUD + validation + stable identity). Stage 5 now 1 of 10. Stopped for owner review before S5.2. | [SPEC] | Crouton (S5.1 implementation) |
 | 2026-11-06 | S5.2 complete. Acceptance verified (430 tests incl. 5 location-variations; multi-variation, per-location label uniqueness, inherit-by-default overrides). Stage 5 now 2 of 10. Stopped for owner review before S5.3. | [SPEC] | Crouton (S5.2 implementation) |
 | 2026-11-06 | S5.3 complete. Acceptance verified (435 tests incl. 5 location-references; slot association with registry validation + exact slot queries). Stage 5 now 3 of 10. Stopped for owner review before S5.4. | [SPEC] | Crouton (S5.3 implementation) |
