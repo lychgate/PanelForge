@@ -389,6 +389,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_assignments_pair ON panel_assignments(panel_id, character_id)",
     ],
   },
+  // S6.4: location assignment (§8.7). One location (optional
+  // variation) per panel.
+  {
+    version: 32,
+    name: "032_panel_location_assignments",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_location_assignments (assignment_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), location_id TEXT NOT NULL REFERENCES locations(location_id), variation_id TEXT REFERENCES location_variations(variation_id), created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_location_assignments_panel ON panel_location_assignments(panel_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
