@@ -7,6 +7,27 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S2.17 — Cooling Down State (2026-11-05) — [`edbcc3d`](https://github.com/lychgate/PanelForge/commit/edbcc3db9c10439858406e7a5265b376011da8d0)
+
+**Added**
+
+- `src/engines/tasks/cooling.ts` — user-configurable soft/hard
+  thresholds (`validateThresholds`, `evaluateThermal`: measured °C
+  only; unknown telemetry never triggers), `describeCooling`
+  (§10.5 five-question view), and `createCoolingQueue` (while hot,
+  new dispatch blocks — queued tasks wait, never fail; generating
+  tasks cooperatively interrupt to `cooling-down` → `queued`;
+  `onCoolingChange` notifications; `resumeCooled` on cooldown).
+- `tests/cooling-down.test.js` — 7 tests: threshold tripping/unknown
+  honesty, validation, blocked dispatch + waiting, cooperative
+  cool-down + resume, descriptor fields, notification edges,
+  no-control guard.
+
+**Changed**
+
+- Register: S2.17 marked **Complete**; §11 next task is S2.18.
+- `Plan.md`: S2.17 checked off (2026-11-05).
+
 ### S2.16 — Graceful Telemetry Failure (2026-11-05) — [`5ef2e45`](https://github.com/lychgate/PanelForge/commit/5ef2e45749bf74118b22b9a88d612823373b7595)
 
 **Added**

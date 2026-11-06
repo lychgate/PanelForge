@@ -64,7 +64,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S2.14 Hardware Detection — completed 2026-11-05
 - [x] S2.15 Telemetry Adapter Interface — completed 2026-11-05
 - [x] S2.16 Graceful Telemetry Failure — completed 2026-11-05
-- [ ] S2.17 Cooling Down State
+- [x] S2.17 Cooling Down State — completed 2026-11-05
 - [ ] S2.18 Small GPU Mode
 
 ## Stage 3 — Manuscript Analysis and Art Style Profiles

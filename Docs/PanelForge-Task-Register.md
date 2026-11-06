@@ -485,7 +485,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Cooling is distinguishable from Paused/Failed/Waiting/Complete, explains why, and resumes correctly.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.4, S2.16.
 - **Stop:** PanelForge never claims to control temperature/fans/power (§10.4).
-- **Status:** **In Progress** (2026-11-05 — authorized by owner; implementing)
+- **Status:** **Complete** (2026-11-05 — acceptance verified; see §10 test results; impl commit edbcc3d)
 
 #### S2.18 Small GPU Mode [SPEC]
 - **Goal:** First-class low-VRAM operation (GTX 1660 Ti-class target).
@@ -941,6 +941,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-05 | S2.16 | `DISPLAY=:0 npm test` | Pass — 284 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 9 ipc + 13 security) | `tests/telemetry-failure.test.js` (6 tests): killed-telemetry verdict, present-telemetry clearing, Unknown display honesty, conservative clamp with cooling preserved, invalid-sample rejection, queue completion without telemetry. |
 | 2026-11-05 | S2.16 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-05 | S2.16 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-05 | S2.17 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-05 | S2.17 | `npm run build` | Pass | `out/node/engines/tasks/cooling.js` emitted. |
+| 2026-11-05 | S2.17 | `DISPLAY=:0 npm test` | Pass — 291 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 9 ipc + 13 security) | `tests/cooling-down.test.js` (7 tests): threshold tripping/unknown honesty, validation, blocked dispatch + waiting, cooperative cool-down + resume, descriptor fields, notification edges, no-control guard. |
+| 2026-11-05 | S2.17 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-05 | S2.17 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S2.17 implemented files:** `src/engines/tasks/cooling.ts` (New — `CoolingThresholds` + `validateThresholds` + `evaluateThermal`, `describeCooling`, `createCoolingQueue` (blocked dispatch, cooperative generating→cooling-down→queued, `onCoolingChange`, `resumeCooled`)), `tests/cooling-down.test.js` (New, 7 tests). No fan/temperature/power control claimed.
 
 **S2.16 implemented files:** `src/engines/hardware/telemetry-status.ts` (New — `displayMetric`, `summarizeTelemetry` + `TELEMETRY_UNAVAILABLE_INDICATOR`, `resolveEffectiveProfile` (conservative clamp, cooling preserved)), `tests/telemetry-failure.test.js` (New, 6 tests). Threshold pausing stays S2.17.
 
@@ -1058,11 +1065,11 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 - **[RECOMMENDATION + owner direction]** Stop and do not proceed to S0.2 until acceptance passes and `git` is tracking the scaffold. Do not add any dependency not needed for Stage 0 (no Drizzle/SQLite, Sharp, or PDF lib until their respective tasks; S0.1 must not install or select a database stack — D8/Q3 are deferred to S0.8). Do not implement any Electron window, IPC, DB, or project code — those are S0.2+.
 - **[APPROVED CHANGE — owner, 2026-11-05]** After S0.1 completes, **stop and wait for owner review and authorization before beginning S0.2.** Review covers repository, dependencies, scripts, and Git setup. One task at a time.
 
-### Next task: S2.17 — Cooling Down State [SPEC §15] — **Awaiting Owner Authorization**
+### Next task: S2.18 — Small GPU Mode [SPEC §15] — **Awaiting Owner Authorization**
 
-**Status:** **Not Started** — S2.16 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.17 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
+**Status:** **Not Started** — S2.17 Complete (2026-11-05, acceptance verified; see §10). **Do not begin S2.18 without explicit owner authorization.** One-task-at-a-time (approved) stops here.
 
-**Goal [SPEC]:** Cooling Down as queue + task state with soft/hard user-configurable thresholds; pauses new generation, handles active jobs safely, explains why, resumes when cooled — never claims fan/temperature control.
+**Goal [SPEC]:** First-class low-VRAM operation (GTX 1660 Ti-class target): one panel/task at a time, sequential model loading, lower-resolution drafts, optional upscaling/tiling, resource release, CPU fallback, lower-resource retries after OOM — never auto-overwriting or auto-downgrading approved images.
 
 ---
 
@@ -1117,5 +1124,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-05 | S2.14 complete. Acceptance verified (270 tests incl. 8 hardware-detection; honest Detected/Unavailable/Unknown typing, startup step non-blocking). Stopped for owner review before S2.15. | [SPEC] | Crouton (S2.14 implementation) |
 | 2026-11-05 | S2.15 complete. Acceptance verified (278 tests incl. 8 telemetry-adapter; registry + typed sampling + monitoring wiring, Resource Manager untouched). Stopped for owner review before S2.16. | [SPEC] | Crouton (S2.15 implementation) |
 | 2026-11-05 | S2.16 complete. Acceptance verified (284 tests incl. 6 telemetry-failure; Unknown display + conservative clamp + explicit indicator + fully usable). Stopped for owner review before S2.17. | [SPEC] | Crouton (S2.16 implementation) |
+| 2026-11-05 | S2.17 complete. Acceptance verified (291 tests incl. 7 cooling-down; thresholds + blocked dispatch + cooperative cool-down + resume). Stopped for owner review before S2.18. | [SPEC] | Crouton (S2.17 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.
