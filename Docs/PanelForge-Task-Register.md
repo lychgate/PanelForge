@@ -669,7 +669,7 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Acceptance:** Assets associate to versions by slot; unknown assets rejected; slot queries return exact sets.
 - **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.2, S1.5.
 - **Stop:** Completeness scoring stays S4.4.
-- **Status:** Not Started
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit b238a96; see below)
 
 #### S4.4 Reference completeness scoring [SPEC]
 - **Goal:** Every version measured against its tier, with actionable warnings.
@@ -1282,6 +1282,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S4.2 | `DISPLAY=:0 npm test` | Pass — 377 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 9 ipc + 13 security) | `tests/character-versions.test.js` (5 tests): multiple versions per character, case-insensitive label uniqueness, FK + validation, override inheritance, rename collision, list/delete + migration v12. |
 | 2026-11-06 | S4.2 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
 | 2026-11-06 | S4.2 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S4.3 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S4.3 | `npm run build` | Pass | `out/node/core/project/version-references.js` emitted. |
+| 2026-11-06 | S4.3 | `DISPLAY=:0 npm test` | Pass — 382 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 9 ipc + 13 security) | `tests/version-references.test.js` (5 tests): association by slot with registry validation, typed rejections, all eight slots, multi-version asset reuse, remove + migration v13. |
+| 2026-11-06 | S4.3 | `npm run check` | Pass | Baseline + IPC guard green (no new deps). |
+| 2026-11-06 | S4.3 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+
+**S4.3 implemented files:** `src/core/project/version-references.ts` (New — `associateReference`/`getReference`/`listReferencesByVersion`/`listReferencesBySlot`/`removeReference`; registry-validated, eight slot kinds), `src/core/project/metadata.ts` (migration 013 character_version_references), `tests/version-references.test.js` (New, 5 tests). Scoring stays S4.4.
 
 **S4.2 implemented files:** `src/core/project/character-versions.ts` (New — `createVersion`/`getVersion`/`listVersions`/`updateVersion`/`deleteVersion`; case-insensitive per-character label uniqueness, inherit-by-default overrides), `src/core/project/metadata.ts` (migration 012 character_versions), `tests/character-versions.test.js` (New, 5 tests). References stay S4.3.
 
@@ -1475,7 +1482,9 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 
 **Next eligible after S4.1:** S4.2 — Character version records (labels + per-version overrides). **Status: Complete (2026-11-06, impl commit 4dc3c8c; 377 tests incl. 5 character-versions). Stage 4 now 2 of 12.** One-task-at-a-time (approved) stops here.
 
-**Next eligible after S4.2:** S4.3 — Reference asset association (portrait/front/side/rear/expression/pose/clothing/equipment slots). Do not begin without explicit owner authorization.
+**Next eligible after S4.2:** S4.3 — Reference asset association (portrait/front/side/rear/expression/pose/clothing/equipment slots). **Status: Complete (2026-11-06, impl commit b238a96; 382 tests incl. 5 version-references). Stage 4 now 3 of 12.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S4.3:** S4.4 — Reference completeness scoring (Basic / Recommended / Full tiers with missing-slot warnings). Do not begin without explicit owner authorization.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1553,5 +1562,6 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | Stage 4 planning: expanded to S4.1–S4.12 (owner-authorized). Owner answers: records+approval only (no live generation; ComfyUI execution stays Stage 7); entity bridge links, never auto-creates; panel binding table now (opaque panel_id, Stage 6 populates). 12 tasks approved for planning; **do not begin S4.1 without explicit owner authorization.** | [APPROVED CHANGE — owner] | Crouton (Stage 4 planning) |
 | 2026-11-06 | S4.1 complete. Acceptance verified (372 tests incl. 5 characters; CRUD + validation + stable identity). Stage 4 now 1 of 12. Stopped for owner review before S4.2. | [SPEC] | Crouton (S4.1 implementation) |
 | 2026-11-06 | S4.2 complete. Acceptance verified (377 tests incl. 5 character-versions; multi-version, per-character label uniqueness, inherit-by-default overrides). Stage 4 now 2 of 12. Stopped for owner review before S4.3. | [SPEC] | Crouton (S4.2 implementation) |
+| 2026-11-06 | S4.3 complete. Acceptance verified (382 tests incl. 5 version-references; slot association with registry validation + exact slot queries). Stage 4 now 3 of 12. Stopped for owner review before S4.4. | [SPEC] | Crouton (S4.3 implementation) |
 
 > Every future edit gets a new row. Never silently edit task requirements from the spec; proposed changes go to §9 and require authorization before application.

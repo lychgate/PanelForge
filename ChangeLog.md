@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S4.3 — Reference Asset Association (2026-11-06) — [`b238a96`](https://github.com/lychgate/PanelForge/commit/b238a9647fa5604acdbcb3717a14574d8ba934cb)
+
+**Added**
+
+- `src/core/project/version-references.ts` — §8.4 reference
+  association (`associateReference`/`getReference`/
+  `listReferencesByVersion`/`listReferencesBySlot`/
+  `removeReference`): S1.5-registry-validated assets bound to a
+  version under one of eight slot kinds (portrait, front, side,
+  rear, expression, pose, clothing, equipment); an asset may serve
+  any number of versions/slots.
+- Migration 013 (`character_version_references` table) in
+  `src/core/project/metadata.ts`.
+- `tests/version-references.test.js` — 5 tests: association by
+  slot with registry validation, typed rejections, all eight
+  slots, multi-version asset reuse, remove + migration v13.
+
+**Changed**
+
+- Register: S4.3 marked **Complete**; Stage 4 now 3 of 12; §11 next
+  eligible is S4.4.
+- `Plan.md`: S4.3 checked off (2026-11-06).
+
 ### S4.2 — Character Version Records (2026-11-06) — [`4dc3c8c`](https://github.com/lychgate/PanelForge/commit/4dc3c8cc59129729e6dd8a60abaf313bfdedb836)
 
 **Added**
