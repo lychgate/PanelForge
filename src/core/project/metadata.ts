@@ -348,6 +348,18 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE UNIQUE INDEX IF NOT EXISTS idx_studio_requests_subject ON studio_generation_requests(studio, subject_id, slot)",
     ],
   },
+  // S5.9: studio asset history (§8.5/§8.6). Append-only — rows
+  // deleted only with their profile (FK cascade).
+  {
+    version: 28,
+    name: "028_studio_history",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS location_history (history_id TEXT PRIMARY KEY, profile_id TEXT NOT NULL REFERENCES locations(location_id) ON DELETE CASCADE, variation_id TEXT REFERENCES location_variations(variation_id), event TEXT NOT NULL, detail TEXT NOT NULL, created_at TEXT NOT NULL)",
+      "CREATE INDEX IF NOT EXISTS idx_location_history_profile ON location_history(profile_id)",
+      "CREATE TABLE IF NOT EXISTS object_history (history_id TEXT PRIMARY KEY, profile_id TEXT NOT NULL REFERENCES objects(object_id) ON DELETE CASCADE, variation_id TEXT REFERENCES object_variations(variation_id), event TEXT NOT NULL, detail TEXT NOT NULL, created_at TEXT NOT NULL)",
+      "CREATE INDEX IF NOT EXISTS idx_object_history_profile ON object_history(profile_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
