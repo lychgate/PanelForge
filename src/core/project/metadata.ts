@@ -484,6 +484,14 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE TABLE IF NOT EXISTS panel_prompts (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), prompt TEXT NOT NULL, style_id TEXT, polished INTEGER NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
     ],
   },
+  // S7.4: negative prompts (one verbatim string per panel).
+  {
+    version: 41,
+    name: "041_panel_negative_prompts",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_negative_prompts (panel_id TEXT PRIMARY KEY REFERENCES storyboard_panels(panel_id), negative_prompt TEXT NOT NULL, source TEXT NOT NULL, updated_at TEXT NOT NULL)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
