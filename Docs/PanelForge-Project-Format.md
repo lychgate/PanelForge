@@ -77,11 +77,11 @@ unchanged. Writes go through the serialized queue (WAL + foreign keys + busy
 timeout 5000, like the app database), and migrations are tracked in the
 project database's own `schema_migrations` table.
 
-## Schema evolution (migrations 001–019)
+## Schema evolution (migrations 001–028)
 
 The project database gains tables along with each stage (tracked in
 its own `schema_migrations` table; see `src/core/project/metadata.ts`).
-Current head: **19**.
+Current head: **28**.
 
 | Migrations | Contents |
 |---|---|
@@ -98,6 +98,15 @@ Current head: **19**.
 | 017 | Version approval columns (S4.8) |
 | 018 | Generation requests (S4.9) |
 | 019 | Character history (S4.11) |
+| 020 | Location profiles (S5.1) |
+| 021 | Location variations (S5.2) |
+| 022 | Location references (S5.3) |
+| 023 | Object profiles (S5.4) |
+| 024 | Object variations (S5.5) |
+| 025 | Object references (S5.6) |
+| 026 | Location/object bridge (`source_entity_id`, S5.7) |
+| 027 | Studio generation requests (S5.8) |
+| 028 | Studio history (S5.9) |
 
 Manuscript-side tables (Stage 3): `manuscripts`, `normalizations`,
 `chapters`, `scenes`, `entities`, `canon`. All paths stored inside

@@ -177,7 +177,7 @@ Stage 0 (Application Foundation) — mandatory sequence, one task at a time with
 
 - **S2.18 — Small GPU Mode:** complete (1024-capped sequential envelope with release hooks; OOM retries downsize and fall back to CPU; approved art never replaced).
 
-**Stage 2 complete (18 of 18, 2026-11-05).** Stage acceptance — create → persist → execute → interrupt → resume → recover — passes against mocks with real adapters wired behind health gates and resource policy. **Stage 3 complete (14 of 14, 2026-11-06).** **Stage 4 (Character Studio) expanded to S4.1–S4.12 (owner-authorized planning 2026-11-06); **Stage 4 complete (12 of 12, 2026-11-06).** Stage 5 expanded to S5.1–S5.10 and Stage 6 to S6.1–S6.13 (owner-authorized planning 2026-11-06); **Stage 5 complete (10 of 10, 2026-11-06; S5.10 accepted via stage5-fixture tests).** Stage 6 implementation awaits owner authorization of S6.1**; see `Docs/PanelForge-Task-Register.md` §4E.
+**Stage 2 complete (18 of 18, 2026-11-05).** Stage acceptance — create → persist → execute → interrupt → resume → recover — passes against mocks with real adapters wired behind health gates and resource policy. **Stage 3 complete (14 of 14, 2026-11-06).** **Stage 4 (Character Studio) expanded to S4.1–S4.12 (owner-authorized planning 2026-11-06); **Stage 4 complete (12 of 12, 2026-11-06).** Stage 5 expanded to S5.1–S5.10 and Stage 6 to S6.1–S6.13 (owner-authorized planning 2026-11-06); **Stage 5 complete (10 of 10, 2026-11-06; S5.10 accepted via stage5-fixture tests).** Stage 6 implementation awaits owner authorization of S6.1; Stage 7 expanded to S7.1–S7.14 (owner-authorized planning 2026-11-06), implementation awaits owner authorization of S7.1**; see `Docs/PanelForge-Task-Register.md` §4E.
 
 ## Known limitations (end of Stage 0)
 

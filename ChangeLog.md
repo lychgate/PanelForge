@@ -206,6 +206,27 @@ remains the authoritative progress record; this file summarizes what each task c
   §11 next eligible is S5.2.
 - `Plan.md`: S5.1 checked off (2026-11-06).
 
+### Stage 7 Planning — Art Studio Expansion (2026-11-06)
+
+**Changed**
+
+- Register §4E: Stage 7 expanded to 14 micro-tasks S7.1–S7.14
+  (owner-authorized planning), spine first: ComfyUI
+  integration, workflow templates, template prompt assembly
+  with optional LLM assist, negative prompts, reference
+  conditioning, individual generation, variations,
+  inpaint/outpaint, aspect ratios, comparisons, provenance,
+  history/approval/restoration, acceptance fixture last.
+- Owner decisions (2026-11-06): both repaint ops
+  coordinate-based (no mask UI); prompts template-assembled +
+  optional LLM assist; workflow templates as portable project
+  files, hash-verified. First live-generation stage.
+- `Plan.md`: Stage 7 task list added (all Not Started).
+- `Docs/PanelForge-Project-Format.md`: schema table brought to
+  migrations 001–028 (was stale at 019).
+- **No implementation yet** — S6.1/S7.1 must not begin without
+  explicit owner authorization.
+
 ### Stages 5 + 6 Planning — Location/Object + Storyboard Expansion (2026-11-06)
 
 **Changed**

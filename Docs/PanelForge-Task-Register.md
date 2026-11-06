@@ -953,10 +953,130 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Stop:** Stage gate — Art Studio (S7) begins only after this passes.
 - **Status:** Not Started
 
-Stages 7–11 — task groups [SPEC §15]
+**Stage 7 — Art Studio: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
+
+> Goal [SPEC]: Generate, review, compare, and approve individual artwork assets.
+> Stage acceptance [SPEC]: individual panels can be generated and regenerated independently; generation history is retained; approved work is preserved; workflow provenance is stored.
+> Structure [RECOMMENDATION]: 14 micro-tasks S7.1–S7.14, spine first (ComfyUI integration → workflow templates → prompt assembly (templates, optional LLM assist) → negative prompts → reference conditioning → individual generation → variations → inpaint → outpaint → aspect ratios → comparisons → provenance → version history/approval/restoration), then acceptance fixture last. First live-generation stage (owner decisions 2026-11-06: both repaint ops coordinate-based with no mask-painting UI; templates + optional LLM assist; workflow templates as portable project files, hash-verified).
+
+#### S7.1 ComfyUI workflow integration [SPEC]
+- **Goal:** Submit workflows to ComfyUI and harvest results.
+- **Scope:** Client over the S2.13 adapter behind health gates: POST workflow JSON, poll job status, harvest image bytes; typed errors (unavailable, failed, timeout); Small GPU Mode envelope honored (S2.18).
+- **Deliverables [SPEC]:** ComfyUI workflow integration.
+- **Acceptance:** Mock-deferred against a local fixture server: submit → poll → bytes; health-closed → typed refusal; no silent retries.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.12–S2.13, S2.18.
+- **Stop:** Templates stay S7.2; prompt assembly stays S7.3.
+- **Status:** Not Started
+
+#### S7.2 Workflow templates [SPEC]
+- **Goal:** Reusable, versioned workflow definitions.
+- **Scope:** Portable template files under `workflows/` in the project (S1.1 reserves the directory), hash-verified at load; DB registry of template (name, relative path, hash, version); tampered templates refuse with typed errors.
+- **Deliverables [SPEC]:** Workflow templates.
+- **Acceptance:** Templates round-trip through copy/backup/restore; hash mismatch rejects; missing templates reject.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S1.9, S7.1.
+- **Status:** Not Started
+
+#### S7.3 Prompt assembly [SPEC]
+- **Goal:** Prompts from panel briefs, not from vibes.
+- **Scope:** Deterministic template assembly: S6.9 panel instructions + style fields (S3.11) + reference tags (S7.5) → prompt string stored on the job; optional LM Studio polish hook behind the S2.12 contract with the small-memory profile (assist only, deterministic fallback).
+- **Deliverables [SPEC]:** Prompt generation.
+- **Acceptance:** Same brief + same template = same prompt; LLM hook off → byte-identical template output; prompted jobs store the exact string.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S6.9.
+- **Stop:** Actual dispatch stays S7.6.
+- **Status:** Not Started
+
+#### S7.4 Negative prompt handling [SPEC]
+- **Goal:** Negative prompts as first-class job fields.
+- **Scope:** Per-job negative prompt (user + style-level defaults from S3.11, job overrides win); stored verbatim; empty negatives allowed and recorded as empty.
+- **Deliverables [SPEC]:** Negative prompt handling.
+- **Acceptance:** Jobs store/use the intended negative string; overrides beat defaults.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S7.3.
+- **Status:** Not Started
+
+#### S7.5 Reference conditioning [SPEC]
+- **Goal:** Approved references shape the generation.
+- **Scope:** Attach approved references by slot (S4.3 character versions, S5.3 location variations, S5.6 object variations) to a job; pending/rejected references cannot condition (S4.8 gate); unattached jobs generate unconditioned.
+- **Deliverables [SPEC]:** Reference conditioning.
+- **Acceptance:** Conditioned jobs name their exact reference asset IDs; unapproved refs reject.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.3, S5.3, S5.6, S7.3.
+- **Status:** Not Started
+
+#### S7.6 Individual panel generation [SPEC]
+- **Goal:** One panel, one job, independently regenerated.
+- **Scope:** Dispatch engine: request (S4.9/S5.8 shape + S7.3 prompt + S7.5 conditioning) → S7.1 → result bytes → S1.5 asset import → artwork row (panel/character/location/style references). Each generation = a new artwork version; regeneration never overwrites.
+- **Deliverables [SPEC]:** Individual panel generation.
+- **Acceptance:** A panel generates and regenerates independently; each run produces a distinct preserved version; the job's stage chain is visible.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S2.1, S6.3, S7.1–S7.5.
+- **Status:** Not Started
+
+#### S7.7 Variations [SPEC]
+- **Goal:** N candidate artworks per job.
+- **Scope:** Variation count per job (1..N, Small GPU cap honored); each variant = its own artwork version + provenance row; variation links share the job.
+- **Deliverables [SPEC]:** Variations.
+- **Acceptance:** One job yields N distinct preserved versions; each varies provenance independently.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.6, S2.18.
+- **Status:** Not Started
+
+#### S7.8 Inpainting [SPEC]
+- **Goal:** Repaint selected regions.
+- **Scope:** Region rectangles as coordinate rows on a job (owner decision 2026-11-06: coordinate-based, no mask-painting UI); repaint request shape + ComfyUI dispatch through S7.1; result = new artwork version.
+- **Deliverables [SPEC]:** Inpainting.
+- **Acceptance:** Coordinate regions validate (in-bounds, non-empty); repaints preserve pixels outside regions' versions via new rows.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.6.
+- **Status:** Not Started
+
+#### S7.9 Outpainting [SPEC]
+- **Goal:** Extend canvas beyond the frame.
+- **Scope:** Canvas-extension parameters (pixels per side) as validated rows; dispatch through S7.1; result = new artwork version.
+- **Deliverables [SPEC]:** Outpainting.
+- **Acceptance:** Extension params validate; outpaint results are distinct preserved versions.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.6.
+- **Status:** Not Started
+
+#### S7.10 Aspect ratio adjustment [SPEC]
+- **Goal:** Aspect ratios that fit the layout.
+- **Scope:** Per-job aspect (from S3.11 style aspectRatios vocabulary); validated against the style's set; re-dispatch with the new ratio is a new version, never a resize of approved work.
+- **Deliverables [SPEC]:** (group: generation — aspect adjustment)
+- **Acceptance:** Ratios validate against the style vocabulary; ratio changes produce new versions.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.11, S7.6.
+- **Status:** Not Started
+
+#### S7.11 Side-by-side and approved-reference comparison [SPEC]
+- **Goal:** Drift is visible before approval.
+- **Scope:** Read-only compare of two artworks, plus the §8.8 first-class modes: current vs previous generation, vs approved character portrait, vs approved reference views (character/location/object); reuses the S4.10 no-mutation rule; pixel-identity check included.
+- **Deliverables [SPEC]:** Side-by-side comparison; approved reference comparison.
+- **Acceptance:** All four §8.8 modes return exact compared pairs; approved-reference modes use the approved package, not the latest generation.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.10, S4.8, S7.6.
+- **Status:** Not Started
+
+#### S7.12 Generation provenance [SPEC]
+- **Goal:** Every artwork explains how it was born.
+- **Scope:** Per-version provenance row: workflow template + hash, prompt + negative prompt, seed, model/provider, references, timestamp, job ID; queryable per artwork; never edited.
+- **Deliverables [SPEC]:** Generation provenance.
+- **Acceptance:** Any artwork version replays its full provenance; provenance is complete for every generated version.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.6, S7.2.
+- **Status:** Not Started
+
+#### S7.13 Version history, approval, and restoration [SPEC]
+- **Goal:** Approval never destroys history.
+- **Scope:** Artwork-version ledger: pending/approved/rejected per version (S4.8 pattern); restore sets the approved pointer back without deleting later versions; approved versions are never silently replaced (§2.4); dependency tracking surfaces what each job fed.
+- **Deliverables [SPEC]:** Version history; approval and restoration; dependency tracking.
+- **Acceptance:** Restore returns an earlier version to approved; later versions remain; approved work passes through untouched.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S4.8, S7.6.
+- **Status:** Not Started
+
+#### S7.14 Stage 7 acceptance fixture [SPEC]
+- **Goal:** End-to-end proof of Stage 7.
+- **Scope:** A storyboard panel from the Stage 6 fixture flows to first artwork: prompt assembled → conditioned → generated (mock/local ComfyUI) → compared against approved refs → approved; inpaint/outpaint produce new versions; approved work preserved throughout.
+- **Deliverables [SPEC]:** Stage 7 fixture.
+- **Acceptance:** The whole Stage-7 acceptance passes on the fixture; provenance complete; history retained.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S7.1–S7.13.
+- **Stop:** Stage gate — Comic Layout Studio (S8) begins only after this passes.
+- **Status:** Not Started
+
+Stages 8–11 — task groups [SPEC §15]
 
 All groups: **Completeness Incomplete; Status Needs Clarification.** Each must be expanded per §16.2 before implementation.
-- **Stage 7 — Art Studio.** Goal: Generate/review/compare/approve individual artworks. Acceptance: independent generation/regeneration; history retained; approved work preserved; provenance stored. Groups: ComfyUI workflow integration/templates, prompt/negative/reference conditioning, individual generation, variations, inpaint/outpaint, side-by-side and approved-reference comparison (§8.8), provenance (§12), version history, approval/restoration, dependency tracking (§11.5).
 - **Stage 8 — Comic Layout Studio.** Goal: Assemble approved artwork into finished pages. Acceptance: page assembled without modifying original artwork; dialogue/captions editable; traditional + vertical formats work. Groups: page creation, traditional/webtoon layouts, placement/resizing/borders, balloon creation/positioning/tail, dialogue/caption editing, sound effects, reading order, layout snapshots. Note [SPEC §8.9]: text not baked into artwork.
 - **Stage 9 — Continuity and QA.** Goal: Detect meaningful inconsistencies. Acceptance: major inconsistencies reported; minor issues don't overwhelm; warnings identify affected scene/panel. Groups: version/age/clothing/equipment/injury/location/chronology/reference checks, severity classification (§8.10: Critical/Warning/Informational), suppression/overrides, actionable recommendations.
 - **Stage 10 — Publishing and Export.** Goal: Produce finished deliverables. Acceptance: layout preserved; text readable; output passes integrity checks. Groups: PDF/CBZ/PNG/JPEG/webtoon export, dimensions/resolution/DPI/margins/bleed/metadata, export validation. Note [SPEC §8.11]: PDF/CBZ/PNG/JPEG/webtoon sequences; settings include dimensions/resolution/DPI/color profile/bleed/margins/reading direction/cover/metadata.
@@ -1863,7 +1983,7 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 **Next eligible after S5.10:** Stage 6 — Storyboard Studio, **EXPANDED to S6.1–S6.13 (owner-authorized planning 2026-11-06; owner answers: infra first + minimal hand-rolled UI second, full-copy snapshots — see §12)**. Do not begin S6.1 implementation without explicit owner authorization of S6.1. One-task-at-a-time (approved) stops here.
 
 **Next eligible after Stage 6 expansion:** S6.1 — Scene records (see §4E Stage 6). **Status: Not Started.**
-**Next eligible after Stage 6 expansion:** S6.1 — Scene records (see §4E Stage 6). **Status: Not Started.**
+**Next eligible after Stage 7 expansion:** S7.1 — ComfyUI workflow integration (see §4E Stage 7). **Status: Not Started.**
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
@@ -1953,6 +2073,7 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 | 2026-11-06 | S4.12 complete. Acceptance verified (420 tests incl. 2 stage4-fixture; full pipeline entity→bind→history on two characters). **Stage 4 gate passes (12 of 12).** Stopped for owner review before Stage 5 expansion. | [SPEC] | Crouton (S4.12 implementation) |
 | 2026-11-06 | Stage 5 + Stage 6 planning: expanded to S5.1–S5.10 and S6.1–S6.13 (owner-authorized). Stage 5 answers: link-never-create for entity seeding, records-only generation (S4.9 pattern). Stage 6 answers: infra first + minimal hand-rolled UI second (no framework; CSP finalization still deferred), full-copy snapshots with lineage branching. **Do not begin S5.1/S6.1 without explicit owner authorization.** | [APPROVED CHANGE — owner] | Crouton (Stage 5/6 planning) |
 | 2026-11-06 | Test data: `tests/TestData/` (owner's book — 22 chapters + epilogue + prologue, PDFs, ~2.6 MB) committed for Stage 6+ testing. Chapters 4–15 use a journal-entry layout; the rest a normal-novel layout. All 25 PDFs report `scanned` under the S3.10 text-layer-only parser (image-based, no extractable text); Epilogue additionally fails FlateDecode inflate in our parser — see `tests/TestData/README.md`. | [SPEC] | Crouton (test data) |
+| 2026-11-06 | Stage 7 planning: expanded to S7.1–S7.14 (owner-authorized). Owner answers: both repaint ops coordinate-based (no mask UI); prompts template-assembled + optional LLM assist; workflow templates as portable project files, hash-verified. First live-generation stage. **Do not begin S7.1 without explicit owner authorization.** | [APPROVED CHANGE — owner] | Crouton (Stage 7 planning) |
 | 2026-11-06 | S5.1 complete. Acceptance verified (425 tests incl. 5 locations; CRUD + validation + stable identity). Stage 5 now 1 of 10. Stopped for owner review before S5.2. | [SPEC] | Crouton (S5.1 implementation) |
 | 2026-11-06 | S5.2 complete. Acceptance verified (430 tests incl. 5 location-variations; multi-variation, per-location label uniqueness, inherit-by-default overrides). Stage 5 now 2 of 10. Stopped for owner review before S5.3. | [SPEC] | Crouton (S5.2 implementation) |
 | 2026-11-06 | S5.3 complete. Acceptance verified (435 tests incl. 5 location-references; slot association with registry validation + exact slot queries). Stage 5 now 3 of 10. Stopped for owner review before S5.4. | [SPEC] | Crouton (S5.3 implementation) |

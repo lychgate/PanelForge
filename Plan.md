@@ -166,7 +166,31 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 ## Stage 7 — Art Studio
 
-- [ ] Stage 7 — not started
+> Expanded planning 2026-11-06 (owner-authorized expansion, awaiting task-level
+> approval): 14 micro-tasks S7.1–S7.14, spine first (ComfyUI integration →
+> workflow templates → template prompt assembly with optional LLM assist →
+> negative prompts → approved-reference conditioning → individual generation
+> → variations → inpaint → outpaint → aspect ratios → comparisons →
+> provenance → version history/approval/restoration), then acceptance
+> fixture last. First live-generation stage — both repaint ops
+> coordinate-based (no mask UI); workflow templates are portable project
+> files, hash-verified. See `Docs/PanelForge-Task-Register.md` §4E Stage 7
+> for full per-task spec.
+
+- [ ] S7.1 ComfyUI workflow integration (submit → poll → harvest; Small GPU honored)
+- [ ] S7.2 Workflow templates (project files under `workflows/`, hash-verified registry)
+- [ ] S7.3 Prompt assembly (templates from S6.9 + style + reference tags; optional LM Studio polish)
+- [ ] S7.4 Negative prompt handling (per-job + style defaults, job wins)
+- [ ] S7.5 Reference conditioning (approved refs by slot; unapproved refuse)
+- [ ] S7.6 Individual panel generation (engine: request → ComfyUI → asset → artwork row; never overwrite)
+- [ ] S7.7 Variations (N versions per job; Small GPU cap honored)
+- [ ] S7.8 Inpainting (coordinate regions; no mask UI)
+- [ ] S7.9 Outpainting (canvas-extension params; no mask UI)
+- [ ] S7.10 Aspect ratio adjustment (style vocabulary; new versions only)
+- [ ] S7.11 Side-by-side + approved-reference comparison (all four §8.8 modes)
+- [ ] S7.12 Generation provenance (template + hash, prompt, seed, model, timestamp)
+- [ ] S7.13 Version history, approval, and restoration (restore returns pointer, never deletes)
+- [ ] S7.14 Stage 7 acceptance fixture (brief → artwork → approve; approved work preserved)
 
 ## Stage 8 — Comic Layout Studio
 
