@@ -29,6 +29,7 @@ export type CharacterProfile = {
   distinguishingFeatures: string;
   relationships: string;
   timeline: string;
+  sourceEntityId: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -87,6 +88,7 @@ function toRecord(row: Record<string, unknown>): CharacterProfile {
     distinguishingFeatures: String(row.distinguishing_features ?? ""),
     relationships: String(row.relationships ?? ""),
     timeline: String(row.timeline ?? ""),
+    sourceEntityId: row.source_entity_id === null || row.source_entity_id === undefined ? null : String(row.source_entity_id),
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };

@@ -205,6 +205,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "INSERT OR IGNORE INTO completeness_tiers (tier, slot, min_count) VALUES ('recommended', 'portrait', 1), ('recommended', 'front', 1), ('recommended', 'expression', 1), ('full', 'portrait', 1), ('full', 'front', 1), ('full', 'side', 1), ('full', 'rear', 1), ('full', 'expression', 2), ('full', 'pose', 1), ('full', 'clothing', 1), ('full', 'equipment', 1)",
     ],
   },
+  // S4.6: entity → character bridge. source_entity_id (nullable,
+  // unique) records which Stage 3 extraction spawned a profile —
+  // one profile per entity, never auto-created.
+  {
+    version: 15,
+    name: "015_character_entity_bridge",
+    statements: [
+      "ALTER TABLE characters ADD COLUMN source_entity_id TEXT",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_characters_source_entity ON characters(source_entity_id) WHERE source_entity_id IS NOT NULL",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {
