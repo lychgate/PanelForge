@@ -232,6 +232,29 @@ remains the authoritative progress record; this file summarizes what each task c
 - `Plan.md`: S7.14 + S7.15 task lines (Stage 7 now 15 tasks).
 - `README.md`: Stage 7 range S7.1–S7.15.
 
+### S7.2 — Workflow Templates (2026-11-06) — [`3e715ed`](https://github.com/lychgate/PanelForge/commit/3e715ed723b78984d4c2ede782c36b57ec59d04b7)
+
+**Added**
+
+- `src/core/project/workflow-templates.ts` —
+  `saveTemplate`/`getTemplate`/`listTemplates`: portable
+  `workflows/<slug>.json` files + DB registry (name,
+  relative path, sha256, version); every load verifies the
+  registered hash first (tampered → `TEMPLATE_TAMPERED`,
+  missing → `TEMPLATE_MISSING`, unknown → `NOT_FOUND`).
+- Migration 039 (`workflow_templates` table) in
+  `src/core/project/metadata.ts`.
+- `tests/workflow-templates.test.js` — 4 tests: round-trip
+  + version replace, tamper/missing/unknown rejections,
+  backup-restore + project-copy round-trips (plus fix
+  commit `57a7ff2`), migration v39.
+
+**Changed**
+
+- Register: S7.2 marked **Complete**; Stage 7 now 2 of 15;
+  §11 next eligible is S7.3.
+- `Plan.md`: S7.2 checked off (2026-11-06).
+
 ### S7.1 — ComfyUI Workflow Integration (2026-11-06) — [`4edda23`](https://github.com/lychgate/PanelForge/commit/4edda237d8a8e4bade7011ceddaef8eb58be5581)
 
 **Added**
