@@ -228,6 +228,17 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE INDEX IF NOT EXISTS idx_panel_character_bindings_version ON panel_character_bindings(version_id)",
     ],
   },
+  // S4.8: generation approval (§8.4). Per-version status
+  // (pending/approved/rejected) with rationale + timestamp.
+  {
+    version: 17,
+    name: "017_character_version_approval",
+    statements: [
+      "ALTER TABLE character_versions ADD COLUMN approval_status TEXT NOT NULL DEFAULT 'pending'",
+      "ALTER TABLE character_versions ADD COLUMN approval_rationale TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE character_versions ADD COLUMN approval_decided_at TEXT",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {

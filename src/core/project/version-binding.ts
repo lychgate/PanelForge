@@ -87,6 +87,10 @@ export async function bindVersion(
       if (String(version.character_id) !== characterId) {
         throw new BindingError("INVALID_ARGUMENTS", `Version ${versionId} does not belong to character ${characterId}`);
       }
+      const status = String(version.approval_status ?? "pending");
+      if (status !== "approved") {
+        throw new BindingError("NOT_APPROVED", `Version ${versionId} is ${status}; only approved versions can bind`);
+      }
       return await runWithBusyRetry<CharacterBinding>(() => {
         db.exec("BEGIN IMMEDIATE");
         try {
@@ -192,6 +196,12 @@ export async function verifyBindingEra(root: string, panelId: string, characterI
     const overrideAge = version ? String(version.age ?? "") : "";
     const boundAge = overrideAge !== "" ? overrideAge : profile ? String(profile.age ?? "") : "";
     const mismatch = boundAge !== "" && expectedAge.trim() !== "" && boundAge !== expectedAge.trim();
+    const warnings: string[] = [];
+    if (mismatch) warnings.push(`bound version age ${boundAge} disagrees with panel-stated age ${expectedAge.trim()} for character ${characterId} in panel ${panelId}`);
+    const status = version ? String(version.approval_status ?? "pending") : "pending";
+    if (status !== "approved") {
+      warnings.push(`bound version ${binding.versionId} is no longer approved (status: ${status}) for character ${characterId} in panel ${panelId}`);
+    }
     return {
       panelId,
       characterId,
@@ -199,9 +209,7 @@ export async function verifyBindingEra(root: string, panelId: string, characterI
       boundAge,
       expectedAge,
       mismatch,
-      warnings: mismatch
-        ? [`bound version age ${boundAge} disagrees with panel-stated age ${expectedAge.trim()} for character ${characterId} in panel ${panelId}`]
-        : [],
+      warnings,
     };
   } finally {
     db.close();

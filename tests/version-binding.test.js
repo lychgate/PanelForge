@@ -31,6 +31,8 @@ const { createProject } = require(servicePath);
 const { createCharacter } = require(charactersPath);
 const { createVersion, deleteVersion } = require(versionsPath);
 const { bindVersion, getBinding, listBindingsByPanel, listBindingsByCharacter, unbind, verifyBindingEra } = require(bindingPath);
+const approvalPath = path.join(root, "out/node/core/project/approval.js");
+const { setApproval } = require(approvalPath);
 
 let projectRoot;
 let robby;
@@ -45,6 +47,9 @@ beforeEach(async () => {
   mira = await createCharacter(projectRoot, { name: "Mira", age: "30" });
   v7 = await createVersion(projectRoot, { characterId: robby.characterId, label: "Robert, age 7", age: "7" });
   v12 = await createVersion(projectRoot, { characterId: robby.characterId, label: "Robert, age 12", age: "12" });
+  // S4.8: only approved versions can bind.
+  await setApproval(projectRoot, v7.versionId, "approved", "fixture approval");
+  await setApproval(projectRoot, v12.versionId, "approved", "fixture approval");
 });
 
 describe("S4.7 character version binding", () => {
@@ -91,7 +96,9 @@ describe("S4.7 character version binding", () => {
   it("character-scoped listing spans panels; migration v16 present", async () => {
     await bindVersion(projectRoot, "panel-1", robby.characterId, v7.versionId);
     await bindVersion(projectRoot, "panel-2", robby.characterId, v12.versionId);
-    await bindVersion(projectRoot, "panel-1", mira.characterId, (await createVersion(projectRoot, { characterId: mira.characterId, label: "Mira, 30" })).versionId);
+    const miraVersion = await createVersion(projectRoot, { characterId: mira.characterId, label: "Mira, 30" });
+    await setApproval(projectRoot, miraVersion.versionId, "approved", "fixture approval");
+    await bindVersion(projectRoot, "panel-1", mira.characterId, miraVersion.versionId);
     expect((await listBindingsByCharacter(projectRoot, robby.characterId)).map((b) => b.panelId)).toEqual(["panel-1", "panel-2"]);
     expect((await listBindingsByPanel(projectRoot, "panel-1")).map((b) => b.characterId)).toContain(mira.characterId);
     const { openProjectDatabase } = require(metadataPath);
