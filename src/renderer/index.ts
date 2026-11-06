@@ -692,7 +692,8 @@ if (root && navEl) {
     card.appendChild(legend);
     const readingBox = document.createElement("div");
     readingBox.id = "layout-reading-order";
-    readingBox.textContent = "reading order: " + details.placements.map((p: any) => p.placementId.slice(0, 8)).join(", ");
+    readingBox.textContent =
+      "reading order: " + details.placements.map((p: any) => p.placementId.slice(0, 8)).join(", ") + (details.flags?.length ? ` · flags: ${details.flags.join(", ")}` : "");
     card.appendChild(readingBox);
 
     for (const placement of details.placements as any[]) {
@@ -700,6 +701,15 @@ if (root && navEl) {
       const title = document.createElement("legend");
       title.textContent = `Placement ${placement.placementId.slice(0, 8)} (panel ${placement.panelId.slice(0, 8)})`;
       fieldset.appendChild(title);
+      const traceLine = document.createElement("div");
+      traceLine.id = "layout-trace";
+      const trace = placement.trace;
+      const versions =
+        trace?.assignments?.length > 0
+          ? trace.assignments.map((a: any) => `${a.characterName} (${a.versionLabel})`).join(", ")
+          : "unassigned";
+      traceLine.textContent = `trace: scene ${trace?.scenePurpose ?? trace?.sceneId ?? "?"} · characters: ${versions}${trace?.flags?.length ? ` · flags: ${trace.flags.join(", ")}` : ""}`;
+      fieldset.appendChild(traceLine);
       const xInput = numInput("Placement x", placement.x);
       const yInput = numInput("Placement y", placement.y);
       const wInput = numInput("Placement width", placement.width);

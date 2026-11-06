@@ -7,17 +7,19 @@
 // - `getLayoutPage` returns one page's full card:
 //   the page, its placements in reading order
 //   (S8.9) with border specs (S8.5), balloons +
-//   lettering (S8.6-S8.7), SFX (S8.8), and the
+//   lettering (S8.6-S8.7), SFX (S8.8), the
 //   deterministic SVG string (S8.11) the canvas
-//   draws from.
+//   draws from, and trace links (S8.13) to source
+//   panels/scenes/character versions.
+// - Page-level `flags` name pages with no artwork
+//   slot (`EMPTY_PAGE`); empty pages are flagged,
+//   never broken.
 // - Edits stay in their own modules (placements,
 //   borders, balloons, lettering, sfx,
 //   reading-order); this file only reads, so the
 //   UI surface cannot bypass typed errors.
 // - No export controls live here (Stage 10 owns
 //   rasterization/export).
-//
-// Traceability (pages -> panels/versions) stays S8.13.
 
 import { identifyProject } from "./service";
 import { listManuscripts } from "./manuscripts";
@@ -26,6 +28,7 @@ import { getReadingOrder } from "./reading-order";
 import { openProjectDatabase } from "./metadata";
 import { renderPageSvg } from "./svg-render";
 import { getBorder, type BorderSpec } from "./borders";
+import { getPlacementTrace, getPageTrace, type PlacementTrace } from "./traceability";
 import type { PagePlacement } from "./placements";
 import type { Balloon } from "./balloons";
 import type { Sfx } from "./sfx";
@@ -53,6 +56,7 @@ export type LayoutPlacementCard = Omit<PagePlacement, "border"> & {
   border: BorderSpec | null;
   balloons: Balloon[];
   sfx: Sfx[];
+  trace: PlacementTrace;
 };
 
 /** loosen Balloon to include lettering text for the UI card */
@@ -64,21 +68,27 @@ export type LayoutPlacementCardWithText = Omit<LayoutPlacementCard, "balloons"> 
 
 export type LayoutPageDetails = {
   page: LayoutPage;
+  flags: string[];
   placements: LayoutPlacementCardWithText[];
   svg: string;
 };
 
+export type LayoutBoardPage = LayoutPage & { flag: string | null };
+
 export type LayoutBoard = {
-  pages: LayoutPage[];
+  pages: LayoutBoardPage[];
 };
 
-/** Every layout page across all manuscripts, in creation order. */
+/** Every layout page across all manuscripts, in creation order. Empty pages are flagged, never hidden. */
 export async function listLayoutBoard(root: string): Promise<LayoutBoard> {
   requireProject(root);
   const manuscripts = await listManuscripts(root);
-  const pages: LayoutPage[] = [];
+  const pages: LayoutBoardPage[] = [];
   for (const manuscript of manuscripts) {
-    pages.push(...(await listPages(root, manuscript.manuscriptId)));
+    for (const page of await listPages(root, manuscript.manuscriptId)) {
+      const trace = await getPageTrace(root, page.pageId);
+      pages.push({ ...page, flag: trace.flags[0] ?? null });
+    }
   }
   return { pages };
 }
@@ -149,10 +159,12 @@ export async function getLayoutPage(root: string, pageId: string): Promise<Layou
         border: await getBorder(root, placement.placementId),
         balloons: balloonsByPlacement.get(placement.placementId) ?? [],
         sfx: sfxByPlacement.get(placement.placementId) ?? [],
+        trace: await getPlacementTrace(root, placement.placementId),
       });
     }
     const svg = await renderPageSvg(root, pageId);
-    return { page, placements, svg };
+    const pageTrace = await getPageTrace(root, pageId);
+    return { page, flags: pageTrace.flags, placements, svg };
   } finally {
     db.close();
   }
