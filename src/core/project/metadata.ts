@@ -379,6 +379,16 @@ const PROJECT_DB_MIGRATIONS: readonly ProjectDbMigration[] = [
       "CREATE INDEX IF NOT EXISTS idx_storyboard_panels_scene ON storyboard_panels(scene_id, sort_order)",
     ],
   },
+  // S6.3: character/version assignment realizing S4.7 against
+  // real panel rows; approved versions only (S4.8 gate).
+  {
+    version: 31,
+    name: "031_panel_assignments",
+    statements: [
+      "CREATE TABLE IF NOT EXISTS panel_assignments (assignment_id TEXT PRIMARY KEY, panel_id TEXT NOT NULL REFERENCES storyboard_panels(panel_id), character_id TEXT NOT NULL REFERENCES characters(character_id), version_id TEXT NOT NULL REFERENCES character_versions(version_id), created_at TEXT NOT NULL, updated_at TEXT NOT NULL)",
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_panel_assignments_pair ON panel_assignments(panel_id, character_id)",
+    ],
+  },
 ];
 
 export function projectDatabasePath(root: string): string {

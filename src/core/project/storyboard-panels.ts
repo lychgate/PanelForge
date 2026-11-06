@@ -159,6 +159,10 @@ export async function deletePanel(root: string, panelId: string): Promise<void> 
       await runWithBusyRetry(() => {
         const current = db.prepare("SELECT * FROM storyboard_panels WHERE panel_id = ?").get(panelId);
         if (!current) throw new PanelError("NOT_FOUND", `No panel with id: ${panelId}`);
+        const bound = db.prepare("SELECT COUNT(*) AS n FROM panel_assignments WHERE panel_id = ?").get(panelId) as Record<string, unknown>;
+        if (Number(bound.n) > 0) {
+          throw new PanelError("BOUND_PANEL", `Panel ${panelId} has ${Number(bound.n)} character assignment(s); unassign first`);
+        }
         db.prepare("DELETE FROM storyboard_panels WHERE panel_id = ?").run(panelId);
       });
     } finally {
