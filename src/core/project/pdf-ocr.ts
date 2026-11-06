@@ -109,6 +109,8 @@ async function ocrPages(pages: string[]): Promise<string> {
   const { createWorker } = require("tesseract.js") as typeof import("tesseract.js");
   const worker = await createWorker("eng", 1, {
     logger: () => undefined,
+    // Keep traineddata out of the working tree (repo root).
+    cachePath: os.tmpdir(),
   });
   try {
     const parts: string[] = [];
