@@ -7,6 +7,29 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S5.1 — Location Profile Records (2026-11-06) — [`e1e4df5`](https://github.com/lychgate/PanelForge/commit/e1e4df5575d87268ea8315400b006ef6011b9409)
+
+**Added**
+
+- `src/core/project/locations.ts` — §8.5 profile CRUD
+  (`createLocation`/`getLocation`/`listLocations`/
+  `updateLocation`/`deleteLocation`): name required, all other
+  fields (architecture, geography, interior/exterior layout,
+  lighting, time of day, weather, materials, color palette,
+  damage states, historical/chronological variations) optional
+  structured text defaulting to `""`; identity stable.
+- Migration 020 (`locations` table) in
+  `src/core/project/metadata.ts`.
+- `tests/locations.test.js` — 5 tests: create with §8.5 fields,
+  empty-string defaults, validation, partial-update identity
+  stability, list/delete + migration v20.
+
+**Changed**
+
+- Register: S5.1 marked **Complete**; Stage 5 now 1 of 10;
+  §11 next eligible is S5.2.
+- `Plan.md`: S5.1 checked off (2026-11-06).
+
 ### Stages 5 + 6 Planning — Location/Object + Storyboard Expansion (2026-11-06)
 
 **Changed**

@@ -127,7 +127,7 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > `Docs/PanelForge-Task-Register.md` §4E Stage 5 for full per-task
 > Goal/Scope/Deliverables/Deps/Acceptance/Stop.
 
-- [ ] S5.1 Location profile records (§8.5 fields + CRUD)
+- [x] S5.1 Location profile records (§8.5 fields + CRUD) — completed 2026-11-06
 - [ ] S5.2 Location variations (identifiable states like "Ravenholt, winter, damaged")
 - [ ] S5.3 Location reference association (exterior/interior/overview/detail/day/night/weather/damaged slots)
 - [ ] S5.4 Object profile records (§8.6 fields + CRUD)
