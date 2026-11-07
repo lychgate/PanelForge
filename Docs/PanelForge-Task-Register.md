@@ -1218,6 +1218,15 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **How the owner sees it:** `electron .` → Alt+6 (Import) → open a project from Projects (Alt+3) or paste its root → Load manuscripts (empty state: "No manuscripts yet.") → Choose file... (main-process dialog) → pick a .txt/.md/.docx/.epub/.pdf → status shows `imported: <title> (<format>)` (PDFs add `· ocr: N pages via <engine>` when autodetected) → Verify shows `verify: <title> — ok (...)` → View OCR shows the editor or "No OCR text for this manuscript." → edit + Save OCR shows `saved OCR for <title>`.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 682a206; 623 tests incl. 6 import-ui; see §10)
 
+#### S8U.2 Text/Chapters UI [SPEC]
+- **Goal:** Read normalized text and chapters from the UI end-to-end (pick → read → normalize → derive).
+- **Scope:** Hand-rolled Text view (Alt+7): project-root input, manuscript picker (reusing the S8U.1 import list), normalized-text area with empty state, Normalize (txt/md derive via S3.2), Derive chapters (via S3.3), chapter list with empty state (each chapter a focusable button showing its slice), typed-error status line. Four new allowlisted channels (`panelforge:text.get`, `panelforge:text.normalize`, `panelforge:chapters.list`, `panelforge:chapters.derive`) wrapping the existing S3.2/S3.3 core; handlers project away the offset map, backend behavior unchanged. Renderer test `tests/text-ui.test.js`.
+- **Deliverables [SPEC]:** Text/Chapters UI surface.
+- **Acceptance:** Normalized text + chapters read and derive fully without opening the filesystem; originals preserved.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.2, S3.3.
+- **How the owner sees it:** `electron .` → Alt+7 (Text) → open a project from Projects (Alt+3) or paste its root → Load manuscripts → pick the manuscript in the list → status shows `text: <N> bytes` (or "No normalized text for this manuscript.") → Normalize shows `text: normalized <N> bytes` → Derive chapters shows `text: <N> chapter(s)` and the chapter buttons → clicking a chapter button shows `text: <title> (chars a–b)` and its slice below.
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit b680451; 628 tests incl. 5 text-ui; see §10)
+
 **Stage 9 — Continuity and QA: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
 
 > Goal [SPEC]: Detect meaningful inconsistencies.
@@ -2169,6 +2178,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S8U.1 | `DISPLAY=:0 npm test` | Pass — 623 passed (617 baseline + 6 import-ui; incl. 9 ipc + 12 shortcuts). | `tests/import-ui.test.js` (6 tests): 6 import channels validated + registered; txt import → list → verify round-trip; docx/epub via envelope; pdf autodetect without OCR; typed codes (NOT_FOUND/INVALID_FORMAT); renderer carries Import view (Alt+6, Load manuscripts, Choose file..., Verify, View OCR, Save OCR, empty states) with no raw IPC/Node. |
 | 2026-11-06 | S8U.1 | `npm run check` | Pass | Baseline + IPC guard green (no new deps; 34 channels total). |
 | 2026-11-06 | S8U.1 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored; `PanelForge.zip` untracked (owner to direct). |
+| 2026-11-06 | S8U.2 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S8U.2 | `npm run build` | Pass | `out/node/core/ipc/registry.js` + rebuilt renderer emitted. |
+| 2026-11-06 | S8U.2 | `DISPLAY=:0 npm test` | Pass — 628 passed (623 baseline + 5 text-ui; incl. 9 ipc + 12 shortcuts). | `tests/text-ui.test.js` (5 tests): 4 text/chapter channels validated + registered; txt null-text → normalize → derive → list round-trip (spans tile, ordered); docx carries normalization, normalize rejects INVALID_FORMAT, typed NOT_FOUND + derive; derive-without-normalization typed NOT_FOUND; renderer carries Text view (Alt+7, Load manuscripts, Normalize, Derive chapters, empty states, Show chapter) with no raw IPC/Node. |
+| 2026-11-06 | S8U.2 | `npm run check` | Pass | Baseline + IPC guard green (no new deps; 38 channels total). |
+| 2026-11-06 | S8U.2 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored; `PanelForge.zip` untracked (owner to direct). |
+
+**S8U.2 implemented files:** `src/shared/types/index.ts` (TextChapterKeyArgs), `src/core/ipc/registry.ts` (4 text/chapter channels, validators, offset-map projection; dispatch to S3.2/S3.3 core — backend behavior unchanged), `src/preload/index.ts` (frozen `text`/`chapters` bridges), `src/renderer/index.ts` (Text view Alt+7: root input, manuscript picker, Normalize / Derive chapters, normalized-text + chapter-slice areas, chapter buttons), `Docs/PanelForge-Shortcuts.md` (Alt+7 + Text keyboard notes), `tests/text-ui.test.js` (New, 5 tests), `tests/ipc.test.js` (allowlist 34 → 38). Stage 9 remains paused until the Stage 8.1 click-through is gated.
 
 **S8U.1 implemented files:** `src/shared/types/index.ts` (import error codes + arg types), `src/core/ipc/registry.ts` (6 import channels, validators, main-process `dialog.showOpenDialog` pickFile, format dispatch to S3.1/S3.8/S3.9/S3.10/S6.13 core — backend behavior unchanged), `src/preload/index.ts` (frozen `import` bridge), `src/renderer/index.ts` (Import view Alt+6: root input, Load manuscripts, Choose file..., list + Verify + View OCR/Save OCR, typed-error status), `Docs/PanelForge-Shortcuts.md` (Alt+6 + Import keyboard notes), `tests/import-ui.test.js` (New, 6 tests), `tests/ipc.test.js` (allowlist 28 → 34). Stage 9 remains paused until the Stage 8.1 click-through is gated.
 
@@ -2619,6 +2635,8 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 **Next eligible after S8.14:** Stage 9 — Continuity and QA (S9.1 QA threshold settings, §4E Stage 9 expanded plan). Do not begin without explicit owner authorization.
 
 **Next eligible after S8U.1:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit 682a206; 623 tests incl. 6 import-ui). Stage 8.1 now 1 task done.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8U.2:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit b680451; 628 tests incl. 5 text-ui). Stage 8.1 now 2 tasks done.** One-task-at-a-time (approved) stops here.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 

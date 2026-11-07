@@ -217,7 +217,8 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 > Owner rules: hand-rolled HTML/CSS + TypeScript only (no framework, editable by anyone); renderer never touches Node/raw IPC — every new action is an allowlisted channel in `src/core/ipc/registry.ts` + `src/preload/index.ts`, validated, with `npm run check` green; call existing core services without changing backend behavior unless the task says so; visible result or typed error per action, empty state per list; keyboard alternative for every pointer action recorded in `Docs/PanelForge-Shortcuts.md`; file/folder picking in the main process via Electron dialog; exact "How the owner sees it" live-Electron steps per task; small renderer test per task where possible; stop for review after each task.
 
 - [x] S8U.1 Import UI (Import view Alt+6; six import channels; main-process file picking; 623 tests incl. 6 import-ui) — completed 2026-11-06; Stage 8.1 now 1 task done
-- [ ] S8U.2 — next Studio UI task, awaiting owner authorization (Stage 9 paused)
+- [x] S8U.2 Text/Chapters UI (normalized-text + chapters view; four text/chapter channels; Alt+7; 628 tests incl. 5 text-ui) — completed 2026-11-06; Stage 8.1 now 2 tasks done
+- [ ] S8U.3 — next Studio UI task, awaiting owner authorization (Stage 9 paused)
 
 ## Stage 9 — Continuity and QA (expanded 2026-11-06: S9.1–S9.12)
 

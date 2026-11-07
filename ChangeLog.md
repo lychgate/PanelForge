@@ -7,6 +7,38 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S8U.2 — Text/Chapters UI (2026-11-06) — [`b680451`](https://github.com/lychgate/PanelForge/commit/b680451)
+
+**Added**
+
+- New Text view in `src/renderer/index.ts` (Alt+7): project-root
+  input, manuscript picker (reusing the S8U.1 import list),
+  normalized-text area ("No normalized text for this manuscript."
+  when absent), Normalize (txt/md derive via S3.2), Derive chapters
+  (via S3.3), chapter list with empty state ("No chapters yet."),
+  chapter buttons showing the selected slice, and a typed-error
+  status line.
+- Four allowlisted IPC channels (`panelforge:text.get`,
+  `panelforge:text.normalize`, `panelforge:chapters.list`,
+  `panelforge:chapters.derive`) in `src/core/ipc/registry.ts` +
+  validators + frozen `text`/`chapters` bridges in
+  `src/preload/index.ts`, dispatching to the existing S3.2/S3.3 core
+  (offset map projected away from renderer payloads).
+- `tests/text-ui.test.js` (5 tests): channel registration +
+  validation, txt null → normalize → derive → list round-trip with
+  tiling spans, docx typed-code surfaces, derive-without-normalization
+  typed `NOT_FOUND`, renderer strings with no raw IPC/Node.
+- `Docs/PanelForge-Shortcuts.md`: Alt+7 + Text keyboard notes.
+
+**Changed**
+
+- `tests/ipc.test.js`: allowlist count 34 → 38.
+- Register: S8U.2 definition (§4E), §10 test log, §11 next eligible
+  (Stage 8.1 continues; Stage 9 paused).
+- `Plan.md`: S8U.2 checked off (Stage 8.1 now 2 tasks done).
+- `README.md`: test count 623 → 628, status line Stage 8.1 in progress.
+- Full suite: 628 passed; `typecheck`/`build`/`check` green.
+
 ### S8U.1 — Import UI (2026-11-06) — [`682a206`](https://github.com/lychgate/PanelForge/commit/682a206)
 
 **Added**
