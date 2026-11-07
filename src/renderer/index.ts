@@ -102,6 +102,10 @@ type PanelForgeApi = {
     list(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
     derive(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
   };
+  scenes: {
+    list(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+    derive(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+  };
   version: Record<string, never>;
 };
 
@@ -109,7 +113,7 @@ type PanelForgeWindow = Window & { panelforge: PanelForgeApi };
 
 const win = window as unknown as PanelForgeWindow;
 
-const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout", "import", "text"] as const;
+const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout", "import", "text", "scenes"] as const;
 const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   diagnostics: "Diagnostics",
   about: "About",
@@ -118,6 +122,7 @@ const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   layout: "Layout",
   import: "Import",
   text: "Text",
+  scenes: "Scenes",
 };
 
 const navigation = createNavigation(VIEWS, "diagnostics");
@@ -129,6 +134,7 @@ shortcuts.register("nav.storyboard", "Go to Storyboard view", "Alt+4");
 shortcuts.register("nav.layout", "Go to Layout view", "Alt+5");
 shortcuts.register("nav.import", "Go to Import view", "Alt+6");
 shortcuts.register("nav.text", "Go to Text view", "Alt+7");
+shortcuts.register("nav.scenes", "Go to Scenes view", "Alt+8");
 
 const root = document.getElementById("root");
 const navEl = document.getElementById("app-nav");
@@ -197,6 +203,7 @@ if (root && navEl) {
     if (def.id === "nav.layout") goToView("layout");
     if (def.id === "nav.import") goToView("import");
     if (def.id === "nav.text") goToView("text");
+    if (def.id === "nav.scenes") goToView("scenes");
   });
 
   renderView();
@@ -1377,6 +1384,158 @@ if (root && navEl) {
       const chapters = (res.data as any).chapters as any[];
       textStatus.textContent = `text: ${chapters.length} chapter(s)`;
       void refreshText();
+    })();
+  });
+
+  // Scenes (S8U.3): hand-rolled scene list/detail over the stored
+  // S3.4 rows. Pick a manuscript, read its normalized text (for
+  // slicing), list / derive scenes; each scene is a focusable button
+  // showing its slice. Manual re-cutting stays a later task, so the
+  // surface is read + derive only.
+  const scenesSection = sections.scenes;
+  const scenesStatus = document.createElement("div");
+  scenesStatus.id = "scenes-status";
+  scenesStatus.textContent = "scenes: open a project from Projects first (Alt+3), or paste its root below.";
+  scenesSection.appendChild(scenesStatus);
+  const scenesRootInput = document.createElement("input");
+  scenesRootInput.id = "scenes-root";
+  scenesRootInput.placeholder = "Project root (directory)";
+  scenesRootInput.setAttribute("aria-label", "Project root");
+  scenesSection.appendChild(scenesRootInput);
+  const scenesLoadBtn = document.createElement("button");
+  scenesLoadBtn.type = "button";
+  scenesLoadBtn.textContent = "Load manuscripts";
+  scenesSection.appendChild(scenesLoadBtn);
+  const scenesSelect = document.createElement("select");
+  scenesSelect.id = "scenes-manuscript";
+  scenesSelect.setAttribute("aria-label", "Manuscript");
+  scenesSection.appendChild(scenesSelect);
+  const scenesDeriveBtn = document.createElement("button");
+  scenesDeriveBtn.type = "button";
+  scenesDeriveBtn.textContent = "Derive scenes";
+  scenesSection.appendChild(scenesDeriveBtn);
+  const scenesDetail = document.createElement("textarea");
+  scenesDetail.id = "scenes-detail";
+  scenesDetail.setAttribute("aria-label", "Scene text");
+  scenesDetail.readOnly = true;
+  scenesSection.appendChild(scenesDetail);
+  const scenesListEl = document.createElement("div");
+  scenesListEl.id = "scenes-list";
+  scenesSection.appendChild(scenesListEl);
+
+  let scenesRoot: string | null = openRoot;
+  let scenesText: string | null = null;
+
+  function scenesFail(action: string, res: { code?: string; message?: string }): void {
+    scenesStatus.textContent = `scenes ${action} failed: ${res.code ?? "error"} ${res.message ?? ""}`;
+  }
+
+  async function refreshScenes(): Promise<void> {
+    const manuscriptId = scenesSelect.value;
+    if (!scenesRoot || manuscriptId === "") {
+      return;
+    }
+    const textRes = await win.panelforge.text.get({ root: scenesRoot, manuscriptId });
+    scenesText = null;
+    if (textRes.ok && textRes.data) {
+      const normalization = (textRes.data as any).normalization as any | null;
+      if (normalization) {
+        scenesText = normalization.normalizedText as string;
+      }
+    }
+    const chaptersRes = await win.panelforge.chapters.list({ root: scenesRoot, manuscriptId });
+    const chapterTitles = new Map<string, string>();
+    if (chaptersRes.ok && chaptersRes.data) {
+      for (const chapter of (chaptersRes.data as any).chapters as any[]) {
+        chapterTitles.set(chapter.chapterId as string, chapter.title as string);
+      }
+    }
+    const result = await win.panelforge.scenes.list({ root: scenesRoot, manuscriptId });
+    if (!result.ok || !result.data) {
+      scenesFail("list", result);
+      return;
+    }
+    const scenes = (result.data as any).scenes as any[];
+    scenesStatus.textContent = `scenes: ${scenes.length} scene(s)`;
+    scenesListEl.replaceChildren();
+    if (scenes.length === 0) {
+      scenesListEl.textContent = "No scenes yet.";
+      return;
+    }
+    for (const scene of scenes as any[]) {
+      const chapterTitle = chapterTitles.get(scene.chapterId) ?? `chapter ${String(scene.chapterId).slice(0, 8)}`;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = `${chapterTitle}: ${scene.title} (chars ${scene.normStart}–${scene.normEnd})`;
+      btn.setAttribute("aria-label", `Show scene: ${scene.title}`);
+      btn.addEventListener("click", () => {
+        if (scenesText === null) {
+          scenesDetail.value = "";
+          scenesStatus.textContent = "No normalized text for this manuscript.";
+          return;
+        }
+        scenesDetail.value = scenesText.slice(scene.normStart, scene.normEnd);
+        scenesStatus.textContent = `scenes: ${chapterTitle}: ${scene.title} (chars ${scene.normStart}–${scene.normEnd})`;
+      });
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(btn);
+      scenesListEl.appendChild(wrapper);
+    }
+  }
+
+  scenesLoadBtn.addEventListener("click", () => {
+    void (async () => {
+      scenesRoot = scenesRootInput.value.trim() === "" ? openRoot : scenesRootInput.value.trim();
+      if (!scenesRoot) {
+        scenesStatus.textContent = "scenes: choose a project root first (open from Projects or paste its root below)";
+        return;
+      }
+      const res = await win.panelforge.import.list({ root: scenesRoot });
+      if (!res.ok || !res.data) {
+        scenesFail("load manuscripts", res);
+        return;
+      }
+      const manuscripts = (res.data as any).manuscripts as any[];
+      scenesSelect.replaceChildren();
+      if (manuscripts.length === 0) {
+        scenesSelect.textContent = "";
+        scenesStatus.textContent = "No manuscripts yet.";
+        scenesText = null;
+        scenesDetail.value = "";
+        scenesListEl.textContent = "No scenes yet.";
+        return;
+      }
+      for (const record of manuscripts as any[]) {
+        const option = document.createElement("option");
+        option.value = record.manuscriptId;
+        option.textContent = `${record.title} (${record.format})`;
+        scenesSelect.appendChild(option);
+      }
+      scenesStatus.textContent = `scenes: ${manuscripts.length} manuscript(s)`;
+      void refreshScenes();
+    })();
+  });
+
+  scenesSelect.addEventListener("change", () => {
+    scenesDetail.value = "";
+    void refreshScenes();
+  });
+
+  scenesDeriveBtn.addEventListener("click", () => {
+    void (async () => {
+      const manuscriptId = scenesSelect.value;
+      if (!scenesRoot || manuscriptId === "") {
+        scenesStatus.textContent = "scenes: load manuscripts first";
+        return;
+      }
+      const res = await win.panelforge.scenes.derive({ root: scenesRoot, manuscriptId });
+      if (!res.ok || !res.data) {
+        scenesFail("derive scenes", res);
+        return;
+      }
+      const scenes = (res.data as any).scenes as any[];
+      scenesStatus.textContent = `scenes: ${scenes.length} scene(s)`;
+      void refreshScenes();
     })();
   });
 }

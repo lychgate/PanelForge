@@ -14,6 +14,7 @@ shortcut registry (`src/renderer/shortcuts.ts`) and documented here.
 | `Alt+5` | Go to the Layout view |
 | `Alt+6` | Go to the Import view |
 | `Alt+7` | Go to the Text view |
+| `Alt+8` | Go to the Scenes view |
 | `Tab` / `Shift+Tab` | Move focus through navigation and view controls |
 | `Enter` / `Space` | Activate the focused control |
 | `Ctrl+Q` (`Cmd+Q` on macOS) | Quit the application (application menu, File) |
@@ -38,4 +39,10 @@ Notes:
   shows its span, spoken by its `Show chapter:` label. The
   normalized-text and chapter areas are read-only textareas
   reached with `Tab` (arrows scroll them).
+- All Scenes actions (Load manuscripts, Derive scenes) are native
+  focusable buttons reachable with `Tab` + `Enter`. The manuscript
+  picker is a focusable `<select>` (arrow keys pick, refreshes on
+  change); each scene is a focusable button that shows its span
+  (`Show scene:` label); the scene-text area is a read-only
+  textarea reached with `Tab`.
 - The current view is marked with `aria-current="page"` on its nav button.

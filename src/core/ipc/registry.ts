@@ -48,6 +48,7 @@ import {
   ImportOcrGetArgs,
   ImportOcrUpdateArgs,
   TextChapterKeyArgs,
+  ScenesKeyArgs,
 } from "../../shared/types";
 import { defaultLogService } from "../logging/service";
 import {
@@ -88,6 +89,7 @@ import { importEpubManuscript } from "../project/epub-import";
 import { importPdfAutodetect, getOcrText, updateOcrText } from "../project/pdf-ocr";
 import { getNormalization, storeNormalization } from "../project/text-normalize";
 import { listChapters, storeChapters } from "../project/chapters";
+import { listScenes, storeScenes } from "../project/scenes";
 
 export const IPC_CHANNELS = {
   diagnosticsPing: "panelforge:diagnostics.ping",
@@ -128,6 +130,8 @@ export const IPC_CHANNELS = {
   textNormalize: "panelforge:text.normalize",
   chaptersList: "panelforge:chapters.list",
   chaptersDerive: "panelforge:chapters.derive",
+  scenesList: "panelforge:scenes.list",
+  scenesDerive: "panelforge:scenes.derive",
 } as const;
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];
@@ -411,6 +415,12 @@ function isValidImportPickFileArgs(args: unknown): args is Record<string, never>
 // Text/Chapters UI (S8U.2): same key shape as import (root +
 // manuscriptId); the renderer never deals in raw paths here.
 function isValidTextChapterKeyArgs(args: unknown): args is TextChapterKeyArgs {
+  if (!isValidImportRootArgs(args)) return false;
+  return isNonEmptyString((args as { manuscriptId?: unknown }).manuscriptId);
+}
+
+// Scenes UI (S8U.3): same key shape (root + manuscriptId).
+function isValidScenesKeyArgs(args: unknown): args is ScenesKeyArgs {
   if (!isValidImportRootArgs(args)) return false;
   return isNonEmptyString((args as { manuscriptId?: unknown }).manuscriptId);
 }
@@ -793,6 +803,28 @@ const handlers: Record<
         throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
       }
       return { chapters: await storeChapters(args.root, args.manuscriptId) };
+    },
+  },
+  // Scenes UI (S8U.3): read/derive the stored S3.4 rows around the
+  // existing core services. No backend behavior changes.
+  [IPC_CHANNELS.scenesList]: {
+    validate: isValidScenesKeyArgs,
+    handle: async (_event, args) => {
+      const record = await getManuscript(args.root, args.manuscriptId);
+      if (!record) {
+        throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
+      }
+      return { scenes: await listScenes(args.root, args.manuscriptId) };
+    },
+  },
+  [IPC_CHANNELS.scenesDerive]: {
+    validate: isValidScenesKeyArgs,
+    handle: async (_event, args) => {
+      const record = await getManuscript(args.root, args.manuscriptId);
+      if (!record) {
+        throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
+      }
+      return { scenes: await storeScenes(args.root, args.manuscriptId) };
     },
   },
 };

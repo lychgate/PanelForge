@@ -307,3 +307,11 @@ export type TextChapterKeyArgs = {
   root: string;
   manuscriptId: string;
 };
+
+// Scenes UI (S8U.3) — one method per channel (D1). "root" is the
+// project directory; "manuscriptId" identifies the manuscript whose
+// stored S3.4 scenes are read or derived.
+export type ScenesKeyArgs = {
+  root: string;
+  manuscriptId: string;
+};

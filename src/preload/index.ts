@@ -12,6 +12,8 @@
 //   picker + manuscript import/list/verify/OCR via existing services).
 // - text.* / chapters.* — S8U.2 hand-rolled text surface (read/derive
 //   stored S3.2 normalization + S3.3 chapters via existing services).
+// - scenes.* — S8U.3 hand-rolled scenes surface (read/derive stored
+//   S3.4 scenes via existing services).
 // The preload wraps the approved channels and does not expose
 // ipcRenderer itself to the renderer.
 
@@ -51,6 +53,7 @@ import type {
   ImportOcrGetArgs,
   ImportOcrUpdateArgs,
   TextChapterKeyArgs,
+  ScenesKeyArgs,
 } from "../shared/types";
 
 async function invoke<T>(channel: string, args: Record<string, unknown>): Promise<IpcResult<T>> {
@@ -287,6 +290,14 @@ const api = Object.freeze({
     },
     async derive(args: TextChapterKeyArgs): Promise<IpcResult<any>> {
       return invoke<any>("panelforge:chapters.derive", { root: args.root, manuscriptId: args.manuscriptId });
+    },
+  }),
+  scenes: Object.freeze({
+    async list(args: ScenesKeyArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:scenes.list", { root: args.root, manuscriptId: args.manuscriptId });
+    },
+    async derive(args: ScenesKeyArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:scenes.derive", { root: args.root, manuscriptId: args.manuscriptId });
     },
   }),
   version: Object.freeze({}),
