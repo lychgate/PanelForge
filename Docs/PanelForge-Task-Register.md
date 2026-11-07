@@ -1236,6 +1236,15 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **How the owner sees it:** `electron .` → Alt+8 (Scenes) → open a project from Projects (Alt+3) or paste its root → Load manuscripts → pick the manuscript in the list → status shows `scenes: <N> scene(s)` (or "No scenes yet.") → Derive scenes shows `scenes: <N> scene(s)` with one button per scene → clicking a scene button shows `scenes: <chapter>: <title> (chars a–b)` and its slice below.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 5ee61db; 632 tests incl. 4 scenes-ui; see §10)
 
+#### S8U.4 Relationships UI [SPEC]
+- **Goal:** Prove source linkage from the UI (pick → traverse → verify).
+- **Scope:** Hand-rolled Relationships view (Alt+9): project-root input, manuscript picker (reusing the S8U.1 import list), scene picker (scenes auto-list on pick), Traverse action showing the full chain (manuscript → chapter → scene → normalized slice → original bytes), Verify chain action with a problems list (empty state: "No problems."), typed-error status line. Two new allowlisted channels (`panelforge:relationships.traverse`, `panelforge:relationships.verifyChain`) wrapping the existing S3.5 core; handlers project raw bytes to byte-length + text, backend behavior unchanged. Renderer test `tests/relationships-ui.test.js`.
+- **Deliverables [SPEC]:** Relationships UI surface.
+- **Acceptance:** Every extraction links back to exact source text from the UI; problems report, never fail silently.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.5.
+- **How the owner sees it:** `electron .` → Alt+9 (Relationships) → open a project from Projects (Alt+3) or paste its root → Load manuscripts → pick the manuscript (scenes auto-list; empty state "No scenes yet.") → pick a scene → Traverse shows `relationships: <manuscript> → <chapter> → <scene> (chars a–b, original N bytes)` with normalized + original slices below → Verify chain shows `relationships: chain verifies clean.` + "No problems." (or the problem list).
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 3aadbce; 637 tests incl. 5 relationships-ui; see §10)
+
 **Stage 9 — Continuity and QA: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
 
 > Goal [SPEC]: Detect meaningful inconsistencies.
@@ -2197,6 +2206,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S8U.3 | `DISPLAY=:0 npm test` | Pass — 632 passed (628 baseline + 4 scenes-ui; incl. 9 ipc + 12 shortcuts). | `tests/scenes-ui.test.js` (4 tests): 2 scenes channels validated + registered; txt empty-list → normalize + chapters → derive → list round-trip (per-chapter tiling, reading order); unknown-id + derive-without-normalization/chapters typed NOT_FOUND; renderer carries Scenes view (Alt+8, Load manuscripts, Derive scenes, empty states, Show scene) with no raw IPC/Node. |
 | 2026-11-06 | S8U.3 | `npm run check` | Pass | Baseline + IPC guard green (no new deps; 40 channels total). |
 | 2026-11-06 | S8U.3 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored; `PanelForge.zip` untracked (owner to direct). |
+| 2026-11-06 | S8U.4 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S8U.4 | `npm run build` | Pass | `out/node/core/ipc/registry.js` + rebuilt renderer emitted. |
+| 2026-11-06 | S8U.4 | `DISPLAY=:0 npm test` | Pass — 637 passed (632 baseline + 5 relationships-ui; incl. 9 ipc + 12 shortcuts). | `tests/relationships-ui.test.js` (5 tests): 2 relationships channels validated + registered; every scene traverses to exact normalized + original text (CRLF restored, bytes projected to length+text); verify passes on well-formed chains + problems reported for missing normalization; unknown scene typed NOT_FOUND; renderer carries Relationships view (Alt+9, Load manuscripts, Traverse, Verify chain, empty states) with no raw IPC/Node. |
+| 2026-11-06 | S8U.4 | `npm run check` | Pass | Baseline + IPC guard green (no new deps; 42 channels total). |
+| 2026-11-06 | S8U.4 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored; `PanelForge.zip` untracked (owner to direct). |
+
+**S8U.4 implemented files:** `src/shared/types/index.ts` (RelationshipsTraverseArgs/RelationshipsVerifyArgs), `src/core/ipc/registry.ts` (2 relationships channels, validators, traversal projection; dispatch to S3.5 core — backend behavior unchanged), `src/preload/index.ts` (frozen `relationships` bridge), `src/renderer/index.ts` (Relationships view Alt+9: root input, manuscript + scene pickers, Traverse / Verify chain, normalized + original slice areas, problems list), `Docs/PanelForge-Shortcuts.md` (Alt+9 + Relationships keyboard notes), `tests/relationships-ui.test.js` (New, 5 tests), `tests/ipc.test.js` (allowlist 40 → 42). Stage 9 remains paused until the Stage 8.1 click-through is gated.
 
 **S8U.3 implemented files:** `src/shared/types/index.ts` (ScenesKeyArgs), `src/core/ipc/registry.ts` (2 scenes channels, validators; dispatch to S3.4 core — backend behavior unchanged), `src/preload/index.ts` (frozen `scenes` bridge), `src/renderer/index.ts` (Scenes view Alt+8: root input, manuscript picker, Derive scenes, scene-slice area, chapter-labelled scene buttons), `Docs/PanelForge-Shortcuts.md` (Alt+8 + Scenes keyboard notes), `tests/scenes-ui.test.js` (New, 4 tests), `tests/ipc.test.js` (allowlist 38 → 40). Stage 9 remains paused until the Stage 8.1 click-through is gated.
 
@@ -2655,6 +2671,8 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 **Next eligible after S8U.2:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit b680451; 628 tests incl. 5 text-ui). Stage 8.1 now 2 tasks done.** One-task-at-a-time (approved) stops here.
 
 **Next eligible after S8U.3:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit 5ee61db; 632 tests incl. 4 scenes-ui). Stage 8.1 now 3 tasks done.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8U.4:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit 3aadbce; 637 tests incl. 5 relationships-ui). Stage 8.1 now 4 tasks done.** One-task-at-a-time (approved) stops here.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 

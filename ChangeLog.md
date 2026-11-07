@@ -7,6 +7,37 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S8U.4 — Relationships UI (2026-11-06) — [`3aadbce`](https://github.com/lychgate/PanelForge/commit/3aadbce)
+
+**Added**
+
+- New Relationships view in `src/renderer/index.ts` (Alt+9):
+  project-root input, manuscript picker (reusing the S8U.1 import
+  list), scene picker (auto-listed on pick), Traverse action
+  showing the full chain (manuscript → chapter → scene →
+  normalized slice → original bytes), Verify chain action with a
+  problems list ("No problems." when clean), and a typed-error
+  status line.
+- Two allowlisted IPC channels (`panelforge:relationships.traverse`,
+  `panelforge:relationships.verifyChain`) in
+  `src/core/ipc/registry.ts` + validators + frozen
+  `relationships` bridge in `src/preload/index.ts`, dispatching to
+  the existing S3.5 core (raw bytes projected to length + text).
+- `tests/relationships-ui.test.js` (5 tests): channel registration
+  + validation, per-scene traversal to exact normalized + original
+  text, verify clean vs problems reported, unknown-scene typed
+  `NOT_FOUND`, renderer strings with no raw IPC/Node.
+- `Docs/PanelForge-Shortcuts.md`: Alt+9 + Relationships keyboard notes.
+
+**Changed**
+
+- `tests/ipc.test.js`: allowlist count 40 → 42.
+- Register: S8U.4 definition (§4E), §10 test log, §11 next eligible
+  (Stage 8.1 continues; Stage 9 paused).
+- `Plan.md`: S8U.4 checked off (Stage 8.1 now 4 tasks done).
+- `README.md`: test count 632 → 637, status line Stage 8.1 in progress.
+- Full suite: 637 passed; `typecheck`/`build`/`check` green.
+
 ### S8U.3 — Scenes UI (2026-11-06) — [`5ee61db`](https://github.com/lychgate/PanelForge/commit/5ee61db)
 
 **Added**
