@@ -49,6 +49,8 @@ import {
   ImportOcrUpdateArgs,
   TextChapterKeyArgs,
   ScenesKeyArgs,
+  RelationshipsTraverseArgs,
+  RelationshipsVerifyArgs,
 } from "../../shared/types";
 import { defaultLogService } from "../logging/service";
 import {
@@ -90,6 +92,7 @@ import { importPdfAutodetect, getOcrText, updateOcrText } from "../project/pdf-o
 import { getNormalization, storeNormalization } from "../project/text-normalize";
 import { listChapters, storeChapters } from "../project/chapters";
 import { listScenes, storeScenes } from "../project/scenes";
+import { traverseFromScene, verifySourceChain } from "../project/relationships";
 
 export const IPC_CHANNELS = {
   diagnosticsPing: "panelforge:diagnostics.ping",
@@ -132,6 +135,8 @@ export const IPC_CHANNELS = {
   chaptersDerive: "panelforge:chapters.derive",
   scenesList: "panelforge:scenes.list",
   scenesDerive: "panelforge:scenes.derive",
+  relationshipsTraverse: "panelforge:relationships.traverse",
+  relationshipsVerifyChain: "panelforge:relationships.verifyChain",
 } as const;
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];
@@ -421,6 +426,18 @@ function isValidTextChapterKeyArgs(args: unknown): args is TextChapterKeyArgs {
 
 // Scenes UI (S8U.3): same key shape (root + manuscriptId).
 function isValidScenesKeyArgs(args: unknown): args is ScenesKeyArgs {
+  if (!isValidImportRootArgs(args)) return false;
+  return isNonEmptyString((args as { manuscriptId?: unknown }).manuscriptId);
+}
+
+// Relationships UI (S8U.4): traverse takes a sceneId; verify takes
+// a manuscriptId. Renderer never deals in raw paths here.
+function isValidRelationshipsTraverseArgs(args: unknown): args is RelationshipsTraverseArgs {
+  if (!isValidImportRootArgs(args)) return false;
+  return isNonEmptyString((args as { sceneId?: unknown }).sceneId);
+}
+
+function isValidRelationshipsVerifyArgs(args: unknown): args is RelationshipsVerifyArgs {
   if (!isValidImportRootArgs(args)) return false;
   return isNonEmptyString((args as { manuscriptId?: unknown }).manuscriptId);
 }
@@ -825,6 +842,44 @@ const handlers: Record<
         throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
       }
       return { scenes: await storeScenes(args.root, args.manuscriptId) };
+    },
+  },
+  // Relationships UI (S8U.4): traverse one scene's full source chain
+  // (projected: original bytes become byte length + text), and verify
+  // a manuscript's stored segmentation against its source. No backend
+  // behavior changes; core typed codes are preserved as-is.
+  [IPC_CHANNELS.relationshipsTraverse]: {
+    validate: isValidRelationshipsTraverseArgs,
+    handle: async (_event, args) => {
+      const traversal = await traverseFromScene(args.root, args.sceneId);
+      return {
+        manuscript: {
+          manuscriptId: traversal.manuscript.manuscriptId,
+          title: traversal.manuscript.title,
+          format: traversal.manuscript.format,
+        },
+        chapter: {
+          chapterId: traversal.chapter.chapterId,
+          title: traversal.chapter.title,
+          normStart: traversal.chapter.normStart,
+          normEnd: traversal.chapter.normEnd,
+        },
+        scene: {
+          sceneId: traversal.scene.sceneId,
+          title: traversal.scene.title,
+          normStart: traversal.scene.normStart,
+          normEnd: traversal.scene.normEnd,
+        },
+        normalizedText: traversal.normalizedText,
+        originalText: traversal.originalText,
+        originalByteLength: traversal.originalBytes.length,
+      };
+    },
+  },
+  [IPC_CHANNELS.relationshipsVerifyChain]: {
+    validate: isValidRelationshipsVerifyArgs,
+    handle: async (_event, args) => {
+      return { verification: await verifySourceChain(args.root, args.manuscriptId) };
     },
   },
 };

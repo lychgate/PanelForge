@@ -315,3 +315,16 @@ export type ScenesKeyArgs = {
   root: string;
   manuscriptId: string;
 };
+
+// Relationships UI (S8U.4) — one method per channel (D1). "root" is
+// the project directory; "sceneId" / "manuscriptId" pick the
+// extraction to traverse or the chain to verify.
+export type RelationshipsTraverseArgs = {
+  root: string;
+  sceneId: string;
+};
+
+export type RelationshipsVerifyArgs = {
+  root: string;
+  manuscriptId: string;
+};

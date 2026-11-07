@@ -106,6 +106,10 @@ type PanelForgeApi = {
     list(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
     derive(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
   };
+  relationships: {
+    traverse(args: { root: string; sceneId: string }): Promise<ProjectResult<any>>;
+    verifyChain(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+  };
   version: Record<string, never>;
 };
 
@@ -113,7 +117,7 @@ type PanelForgeWindow = Window & { panelforge: PanelForgeApi };
 
 const win = window as unknown as PanelForgeWindow;
 
-const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout", "import", "text", "scenes"] as const;
+const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout", "import", "text", "scenes", "relationships"] as const;
 const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   diagnostics: "Diagnostics",
   about: "About",
@@ -123,6 +127,7 @@ const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   import: "Import",
   text: "Text",
   scenes: "Scenes",
+  relationships: "Relationships",
 };
 
 const navigation = createNavigation(VIEWS, "diagnostics");
@@ -135,6 +140,7 @@ shortcuts.register("nav.layout", "Go to Layout view", "Alt+5");
 shortcuts.register("nav.import", "Go to Import view", "Alt+6");
 shortcuts.register("nav.text", "Go to Text view", "Alt+7");
 shortcuts.register("nav.scenes", "Go to Scenes view", "Alt+8");
+shortcuts.register("nav.relationships", "Go to Relationships view", "Alt+9");
 
 const root = document.getElementById("root");
 const navEl = document.getElementById("app-nav");
@@ -204,6 +210,7 @@ if (root && navEl) {
     if (def.id === "nav.import") goToView("import");
     if (def.id === "nav.text") goToView("text");
     if (def.id === "nav.scenes") goToView("scenes");
+    if (def.id === "nav.relationships") goToView("relationships");
   });
 
   renderView();
@@ -1536,6 +1543,186 @@ if (root && navEl) {
       const scenes = (res.data as any).scenes as any[];
       scenesStatus.textContent = `scenes: ${scenes.length} scene(s)`;
       void refreshScenes();
+    })();
+  });
+
+  // Relationships (S8U.4): hand-rolled source-chain surface over the
+  // S3.5 core. Pick a manuscript, pick a scene, Traverse to see the
+  // full chain (manuscript → chapter → scene → normalized slice →
+  // original bytes), and Verify chain to re-verify the stored
+  // segmentation against its source. Scenes auto-list on pick.
+  const relSection = sections.relationships;
+  const relStatus = document.createElement("div");
+  relStatus.id = "relationships-status";
+  relStatus.textContent = "relationships: open a project from Projects first (Alt+3), or paste its root below.";
+  relSection.appendChild(relStatus);
+  const relRootInput = document.createElement("input");
+  relRootInput.id = "relationships-root";
+  relRootInput.placeholder = "Project root (directory)";
+  relRootInput.setAttribute("aria-label", "Project root");
+  relSection.appendChild(relRootInput);
+  const relLoadBtn = document.createElement("button");
+  relLoadBtn.type = "button";
+  relLoadBtn.textContent = "Load manuscripts";
+  relSection.appendChild(relLoadBtn);
+  const relSelect = document.createElement("select");
+  relSelect.id = "relationships-manuscript";
+  relSelect.setAttribute("aria-label", "Manuscript");
+  relSection.appendChild(relSelect);
+  const relSceneSelect = document.createElement("select");
+  relSceneSelect.id = "relationships-scene";
+  relSceneSelect.setAttribute("aria-label", "Scene");
+  relSection.appendChild(relSceneSelect);
+  const relTraverseBtn = document.createElement("button");
+  relTraverseBtn.type = "button";
+  relTraverseBtn.textContent = "Traverse";
+  relSection.appendChild(relTraverseBtn);
+  const relVerifyBtn = document.createElement("button");
+  relVerifyBtn.type = "button";
+  relVerifyBtn.textContent = "Verify chain";
+  relSection.appendChild(relVerifyBtn);
+  const relNormArea = document.createElement("textarea");
+  relNormArea.id = "relationships-norm";
+  relNormArea.setAttribute("aria-label", "Normalized slice");
+  relNormArea.readOnly = true;
+  relSection.appendChild(relNormArea);
+  const relOrigArea = document.createElement("textarea");
+  relOrigArea.id = "relationships-original";
+  relOrigArea.setAttribute("aria-label", "Original slice");
+  relOrigArea.readOnly = true;
+  relSection.appendChild(relOrigArea);
+  const relProblemsEl = document.createElement("div");
+  relProblemsEl.id = "relationships-problems";
+  relSection.appendChild(relProblemsEl);
+
+  let relRoot: string | null = openRoot;
+
+  function relFail(action: string, res: { code?: string; message?: string }): void {
+    relStatus.textContent = `relationships ${action} failed: ${res.code ?? "error"} ${res.message ?? ""}`;
+  }
+
+  async function refreshRelScenes(): Promise<void> {
+    const manuscriptId = relSelect.value;
+    relSceneSelect.replaceChildren();
+    if (!relRoot || manuscriptId === "") {
+      return;
+    }
+    const chaptersRes = await win.panelforge.chapters.list({ root: relRoot, manuscriptId });
+    const chapterTitles = new Map<string, string>();
+    if (chaptersRes.ok && chaptersRes.data) {
+      for (const chapter of (chaptersRes.data as any).chapters as any[]) {
+        chapterTitles.set(chapter.chapterId as string, chapter.title as string);
+      }
+    }
+    const result = await win.panelforge.scenes.list({ root: relRoot, manuscriptId });
+    if (!result.ok || !result.data) {
+      relFail("scenes", result);
+      return;
+    }
+    const scenes = (result.data as any).scenes as any[];
+    if (scenes.length === 0) {
+      relStatus.textContent = "No scenes yet.";
+      return;
+    }
+    for (const scene of scenes as any[]) {
+      const chapterTitle = chapterTitles.get(scene.chapterId) ?? `chapter ${String(scene.chapterId).slice(0, 8)}`;
+      const option = document.createElement("option");
+      option.value = scene.sceneId;
+      option.textContent = `${chapterTitle}: ${scene.title}`;
+      relSceneSelect.appendChild(option);
+    }
+  }
+
+  relLoadBtn.addEventListener("click", () => {
+    void (async () => {
+      relRoot = relRootInput.value.trim() === "" ? openRoot : relRootInput.value.trim();
+      if (!relRoot) {
+        relStatus.textContent = "relationships: choose a project root first (open from Projects or paste its root below)";
+        return;
+      }
+      const res = await win.panelforge.import.list({ root: relRoot });
+      if (!res.ok || !res.data) {
+        relFail("load manuscripts", res);
+        return;
+      }
+      const manuscripts = (res.data as any).manuscripts as any[];
+      relSelect.replaceChildren();
+      relSceneSelect.replaceChildren();
+      relNormArea.value = "";
+      relOrigArea.value = "";
+      relProblemsEl.textContent = "";
+      if (manuscripts.length === 0) {
+        relSelect.textContent = "";
+        relStatus.textContent = "No manuscripts yet.";
+        return;
+      }
+      for (const record of manuscripts as any[]) {
+        const option = document.createElement("option");
+        option.value = record.manuscriptId;
+        option.textContent = `${record.title} (${record.format})`;
+        relSelect.appendChild(option);
+      }
+      relStatus.textContent = `relationships: ${manuscripts.length} manuscript(s)`;
+      await refreshRelScenes();
+      if (relSceneSelect.options.length === 0) {
+        relStatus.textContent = "No scenes yet.";
+      }
+    })();
+  });
+
+  relSelect.addEventListener("change", () => {
+    relNormArea.value = "";
+    relOrigArea.value = "";
+    relProblemsEl.textContent = "";
+    void refreshRelScenes();
+  });
+
+  relTraverseBtn.addEventListener("click", () => {
+    void (async () => {
+      const sceneId = relSceneSelect.value;
+      if (!relRoot || sceneId === "") {
+        relStatus.textContent = "relationships: load manuscripts first";
+        return;
+      }
+      const res = await win.panelforge.relationships.traverse({ root: relRoot, sceneId });
+      if (!res.ok || !res.data) {
+        relFail("traverse", res);
+        return;
+      }
+      const data = res.data as any;
+      relNormArea.value = data.normalizedText as string;
+      relOrigArea.value = data.originalText as string;
+      relStatus.textContent =
+        `relationships: ${data.manuscript.title} → ${data.chapter.title} → ${data.scene.title} ` +
+        `(chars ${data.scene.normStart}–${data.scene.normEnd}, original ${data.originalByteLength} bytes)`;
+    })();
+  });
+
+  relVerifyBtn.addEventListener("click", () => {
+    void (async () => {
+      const manuscriptId = relSelect.value;
+      if (!relRoot || manuscriptId === "") {
+        relStatus.textContent = "relationships: load manuscripts first";
+        return;
+      }
+      const res = await win.panelforge.relationships.verifyChain({ root: relRoot, manuscriptId });
+      if (!res.ok || !res.data) {
+        relFail("verify chain", res);
+        return;
+      }
+      const verification = (res.data as any).verification as any;
+      relProblemsEl.replaceChildren();
+      if (verification.ok) {
+        relStatus.textContent = "relationships: chain verifies clean.";
+        relProblemsEl.textContent = "No problems.";
+        return;
+      }
+      relStatus.textContent = `relationships: chain has ${verification.problems.length} problem(s).`;
+      for (const problem of verification.problems as any[]) {
+        const row = document.createElement("div");
+        row.textContent = `${problem.kind}: ${problem.detail}`;
+        relProblemsEl.appendChild(row);
+      }
     })();
   });
 }

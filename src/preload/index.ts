@@ -14,6 +14,8 @@
 //   stored S3.2 normalization + S3.3 chapters via existing services).
 // - scenes.* — S8U.3 hand-rolled scenes surface (read/derive stored
 //   S3.4 scenes via existing services).
+// - relationships.* — S8U.4 hand-rolled relationship surface (traverse
+//   scene → chapter → manuscript → source bytes; verify source chain).
 // The preload wraps the approved channels and does not expose
 // ipcRenderer itself to the renderer.
 
@@ -54,6 +56,8 @@ import type {
   ImportOcrUpdateArgs,
   TextChapterKeyArgs,
   ScenesKeyArgs,
+  RelationshipsTraverseArgs,
+  RelationshipsVerifyArgs,
 } from "../shared/types";
 
 async function invoke<T>(channel: string, args: Record<string, unknown>): Promise<IpcResult<T>> {
@@ -298,6 +302,14 @@ const api = Object.freeze({
     },
     async derive(args: ScenesKeyArgs): Promise<IpcResult<any>> {
       return invoke<any>("panelforge:scenes.derive", { root: args.root, manuscriptId: args.manuscriptId });
+    },
+  }),
+  relationships: Object.freeze({
+    async traverse(args: RelationshipsTraverseArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:relationships.traverse", { root: args.root, sceneId: args.sceneId });
+    },
+    async verifyChain(args: RelationshipsVerifyArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:relationships.verifyChain", { root: args.root, manuscriptId: args.manuscriptId });
     },
   }),
   version: Object.freeze({}),
