@@ -299,3 +299,11 @@ export type ImportOcrUpdateArgs = {
   manuscriptId: string;
   ocrText: string;
 };
+
+// Text/Chapters UI (S8U.2) — one method per channel (D1). "root" is
+// the project directory; "manuscriptId" identifies the manuscript
+// whose stored S3.2 normalization / S3.3 chapters are read or derived.
+export type TextChapterKeyArgs = {
+  root: string;
+  manuscriptId: string;
+};

@@ -47,6 +47,7 @@ import {
   ImportVerifyArgs,
   ImportOcrGetArgs,
   ImportOcrUpdateArgs,
+  TextChapterKeyArgs,
 } from "../../shared/types";
 import { defaultLogService } from "../logging/service";
 import {
@@ -85,6 +86,8 @@ import {
 import { importDocxManuscript } from "../project/docx-import";
 import { importEpubManuscript } from "../project/epub-import";
 import { importPdfAutodetect, getOcrText, updateOcrText } from "../project/pdf-ocr";
+import { getNormalization, storeNormalization } from "../project/text-normalize";
+import { listChapters, storeChapters } from "../project/chapters";
 
 export const IPC_CHANNELS = {
   diagnosticsPing: "panelforge:diagnostics.ping",
@@ -121,6 +124,10 @@ export const IPC_CHANNELS = {
   importVerify: "panelforge:import.verify",
   importOcrGet: "panelforge:import.ocrGet",
   importOcrUpdate: "panelforge:import.ocrUpdate",
+  textGet: "panelforge:text.get",
+  textNormalize: "panelforge:text.normalize",
+  chaptersList: "panelforge:chapters.list",
+  chaptersDerive: "panelforge:chapters.derive",
 } as const;
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];
@@ -399,6 +406,13 @@ function isValidImportOcrUpdateArgs(args: unknown): args is ImportOcrUpdateArgs 
 
 function isValidImportPickFileArgs(args: unknown): args is Record<string, never> {
   return isRecord(args);
+}
+
+// Text/Chapters UI (S8U.2): same key shape as import (root +
+// manuscriptId); the renderer never deals in raw paths here.
+function isValidTextChapterKeyArgs(args: unknown): args is TextChapterKeyArgs {
+  if (!isValidImportRootArgs(args)) return false;
+  return isNonEmptyString((args as { manuscriptId?: unknown }).manuscriptId);
 }
 
 const handlers: Record<
@@ -718,6 +732,67 @@ const handlers: Record<
     validate: isValidImportOcrUpdateArgs,
     handle: async (_event, args) => {
       return { ocr: await updateOcrText(args.root, args.manuscriptId, args.ocrText) };
+    },
+  },
+  // Text/Chapters UI (S8U.2): read/derive the stored S3.2/S3.3 rows
+  // around the existing core services. No backend behavior changes.
+  // Handlers project away the offset map (renderer never needs it).
+  [IPC_CHANNELS.textGet]: {
+    validate: isValidTextChapterKeyArgs,
+    handle: async (_event, args) => {
+      const record = await getManuscript(args.root, args.manuscriptId);
+      if (!record) {
+        throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
+      }
+      const normalization = await getNormalization(args.root, args.manuscriptId);
+      return {
+        normalization: normalization
+          ? {
+              manuscriptId: normalization.manuscriptId,
+              normalizedText: normalization.normalizedText,
+              byteLength: normalization.byteLength,
+              createdAt: normalization.createdAt,
+            }
+          : null,
+      };
+    },
+  },
+  [IPC_CHANNELS.textNormalize]: {
+    validate: isValidTextChapterKeyArgs,
+    handle: async (_event, args) => {
+      const record = await getManuscript(args.root, args.manuscriptId);
+      if (!record) {
+        throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
+      }
+      const stored = await storeNormalization(args.root, args.manuscriptId);
+      return {
+        normalization: {
+          manuscriptId: stored.manuscriptId,
+          normalizedText: stored.normalizedText,
+          byteLength: stored.byteLength,
+          createdAt: stored.createdAt,
+        },
+      };
+    },
+  },
+  [IPC_CHANNELS.chaptersList]: {
+    validate: isValidTextChapterKeyArgs,
+    handle: async (_event, args) => {
+      const record = await getManuscript(args.root, args.manuscriptId);
+      if (!record) {
+        throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
+      }
+      return { chapters: await listChapters(args.root, args.manuscriptId) };
+    },
+  },
+  [IPC_CHANNELS.chaptersDerive]: {
+    validate: isValidTextChapterKeyArgs,
+    handle: async (_event, args) => {
+      const record = await getManuscript(args.root, args.manuscriptId);
+      if (!record) {
+        throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
+      }
+      return { chapters: await storeChapters(args.root, args.manuscriptId) };
     },
   },
 };

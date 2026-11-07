@@ -13,6 +13,7 @@ shortcut registry (`src/renderer/shortcuts.ts`) and documented here.
 | `Alt+4` | Go to the Storyboard view |
 | `Alt+5` | Go to the Layout view |
 | `Alt+6` | Go to the Import view |
+| `Alt+7` | Go to the Text view |
 | `Tab` / `Shift+Tab` | Move focus through navigation and view controls |
 | `Enter` / `Space` | Activate the focused control |
 | `Ctrl+Q` (`Cmd+Q` on macOS) | Quit the application (application menu, File) |
@@ -30,4 +31,11 @@ Notes:
   (Tab into, edit, Tab to Save OCR). File picking is triggered from
   the keyboard-focusable Choose button and opens the main-process
   dialog.
+- All Text actions (Load manuscripts, Normalize, Derive chapters)
+  are native focusable buttons reachable with `Tab` + `Enter`.
+  The manuscript picker is a focusable `<select>` (arrow keys pick,
+  refreshes on change); each chapter is a focusable button that
+  shows its span, spoken by its `Show chapter:` label. The
+  normalized-text and chapter areas are read-only textareas
+  reached with `Tab` (arrows scroll them).
 - The current view is marked with `aria-current="page"` on its nav button.

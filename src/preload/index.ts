@@ -10,6 +10,8 @@
 //   reading order). No export surface (Stage 10).
 // - import.* — S8U.1 hand-rolled import surface (main-process file
 //   picker + manuscript import/list/verify/OCR via existing services).
+// - text.* / chapters.* — S8U.2 hand-rolled text surface (read/derive
+//   stored S3.2 normalization + S3.3 chapters via existing services).
 // The preload wraps the approved channels and does not expose
 // ipcRenderer itself to the renderer.
 
@@ -48,6 +50,7 @@ import type {
   ImportVerifyArgs,
   ImportOcrGetArgs,
   ImportOcrUpdateArgs,
+  TextChapterKeyArgs,
 } from "../shared/types";
 
 async function invoke<T>(channel: string, args: Record<string, unknown>): Promise<IpcResult<T>> {
@@ -268,6 +271,22 @@ const api = Object.freeze({
         manuscriptId: args.manuscriptId,
         ocrText: args.ocrText,
       });
+    },
+  }),
+  text: Object.freeze({
+    async get(args: TextChapterKeyArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:text.get", { root: args.root, manuscriptId: args.manuscriptId });
+    },
+    async normalize(args: TextChapterKeyArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:text.normalize", { root: args.root, manuscriptId: args.manuscriptId });
+    },
+  }),
+  chapters: Object.freeze({
+    async list(args: TextChapterKeyArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:chapters.list", { root: args.root, manuscriptId: args.manuscriptId });
+    },
+    async derive(args: TextChapterKeyArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:chapters.derive", { root: args.root, manuscriptId: args.manuscriptId });
     },
   }),
   version: Object.freeze({}),

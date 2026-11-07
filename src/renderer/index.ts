@@ -94,6 +94,14 @@ type PanelForgeApi = {
     ocrGet(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
     ocrUpdate(args: { root: string; manuscriptId: string; ocrText: string }): Promise<ProjectResult<any>>;
   };
+  text: {
+    get(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+    normalize(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+  };
+  chapters: {
+    list(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+    derive(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+  };
   version: Record<string, never>;
 };
 
@@ -101,7 +109,7 @@ type PanelForgeWindow = Window & { panelforge: PanelForgeApi };
 
 const win = window as unknown as PanelForgeWindow;
 
-const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout", "import"] as const;
+const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout", "import", "text"] as const;
 const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   diagnostics: "Diagnostics",
   about: "About",
@@ -109,6 +117,7 @@ const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   storyboard: "Storyboard",
   layout: "Layout",
   import: "Import",
+  text: "Text",
 };
 
 const navigation = createNavigation(VIEWS, "diagnostics");
@@ -119,6 +128,7 @@ shortcuts.register("nav.projects", "Go to Projects view", "Alt+3");
 shortcuts.register("nav.storyboard", "Go to Storyboard view", "Alt+4");
 shortcuts.register("nav.layout", "Go to Layout view", "Alt+5");
 shortcuts.register("nav.import", "Go to Import view", "Alt+6");
+shortcuts.register("nav.text", "Go to Text view", "Alt+7");
 
 const root = document.getElementById("root");
 const navEl = document.getElementById("app-nav");
@@ -186,6 +196,7 @@ if (root && navEl) {
     if (def.id === "nav.storyboard") goToView("storyboard");
     if (def.id === "nav.layout") goToView("layout");
     if (def.id === "nav.import") goToView("import");
+    if (def.id === "nav.text") goToView("text");
   });
 
   renderView();
@@ -1185,6 +1196,187 @@ if (root && navEl) {
         : `imported: ${manuscript.title} (${manuscript.format})`;
       importTitleInput.value = "";
       void refreshImportList();
+    })();
+  });
+
+  // Text (S8U.2): hand-rolled normalized-text + chapters surface over
+  // the stored S3.2/S3.3 rows. Pick a manuscript (reusing the import
+  // list), read its normalized text, normalize txt/md when absent,
+  // and derive/list chapters; clicking a chapter shows its slice.
+  // Every action is a native focusable element (Tab + Enter, Alt+7).
+  const textSection = sections.text;
+  const textStatus = document.createElement("div");
+  textStatus.id = "text-status";
+  textStatus.textContent = "text: open a project from Projects first (Alt+3), or paste its root below.";
+  textSection.appendChild(textStatus);
+  const textRootInput = document.createElement("input");
+  textRootInput.id = "text-root";
+  textRootInput.placeholder = "Project root (directory)";
+  textRootInput.setAttribute("aria-label", "Project root");
+  textSection.appendChild(textRootInput);
+  const textLoadBtn = document.createElement("button");
+  textLoadBtn.type = "button";
+  textLoadBtn.textContent = "Load manuscripts";
+  textSection.appendChild(textLoadBtn);
+  const textSelect = document.createElement("select");
+  textSelect.id = "text-manuscript";
+  textSelect.setAttribute("aria-label", "Manuscript");
+  textSection.appendChild(textSelect);
+  const textNormalizeBtn = document.createElement("button");
+  textNormalizeBtn.type = "button";
+  textNormalizeBtn.textContent = "Normalize";
+  textSection.appendChild(textNormalizeBtn);
+  const textDeriveBtn = document.createElement("button");
+  textDeriveBtn.type = "button";
+  textDeriveBtn.textContent = "Derive chapters";
+  textSection.appendChild(textDeriveBtn);
+  const normArea = document.createElement("textarea");
+  normArea.id = "text-norm";
+  normArea.setAttribute("aria-label", "Normalized text");
+  normArea.readOnly = true;
+  textSection.appendChild(normArea);
+  const textDetailArea = document.createElement("textarea");
+  textDetailArea.id = "text-chapter";
+  textDetailArea.setAttribute("aria-label", "Chapter text");
+  textDetailArea.readOnly = true;
+  textSection.appendChild(textDetailArea);
+  const textChaptersEl = document.createElement("div");
+  textChaptersEl.id = "text-chapters";
+  textSection.appendChild(textChaptersEl);
+
+  let textRoot: string | null = openRoot;
+  let textText: string | null = null;
+
+  function textFail(action: string, res: { code?: string; message?: string }): void {
+    textStatus.textContent = `text ${action} failed: ${res.code ?? "error"} ${res.message ?? ""}`;
+  }
+
+  function renderChapters(chapters: any[]): void {
+    textChaptersEl.replaceChildren();
+    if (chapters.length === 0) {
+      textChaptersEl.textContent = "No chapters yet.";
+      return;
+    }
+    for (const chapter of chapters as any[]) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = `${chapter.title} (chars ${chapter.normStart}–${chapter.normEnd})`;
+      btn.setAttribute("aria-label", `Show chapter: ${chapter.title}`);
+      btn.addEventListener("click", () => {
+        if (textText === null) {
+          textDetailArea.value = "";
+          return;
+        }
+        textDetailArea.value = textText.slice(chapter.normStart, chapter.normEnd);
+        textStatus.textContent = `text: ${chapter.title} (chars ${chapter.normStart}–${chapter.normEnd})`;
+      });
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(btn);
+      textChaptersEl.appendChild(wrapper);
+    }
+  }
+
+  async function refreshText(): Promise<void> {
+    const manuscriptId = textSelect.value;
+    if (!textRoot || manuscriptId === "") {
+      return;
+    }
+    const res = await win.panelforge.text.get({ root: textRoot, manuscriptId });
+    if (!res.ok || !res.data) {
+      textFail("get", res);
+      return;
+    }
+    const normalization = (res.data as any).normalization as any | null;
+    if (!normalization) {
+      textText = null;
+      normArea.value = "";
+      textStatus.textContent = "No normalized text for this manuscript.";
+    } else {
+      textText = normalization.normalizedText as string;
+      normArea.value = textText;
+      textStatus.textContent = `text: ${normalization.byteLength} bytes`;
+    }
+    const chaptersRes = await win.panelforge.chapters.list({ root: textRoot, manuscriptId });
+    if (!chaptersRes.ok || !chaptersRes.data) {
+      textFail("chapters", chaptersRes);
+      return;
+    }
+    renderChapters((chaptersRes.data as any).chapters as any[]);
+  }
+
+  textLoadBtn.addEventListener("click", () => {
+    void (async () => {
+      textRoot = textRootInput.value.trim() === "" ? openRoot : textRootInput.value.trim();
+      if (!textRoot) {
+        textStatus.textContent = "text: choose a project root first (open from Projects or paste its root below)";
+        return;
+      }
+      const res = await win.panelforge.import.list({ root: textRoot });
+      if (!res.ok || !res.data) {
+        textFail("load manuscripts", res);
+        return;
+      }
+      const manuscripts = (res.data as any).manuscripts as any[];
+      textSelect.replaceChildren();
+      if (manuscripts.length === 0) {
+        textSelect.textContent = "";
+        textStatus.textContent = "No manuscripts yet.";
+        textText = null;
+        normArea.value = "";
+        textDetailArea.value = "";
+        renderChapters([]);
+        return;
+      }
+      for (const record of manuscripts as any[]) {
+        const option = document.createElement("option");
+        option.value = record.manuscriptId;
+        option.textContent = `${record.title} (${record.format})`;
+        textSelect.appendChild(option);
+      }
+      textStatus.textContent = `text: ${manuscripts.length} manuscript(s)`;
+      void refreshText();
+    })();
+  });
+
+  textSelect.setAttribute("aria-label", "Manuscript");
+  textSelect.addEventListener("change", () => {
+    textDetailArea.value = "";
+    void refreshText();
+  });
+
+  textNormalizeBtn.addEventListener("click", () => {
+    void (async () => {
+      const manuscriptId = textSelect.value;
+      if (!textRoot || manuscriptId === "") {
+        textStatus.textContent = "text: load manuscripts first";
+        return;
+      }
+      const res = await win.panelforge.text.normalize({ root: textRoot, manuscriptId });
+      if (!res.ok || !res.data) {
+        textFail("normalize", res);
+        return;
+      }
+      const normalization = (res.data as any).normalization as any;
+      textStatus.textContent = `text: normalized ${normalization.byteLength} bytes`;
+      void refreshText();
+    })();
+  });
+
+  textDeriveBtn.addEventListener("click", () => {
+    void (async () => {
+      const manuscriptId = textSelect.value;
+      if (!textRoot || manuscriptId === "") {
+        textStatus.textContent = "text: load manuscripts first";
+        return;
+      }
+      const res = await win.panelforge.chapters.derive({ root: textRoot, manuscriptId });
+      if (!res.ok || !res.data) {
+        textFail("derive chapters", res);
+        return;
+      }
+      const chapters = (res.data as any).chapters as any[];
+      textStatus.textContent = `text: ${chapters.length} chapter(s)`;
+      void refreshText();
     })();
   });
 }

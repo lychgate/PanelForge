@@ -63,7 +63,7 @@ describe("S0.4 IPC Foundation", () => {
 
   it("registers exactly the allowlisted channels", () => {
     registerIpcHandlers();
-    expect(handleCalls).toHaveLength(34);
+    expect(handleCalls).toHaveLength(38);
     expect(handleCalls[0].channel).toBe(IPC_CHANNELS.diagnosticsPing);
     expect(handleCalls[0].channel).toBe("panelforge:diagnostics.ping");
     expect(handleCalls[1].channel).toBe(IPC_CHANNELS.diagnosticsGet);
