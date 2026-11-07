@@ -1227,6 +1227,15 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **How the owner sees it:** `electron .` → Alt+7 (Text) → open a project from Projects (Alt+3) or paste its root → Load manuscripts → pick the manuscript in the list → status shows `text: <N> bytes` (or "No normalized text for this manuscript.") → Normalize shows `text: normalized <N> bytes` → Derive chapters shows `text: <N> chapter(s)` and the chapter buttons → clicking a chapter button shows `text: <title> (chars a–b)` and its slice below.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit b680451; 628 tests incl. 5 text-ui; see §10)
 
+#### S8U.3 Scenes UI [SPEC]
+- **Goal:** Read and derive scenes from the UI (pick → read → derive).
+- **Scope:** Hand-rolled Scenes view (Alt+8): project-root input, manuscript picker (reusing the S8U.1 import list), scene list with empty state (each scene a focusable button showing chapter title + slice span), scene slice detail, typed-error status line; Derive scenes via S3.4. Two new allowlisted channels (`panelforge:scenes.list`, `panelforge:scenes.derive`) wrapping the existing S3.4 core; slicing reuses the S8U.2 text channel. Manual re-cutting (`recutScenes`) is deliberately out of scope here — read + derive only, backend behavior unchanged. Renderer test `tests/scenes-ui.test.js`.
+- **Deliverables [SPEC]:** Scenes UI surface.
+- **Acceptance:** Scenes read and derive fully without opening the filesystem; originals preserved.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.4.
+- **How the owner sees it:** `electron .` → Alt+8 (Scenes) → open a project from Projects (Alt+3) or paste its root → Load manuscripts → pick the manuscript in the list → status shows `scenes: <N> scene(s)` (or "No scenes yet.") → Derive scenes shows `scenes: <N> scene(s)` with one button per scene → clicking a scene button shows `scenes: <chapter>: <title> (chars a–b)` and its slice below.
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 5ee61db; 632 tests incl. 4 scenes-ui; see §10)
+
 **Stage 9 — Continuity and QA: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
 
 > Goal [SPEC]: Detect meaningful inconsistencies.
@@ -2183,6 +2192,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S8U.2 | `DISPLAY=:0 npm test` | Pass — 628 passed (623 baseline + 5 text-ui; incl. 9 ipc + 12 shortcuts). | `tests/text-ui.test.js` (5 tests): 4 text/chapter channels validated + registered; txt null-text → normalize → derive → list round-trip (spans tile, ordered); docx carries normalization, normalize rejects INVALID_FORMAT, typed NOT_FOUND + derive; derive-without-normalization typed NOT_FOUND; renderer carries Text view (Alt+7, Load manuscripts, Normalize, Derive chapters, empty states, Show chapter) with no raw IPC/Node. |
 | 2026-11-06 | S8U.2 | `npm run check` | Pass | Baseline + IPC guard green (no new deps; 38 channels total). |
 | 2026-11-06 | S8U.2 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored; `PanelForge.zip` untracked (owner to direct). |
+| 2026-11-06 | S8U.3 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S8U.3 | `npm run build` | Pass | `out/node/core/ipc/registry.js` + rebuilt renderer emitted. |
+| 2026-11-06 | S8U.3 | `DISPLAY=:0 npm test` | Pass — 632 passed (628 baseline + 4 scenes-ui; incl. 9 ipc + 12 shortcuts). | `tests/scenes-ui.test.js` (4 tests): 2 scenes channels validated + registered; txt empty-list → normalize + chapters → derive → list round-trip (per-chapter tiling, reading order); unknown-id + derive-without-normalization/chapters typed NOT_FOUND; renderer carries Scenes view (Alt+8, Load manuscripts, Derive scenes, empty states, Show scene) with no raw IPC/Node. |
+| 2026-11-06 | S8U.3 | `npm run check` | Pass | Baseline + IPC guard green (no new deps; 40 channels total). |
+| 2026-11-06 | S8U.3 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored; `PanelForge.zip` untracked (owner to direct). |
+
+**S8U.3 implemented files:** `src/shared/types/index.ts` (ScenesKeyArgs), `src/core/ipc/registry.ts` (2 scenes channels, validators; dispatch to S3.4 core — backend behavior unchanged), `src/preload/index.ts` (frozen `scenes` bridge), `src/renderer/index.ts` (Scenes view Alt+8: root input, manuscript picker, Derive scenes, scene-slice area, chapter-labelled scene buttons), `Docs/PanelForge-Shortcuts.md` (Alt+8 + Scenes keyboard notes), `tests/scenes-ui.test.js` (New, 4 tests), `tests/ipc.test.js` (allowlist 38 → 40). Stage 9 remains paused until the Stage 8.1 click-through is gated.
 
 **S8U.2 implemented files:** `src/shared/types/index.ts` (TextChapterKeyArgs), `src/core/ipc/registry.ts` (4 text/chapter channels, validators, offset-map projection; dispatch to S3.2/S3.3 core — backend behavior unchanged), `src/preload/index.ts` (frozen `text`/`chapters` bridges), `src/renderer/index.ts` (Text view Alt+7: root input, manuscript picker, Normalize / Derive chapters, normalized-text + chapter-slice areas, chapter buttons), `Docs/PanelForge-Shortcuts.md` (Alt+7 + Text keyboard notes), `tests/text-ui.test.js` (New, 5 tests), `tests/ipc.test.js` (allowlist 34 → 38). Stage 9 remains paused until the Stage 8.1 click-through is gated.
 
@@ -2637,6 +2653,8 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 **Next eligible after S8U.1:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit 682a206; 623 tests incl. 6 import-ui). Stage 8.1 now 1 task done.** One-task-at-a-time (approved) stops here.
 
 **Next eligible after S8U.2:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit b680451; 628 tests incl. 5 text-ui). Stage 8.1 now 2 tasks done.** One-task-at-a-time (approved) stops here.
+
+**Next eligible after S8U.3:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit 5ee61db; 632 tests incl. 4 scenes-ui). Stage 8.1 now 3 tasks done.** One-task-at-a-time (approved) stops here.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 

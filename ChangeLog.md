@@ -7,6 +7,36 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S8U.3 — Scenes UI (2026-11-06) — [`5ee61db`](https://github.com/lychgate/PanelForge/commit/5ee61db)
+
+**Added**
+
+- New Scenes view in `src/renderer/index.ts` (Alt+8): project-root
+  input, manuscript picker (reusing the S8U.1 import list),
+  Derive scenes (via S3.4), scene list with empty state
+  ("No scenes yet."), chapter-labelled scene buttons showing the
+  selected slice, and a typed-error status line. Slicing reuses the
+  S8U.2 text channel; manual re-cutting stays out of scope.
+- Two allowlisted IPC channels (`panelforge:scenes.list`,
+  `panelforge:scenes.derive`) in `src/core/ipc/registry.ts` +
+  validators + frozen `scenes` bridge in `src/preload/index.ts`,
+  dispatching to the existing S3.4 core.
+- `tests/scenes-ui.test.js` (4 tests): channel registration +
+  validation, txt empty-list → normalize + chapters → derive →
+  list round-trip with per-chapter tiling, unknown-id and
+  derive-without-normalization/chapters typed `NOT_FOUND`, renderer
+  strings with no raw IPC/Node.
+- `Docs/PanelForge-Shortcuts.md`: Alt+8 + Scenes keyboard notes.
+
+**Changed**
+
+- `tests/ipc.test.js`: allowlist count 38 → 40.
+- Register: S8U.3 definition (§4E), §10 test log, §11 next eligible
+  (Stage 8.1 continues; Stage 9 paused).
+- `Plan.md`: S8U.3 checked off (Stage 8.1 now 3 tasks done).
+- `README.md`: test count 628 → 632, status line Stage 8.1 in progress.
+- Full suite: 632 passed; `typecheck`/`build`/`check` green.
+
 ### S8U.2 — Text/Chapters UI (2026-11-06) — [`b680451`](https://github.com/lychgate/PanelForge/commit/b680451)
 
 **Added**

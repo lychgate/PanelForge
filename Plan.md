@@ -218,7 +218,8 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 
 - [x] S8U.1 Import UI (Import view Alt+6; six import channels; main-process file picking; 623 tests incl. 6 import-ui) — completed 2026-11-06; Stage 8.1 now 1 task done
 - [x] S8U.2 Text/Chapters UI (normalized-text + chapters view; four text/chapter channels; Alt+7; 628 tests incl. 5 text-ui) — completed 2026-11-06; Stage 8.1 now 2 tasks done
-- [ ] S8U.3 — next Studio UI task, awaiting owner authorization (Stage 9 paused)
+- [x] S8U.3 Scenes UI (scene list/detail view; two scenes channels; Alt+8; 632 tests incl. 4 scenes-ui) — completed 2026-11-06; Stage 8.1 now 3 tasks done
+- [ ] S8U.4 — next Studio UI task, awaiting owner authorization (Stage 9 paused)
 
 ## Stage 9 — Continuity and QA (expanded 2026-11-06: S9.1–S9.12)
 
