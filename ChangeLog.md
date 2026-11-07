@@ -7,6 +7,39 @@ remains the authoritative progress record; this file summarizes what each task c
 
 ## [Unreleased]
 
+### S8U.1 — Import UI (2026-11-06) — [`682a206`](https://github.com/lychgate/PanelForge/commit/682a206)
+
+**Added**
+
+- New Import view in `src/renderer/index.ts` (Alt+6): project-root
+  input, main-process `Choose file...` pick, manuscript list with
+  empty state ("No manuscripts yet."), per-manuscript Verify and
+  View OCR / Save OCR (editor or "No OCR text for this manuscript."),
+  and a typed-error status line.
+- Six allowlisted IPC channels (`panelforge:import.pickFile`,
+  `.list`, `.import`, `.verify`, `.ocrGet`, `.ocrUpdate`) in
+  `src/core/ipc/registry.ts` + validators + frozen `import` bridge
+  in `src/preload/index.ts`, dispatching by format to the existing
+  S3.1/S3.8/S3.9/S3.10/S6.13 core services (txt/md/docx/epub/pdf
+  autodetect). File picking uses `dialog.showOpenDialog` in the
+  main process. New typed codes `INVALID_FORMAT`,
+  `SOURCE_NOT_FOUND`, `OCR_UNAVAILABLE`, `OCR_FAILED` in
+  `src/shared/types/index.ts`.
+- `tests/import-ui.test.js` (6 tests): channel registration +
+  validation, txt list → verify round-trip, docx/epub via envelope,
+  pdf autodetect without OCR, typed-code surfaces, renderer
+  strings with no raw IPC/Node.
+- `Docs/PanelForge-Shortcuts.md`: Alt+6 + Import keyboard notes.
+
+**Changed**
+
+- `tests/ipc.test.js`: allowlist count 28 → 34.
+- Register: Stage 8.1 + S8U.1 definitions (§4E), §10 test log,
+  §11 next eligible (Stage 8.1 continues; Stage 9 paused).
+- `Plan.md`: Stage 8.1 section with S8U.1 checked off.
+- `README.md`: test count 617 → 623, status line Stage 8.1 in progress.
+- Full suite: 623 passed; `typecheck`/`build`/`check` green.
+
 ### S5.10 — Stage 5 Acceptance Fixture (2026-11-06) — [`14d307b`](https://github.com/lychgate/PanelForge/commit/14d307b0e75aa026a898b8859e5d29455b07ac10)
 
 **Added**

@@ -212,6 +212,13 @@ Stage 1 completion: **complete** (2026-11-05 — gated by `tests/stage1-fixture.
 - [x] S8.13 Traceability (pages → storyboard panels + versions) — completed 2026-11-06; Stage 8 now 13 of 14
 - [x] S8.14 Stage 8 acceptance fixture (both formats, lettering editable, artwork untouched) — completed 2026-11-06; Stage 8 now 14 of 14 — GATE PASSES
 
+## Stage 8.1 — Studio UI (expanded 2026-11-06: S8U.1–S8U.15, owner-authorized; Stage 9 paused until the click-through is gated)
+
+> Owner rules: hand-rolled HTML/CSS + TypeScript only (no framework, editable by anyone); renderer never touches Node/raw IPC — every new action is an allowlisted channel in `src/core/ipc/registry.ts` + `src/preload/index.ts`, validated, with `npm run check` green; call existing core services without changing backend behavior unless the task says so; visible result or typed error per action, empty state per list; keyboard alternative for every pointer action recorded in `Docs/PanelForge-Shortcuts.md`; file/folder picking in the main process via Electron dialog; exact "How the owner sees it" live-Electron steps per task; small renderer test per task where possible; stop for review after each task.
+
+- [x] S8U.1 Import UI (Import view Alt+6; six import channels; main-process file picking; 623 tests incl. 6 import-ui) — completed 2026-11-06; Stage 8.1 now 1 task done
+- [ ] S8U.2 — next Studio UI task, awaiting owner authorization (Stage 9 paused)
+
 ## Stage 9 — Continuity and QA (expanded 2026-11-06: S9.1–S9.12)
 
 > Owner decisions: severity thresholds tunable per project; checks use recorded/explicit facts only (unknown skips, never guesses); suppression requires rationale and is auditable.

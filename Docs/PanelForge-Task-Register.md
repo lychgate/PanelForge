@@ -1205,6 +1205,19 @@ S1.10 and Stage 3+); dependency tracking (§11.5) belongs to Stage 3+.
 - **Stop:** Stage gate — Continuity and QA (S9) begins only after this passes.
 - **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit cc326a9; **Stage 8 GATE PASSES (14/14)**; see below)
 
+**Stage 8.1 — Studio UI: EXPANDED (owner-authorized planning 2026-11-06; Stage 9 paused until the Stage 8.1 click-through is gated).**
+
+> Owner rules (apply to every S8U task): hand-rolled renderers only (no framework); the renderer never touches Node or raw IPC — every new action is an allowlisted channel in `src/core/ipc/registry.ts` + `src/preload/index.ts`, validated, with `npm run check` green; call existing core services without changing backend behavior unless the task says so; every action shows a visible result or typed error and every list an empty state; every pointer action has a keyboard alternative recorded in `Docs/PanelForge-Shortcuts.md`; file/folder picking happens in the main process via Electron dialog; each task ends with exact "How the owner sees it" live-Electron steps; add a small renderer test per task where possible and update the Task Register / ChangeLog / README count; stop for review after each task.
+
+#### S8U.1 Import UI [SPEC]
+- **Goal:** Import a manuscript from the UI end-to-end (pick → import → list → verify → OCR).
+- **Scope:** Hand-rolled Import view (Alt+6): project-root input, main-process `pickFile` button, list with empty state, verify and OCR get/update via the preload bridge, typed-error status line. Six new allowlisted channels (`panelforge:import.pickFile`, `.list`, `.import`, `.verify`, `.ocrGet`, `.ocrUpdate`) wrapping the existing S3.1/S3.8/S3.9/S3.10/S6.13 core services (txt/md/docx/epub/pdf autodetect, no backend behavior change). Renderer test `tests/import-ui.test.js`.
+- **Deliverables [SPEC]:** Import UI surface.
+- **Acceptance:** A manuscript imports fully without opening the filesystem; originals preserved byte-for-byte.
+- **Deps [SPEC]:** None stated. [RECOMMENDATION] S3.1, S3.8–S3.10, S6.13.
+- **How the owner sees it:** `electron .` → Alt+6 (Import) → open a project from Projects (Alt+3) or paste its root → Load manuscripts (empty state: "No manuscripts yet.") → Choose file... (main-process dialog) → pick a .txt/.md/.docx/.epub/.pdf → status shows `imported: <title> (<format>)` (PDFs add `· ocr: N pages via <engine>` when autodetected) → Verify shows `verify: <title> — ok (...)` → View OCR shows the editor or "No OCR text for this manuscript." → edit + Save OCR shows `saved OCR for <title>`.
+- **Status:** **Complete** (2026-11-06 — acceptance verified; impl commit 682a206; 623 tests incl. 6 import-ui; see §10)
+
 **Stage 9 — Continuity and QA: EXPANDED (owner-authorized planning 2026-11-06, awaiting task-level approval).**
 
 > Goal [SPEC]: Detect meaningful inconsistencies.
@@ -2151,6 +2164,13 @@ No blockers to starting S0.1. The following are decision requests, not implement
 | 2026-11-06 | S8.14 | `DISPLAY=:0 npm test` | Pass — 617 passed (1 baseline + 12 config + 12 logging + 10 lifecycle + 10 database + 12 shortcuts + 5 packaging + 11 project + 8 project-metadata + 9 project-operations + 10 project-paths + 9 asset-registry + 7 asset-integrity + 8 atomic-metadata + 9 backup-snapshot + 5 portability + 5 project-interface + 2 stage1-fixture + 7 provider-contract + 7 task-records + 9 task-queue + 7 task-transitions + 7 task-pause + 6 task-retry + 9 task-progress + 7 queue-recovery + 4 lmstudio + 5 comfyui + 4 comfyui-client + 8 provider-health + 10 mock-provider + 9 resource-profiles + 8 hardware-detection + 8 telemetry-adapter + 6 telemetry-failure + 7 cooling-down + 6 small-gpu + 5 manuscripts + 5 text-normalize + 5 chapters + 5 scenes + 5 relationships + 5 entities + 5 canon + 5 docx-import + 4 epub-import + 5 pdf-import + 7 art-styles + 4 style-persistence + 6 style-variants + 4 stage3-fixture + 5 characters + 5 character-versions + 5 version-references + 5 completeness + 5 tier-config + 5 entity-bridge + 5 version-binding + 5 approval + 4 generation-requests + 4 version-comparison + 3 history + 2 stage4-fixture + 5 locations + 5 location-variations + 5 location-references + 5 objects + 5 object-variations + 5 object-references + 6 location-object-bridge + 4 studio-requests + 4 studio-history + 2 stage5-fixture + 5 storyboard-scenes + 4 storyboard-panels + 5 panel-assignments + 4 panel-location-assignments + 4 panel-cameras + 4 panel-positions + 4 panel-text + 5 scene-style + 4 panel-instructions + 4 snapshots + 5 storyboard-ui + 5 composition-review + 3 stage6-fixture + 4 workflow-templates + 4 prompt-assembly + 4 negative-prompts + 4 reference-conditioning + 3 panel-generation + 3 variations + 4 inpaint + 3 outpaint + 3 aspect-ratios + 5 comparison + 2 provenance + 3 artwork-approval + 3 engine-provisioning + 1 stage7-fixture + 4 pages + 4 placements + 3 layout-templates + 3 webtoon + 3 borders + 4 balloons + 3 lettering + 3 sfx + 3 reading-order + 3 layout-snapshots + 3 svg-render + 5 layout-ui + 3 traceability + 1 stage8-fixture + 9 ipc + 13 security) | `tests/stage8-fixture.test.js` (1 gate test): traditional + webtoon assemble → balloons/SFX/lettering → SVG both formats → snapshot/branch/restore byte-identical; artwork hashes pinned throughout. |
 | 2026-11-06 | S8.14 | `npm run check` | Pass | Baseline + IPC guard green (runtime/engines gitignored). |
 | 2026-11-06 | S8.14 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored. |
+| 2026-11-06 | S8U.1 | `npm run typecheck` | Pass | Node + web clean. |
+| 2026-11-06 | S8U.1 | `npm run build` | Pass | `out/node/core/ipc/registry.js` + rebuilt renderer emitted. |
+| 2026-11-06 | S8U.1 | `DISPLAY=:0 npm test` | Pass — 623 passed (617 baseline + 6 import-ui; incl. 9 ipc + 12 shortcuts). | `tests/import-ui.test.js` (6 tests): 6 import channels validated + registered; txt import → list → verify round-trip; docx/epub via envelope; pdf autodetect without OCR; typed codes (NOT_FOUND/INVALID_FORMAT); renderer carries Import view (Alt+6, Load manuscripts, Choose file..., Verify, View OCR, Save OCR, empty states) with no raw IPC/Node. |
+| 2026-11-06 | S8U.1 | `npm run check` | Pass | Baseline + IPC guard green (no new deps; 34 channels total). |
+| 2026-11-06 | S8U.1 | `git status` | Clean (commit recorded below) | `out/` and `forge-out/` gitignored; `PanelForge.zip` untracked (owner to direct). |
+
+**S8U.1 implemented files:** `src/shared/types/index.ts` (import error codes + arg types), `src/core/ipc/registry.ts` (6 import channels, validators, main-process `dialog.showOpenDialog` pickFile, format dispatch to S3.1/S3.8/S3.9/S3.10/S6.13 core — backend behavior unchanged), `src/preload/index.ts` (frozen `import` bridge), `src/renderer/index.ts` (Import view Alt+6: root input, Load manuscripts, Choose file..., list + Verify + View OCR/Save OCR, typed-error status), `Docs/PanelForge-Shortcuts.md` (Alt+6 + Import keyboard notes), `tests/import-ui.test.js` (New, 6 tests), `tests/ipc.test.js` (allowlist 28 → 34). Stage 9 remains paused until the Stage 8.1 click-through is gated.
 
 **S8.14 implemented files:** `tests/stage8-fixture.test.js` (New, 1 gate test). **Stage 8 gate: PASSES (14/14).** Stage 9 (Continuity and QA) awaits owner authorization.
 
@@ -2597,6 +2617,8 @@ S0.2 modified/added: `package.json`, `package-lock.json`, `tsconfig.node.json`, 
 **Next eligible after S8.13:** S8.14 — Stage 8 acceptance fixture (both formats, gate). **Status: Complete (2026-11-06, impl commit cc326a9; 617 tests incl. 1 stage8-fixture). Stage 8 now 14 of 14 — GATE PASSES.** One-task-at-a-time (approved) stops here.
 
 **Next eligible after S8.14:** Stage 9 — Continuity and QA (S9.1 QA threshold settings, §4E Stage 9 expanded plan). Do not begin without explicit owner authorization.
+
+**Next eligible after S8U.1:** Stage 8.1 continues (next S8U task, owner-authorized; Stage 9 stays paused until the Stage 8.1 click-through is gated). **Status: Complete (2026-11-06, impl commit 682a206; 623 tests incl. 6 import-ui). Stage 8.1 now 1 task done.** One-task-at-a-time (approved) stops here.
 
 **Next eligible after S3.10:** S3.11 — Art Style Manager (CRUD + canonical default). Do not begin without explicit owner authorization.
 
