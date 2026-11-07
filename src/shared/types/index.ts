@@ -22,7 +22,12 @@ export type SafeErrorCode =
   // Storyboard UI (S6.11) surfaces core typed codes directly.
   | "NOT_APPROVED"
   | "BOUND_PANEL"
-  | "BOUND_VERSION";
+  | "BOUND_VERSION"
+  // Import UI (S8U.1) surfaces core typed codes directly.
+  | "INVALID_FORMAT"
+  | "SOURCE_NOT_FOUND"
+  | "OCR_UNAVAILABLE"
+  | "OCR_FAILED";
 
 export type IpcResult<T> =
   | { ok: true; data: T }
@@ -263,4 +268,34 @@ export type LayoutSetReadingOrderArgs = {
   root: string;
   pageId: string;
   placementIds: string[];
+};
+
+// Import UI (S8U.1) — one method per channel (D1). "root" is the
+// project directory resolved by the main process; the file the
+// renderer imports was picked by the main-process dialog
+// (rule 6), never typed by the renderer itself.
+export type ImportRootArgs = {
+  root: string;
+};
+
+export type ImportImportArgs = {
+  root: string;
+  sourceAbsolutePath: string;
+  title?: string;
+};
+
+export type ImportVerifyArgs = {
+  root: string;
+  manuscriptId: string;
+};
+
+export type ImportOcrGetArgs = {
+  root: string;
+  manuscriptId: string;
+};
+
+export type ImportOcrUpdateArgs = {
+  root: string;
+  manuscriptId: string;
+  ocrText: string;
 };

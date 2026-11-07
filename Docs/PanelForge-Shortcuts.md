@@ -12,6 +12,7 @@ shortcut registry (`src/renderer/shortcuts.ts`) and documented here.
 | `Alt+3` | Go to the Projects view |
 | `Alt+4` | Go to the Storyboard view |
 | `Alt+5` | Go to the Layout view |
+| `Alt+6` | Go to the Import view |
 | `Tab` / `Shift+Tab` | Move focus through navigation and view controls |
 | `Enter` / `Space` | Activate the focused control |
 | `Ctrl+Q` (`Cmd+Q` on macOS) | Quit the application (application menu, File) |
@@ -23,4 +24,10 @@ Notes:
   `panelforge:diagnostics.ping` and `panelforge:diagnostics.get`; shortcuts
   never bypass the preload allowlist.
 - Focus is always visible (`:focus-visible` outline in `index.html`).
+- All Import actions (Load manuscripts, Choose file..., Verify,
+  View OCR, Save OCR) are native focusable buttons reachable with
+  `Tab` + `Enter`; the OCR editor is a focusable textarea
+  (Tab into, edit, Tab to Save OCR). File picking is triggered from
+  the keyboard-focusable Choose button and opens the main-process
+  dialog.
 - The current view is marked with `aria-current="page"` on its nav button.

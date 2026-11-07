@@ -7,7 +7,7 @@
 //   rejected with a safe error envelope (no stack traces to the renderer).
 // - Handlers are centralized: add a channel here, never elsewhere.
 
-import { app, ipcMain, IpcMainInvokeEvent } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent } from "electron";
 import type {
   DiagnosticsGetArgs,
   DiagnosticsGetData,
@@ -42,6 +42,11 @@ import {
   LayoutSetLetteringArgs,
   LayoutSetSfxArgs,
   LayoutSetReadingOrderArgs,
+  ImportRootArgs,
+  ImportImportArgs,
+  ImportVerifyArgs,
+  ImportOcrGetArgs,
+  ImportOcrUpdateArgs,
 } from "../../shared/types";
 import { defaultLogService } from "../logging/service";
 import {
@@ -69,6 +74,17 @@ import { createBalloon, updateBalloon, retargetTail } from "../project/balloons"
 import { setLettering } from "../project/lettering";
 import { createSfx, updateSfx } from "../project/sfx";
 import { setReadingOrder } from "../project/reading-order";
+import {
+  detectManuscriptFormat,
+  getManuscript,
+  importManuscript,
+  listManuscripts,
+  verifyManuscript,
+  ManuscriptError,
+} from "../project/manuscripts";
+import { importDocxManuscript } from "../project/docx-import";
+import { importEpubManuscript } from "../project/epub-import";
+import { importPdfAutodetect, getOcrText, updateOcrText } from "../project/pdf-ocr";
 
 export const IPC_CHANNELS = {
   diagnosticsPing: "panelforge:diagnostics.ping",
@@ -99,6 +115,12 @@ export const IPC_CHANNELS = {
   layoutSetLettering: "panelforge:layout.setLettering",
   layoutSetSfx: "panelforge:layout.setSfx",
   layoutSetReadingOrder: "panelforge:layout.setReadingOrder",
+  importPickFile: "panelforge:import.pickFile",
+  importList: "panelforge:import.list",
+  importImport: "panelforge:import.import",
+  importVerify: "panelforge:import.verify",
+  importOcrGet: "panelforge:import.ocrGet",
+  importOcrUpdate: "panelforge:import.ocrUpdate",
 } as const;
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS];
@@ -351,6 +373,34 @@ function isValidLayoutSetReadingOrderArgs(args: unknown): args is LayoutSetReadi
   return a.placementIds.every((id) => typeof id === "string" && id.trim() !== "");
 }
 
+function isValidImportRootArgs(args: unknown): args is ImportRootArgs {
+  if (!isRecord(args)) return false;
+  return isNonEmptyString((args as { root?: unknown }).root);
+}
+
+function isValidImportImportArgs(args: unknown): args is ImportImportArgs {
+  if (!isValidImportRootArgs(args)) return false;
+  const a = args as ImportImportArgs;
+  if (typeof a.sourceAbsolutePath !== "string" || a.sourceAbsolutePath.trim() === "") return false;
+  if (!path.isAbsolute(a.sourceAbsolutePath)) return false;
+  return a.title === undefined || typeof a.title === "string";
+}
+
+function isValidImportKeyArgs(args: unknown): args is ImportVerifyArgs {
+  if (!isValidImportRootArgs(args)) return false;
+  return isNonEmptyString((args as { manuscriptId?: unknown }).manuscriptId);
+}
+
+function isValidImportOcrUpdateArgs(args: unknown): args is ImportOcrUpdateArgs {
+  if (!isValidImportKeyArgs(args)) return false;
+  const a = args as ImportOcrUpdateArgs;
+  return typeof a.ocrText === "string" && a.ocrText.trim() !== "";
+}
+
+function isValidImportPickFileArgs(args: unknown): args is Record<string, never> {
+  return isRecord(args);
+}
+
 const handlers: Record<
   string,
   {
@@ -596,6 +646,78 @@ const handlers: Record<
     validate: isValidLayoutSetReadingOrderArgs,
     handle: async (_event, args) => {
       return setReadingOrder(args.root, { pageId: args.pageId, placementIds: args.placementIds });
+    },
+  },
+  [IPC_CHANNELS.importPickFile]: {
+    validate: isValidImportPickFileArgs,
+    handle: async (_event, _args) => {
+      void _args;
+      // Rule 6: picking happens in the main process. The renderer
+      // only receives the chosen path (or a cancellation).
+      const focused = BrowserWindow.getFocusedWindow();
+      const dialogOptions = {
+        properties: [("openFile" as const)],
+        filters: [{ name: "Manuscripts", extensions: ["txt", "md", "docx", "epub", "pdf"] }],
+      };
+      const result = focused
+        ? await dialog.showOpenDialog(focused, dialogOptions)
+        : await dialog.showOpenDialog(dialogOptions);
+      if (result.canceled || result.filePaths.length === 0) {
+        return { filePath: null as string | null, canceled: true };
+      }
+      return { filePath: result.filePaths[0], canceled: false };
+    },
+  },
+  [IPC_CHANNELS.importList]: {
+    validate: isValidImportRootArgs,
+    handle: async (_event, args) => {
+      return { manuscripts: await listManuscripts(args.root) };
+    },
+  },
+  [IPC_CHANNELS.importImport]: {
+    validate: isValidImportImportArgs,
+    handle: async (_event, args) => {
+      const format = detectManuscriptFormat(args.sourceAbsolutePath);
+      if (!format) {
+        throw new ManuscriptError("INVALID_FORMAT", `Unsupported manuscript format for: ${path.basename(args.sourceAbsolutePath)}`);
+      }
+      const title = args.title?.trim() ? args.title.trim() : undefined;
+      if (format === "docx") {
+        return { manuscript: await importDocxManuscript(args.root, { sourceAbsolutePath: args.sourceAbsolutePath, title }), ocr: null };
+      }
+      if (format === "epub") {
+        return { manuscript: await importEpubManuscript(args.root, { sourceAbsolutePath: args.sourceAbsolutePath, title }), ocr: null };
+      }
+      if (format === "pdf") {
+        return importPdfAutodetect(args.root, { sourceAbsolutePath: args.sourceAbsolutePath, title });
+      }
+      return { manuscript: await importManuscript(args.root, { sourceAbsolutePath: args.sourceAbsolutePath, title, format }), ocr: null };
+    },
+  },
+  [IPC_CHANNELS.importVerify]: {
+    validate: isValidImportKeyArgs,
+    handle: async (_event, args) => {
+      const record = await getManuscript(args.root, args.manuscriptId);
+      if (!record) {
+        throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
+      }
+      return verifyManuscript(args.root, record);
+    },
+  },
+  [IPC_CHANNELS.importOcrGet]: {
+    validate: isValidImportKeyArgs,
+    handle: async (_event, args) => {
+      const record = await getManuscript(args.root, args.manuscriptId);
+      if (!record) {
+        throw new ManuscriptError("NOT_FOUND", `No manuscript with id: ${args.manuscriptId}`);
+      }
+      return { ocr: await getOcrText(args.root, args.manuscriptId) };
+    },
+  },
+  [IPC_CHANNELS.importOcrUpdate]: {
+    validate: isValidImportOcrUpdateArgs,
+    handle: async (_event, args) => {
+      return { ocr: await updateOcrText(args.root, args.manuscriptId, args.ocrText) };
     },
   },
 };

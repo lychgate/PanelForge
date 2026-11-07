@@ -1,4 +1,4 @@
-// PanelForge — preload bridge (S8.12).
+// PanelForge — preload bridge (S8U.1).
 //
 // Restricted bridge: exposes a frozen API object via contextBridge.
 // - diagnostics.get() — the S0.5 diagnostic round-trip.
@@ -8,6 +8,8 @@
 // - layout.* — S8.12 hand-rolled layout UI surface (read pages,
 //   place/move placements, borders, balloons, lettering, SFX,
 //   reading order). No export surface (Stage 10).
+// - import.* — S8U.1 hand-rolled import surface (main-process file
+//   picker + manuscript import/list/verify/OCR via existing services).
 // The preload wraps the approved channels and does not expose
 // ipcRenderer itself to the renderer.
 
@@ -41,6 +43,11 @@ import type {
   LayoutSetLetteringArgs,
   LayoutSetSfxArgs,
   LayoutSetReadingOrderArgs,
+  ImportRootArgs,
+  ImportImportArgs,
+  ImportVerifyArgs,
+  ImportOcrGetArgs,
+  ImportOcrUpdateArgs,
 } from "../shared/types";
 
 async function invoke<T>(channel: string, args: Record<string, unknown>): Promise<IpcResult<T>> {
@@ -232,6 +239,34 @@ const api = Object.freeze({
         root: args.root,
         pageId: args.pageId,
         placementIds: args.placementIds,
+      });
+    },
+  }),
+  import: Object.freeze({
+    async pickFile(): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:import.pickFile", {});
+    },
+    async list(args: ImportRootArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:import.list", { root: args.root });
+    },
+    async importFile(args: ImportImportArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:import.import", {
+        root: args.root,
+        sourceAbsolutePath: args.sourceAbsolutePath,
+        title: args.title,
+      });
+    },
+    async verify(args: ImportVerifyArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:import.verify", { root: args.root, manuscriptId: args.manuscriptId });
+    },
+    async ocrGet(args: ImportOcrGetArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:import.ocrGet", { root: args.root, manuscriptId: args.manuscriptId });
+    },
+    async ocrUpdate(args: ImportOcrUpdateArgs): Promise<IpcResult<any>> {
+      return invoke<any>("panelforge:import.ocrUpdate", {
+        root: args.root,
+        manuscriptId: args.manuscriptId,
+        ocrText: args.ocrText,
       });
     },
   }),

@@ -86,6 +86,14 @@ type PanelForgeApi = {
     setSfx(args: { root: string; placementId: string; text: string; weight?: string; angle?: number; x: number; y: number; scale?: number; sfxId?: string }): Promise<ProjectResult<any>>;
     setReadingOrder(args: { root: string; pageId: string; placementIds: string[] }): Promise<ProjectResult<any>>;
   };
+  import: {
+    pickFile(): Promise<ProjectResult<any>>;
+    list(args: { root: string }): Promise<ProjectResult<any>>;
+    importFile(args: { root: string; sourceAbsolutePath: string; title?: string }): Promise<ProjectResult<any>>;
+    verify(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+    ocrGet(args: { root: string; manuscriptId: string }): Promise<ProjectResult<any>>;
+    ocrUpdate(args: { root: string; manuscriptId: string; ocrText: string }): Promise<ProjectResult<any>>;
+  };
   version: Record<string, never>;
 };
 
@@ -93,13 +101,14 @@ type PanelForgeWindow = Window & { panelforge: PanelForgeApi };
 
 const win = window as unknown as PanelForgeWindow;
 
-const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout"] as const;
+const VIEWS = ["diagnostics", "about", "projects", "storyboard", "layout", "import"] as const;
 const VIEW_TITLES: Record<(typeof VIEWS)[number], string> = {
   diagnostics: "Diagnostics",
   about: "About",
   projects: "Projects",
   storyboard: "Storyboard",
   layout: "Layout",
+  import: "Import",
 };
 
 const navigation = createNavigation(VIEWS, "diagnostics");
@@ -109,6 +118,7 @@ shortcuts.register("nav.about", "Go to About view", "Alt+2");
 shortcuts.register("nav.projects", "Go to Projects view", "Alt+3");
 shortcuts.register("nav.storyboard", "Go to Storyboard view", "Alt+4");
 shortcuts.register("nav.layout", "Go to Layout view", "Alt+5");
+shortcuts.register("nav.import", "Go to Import view", "Alt+6");
 
 const root = document.getElementById("root");
 const navEl = document.getElementById("app-nav");
@@ -175,6 +185,7 @@ if (root && navEl) {
     if (def.id === "nav.projects") goToView("projects");
     if (def.id === "nav.storyboard") goToView("storyboard");
     if (def.id === "nav.layout") goToView("layout");
+    if (def.id === "nav.import") goToView("import");
   });
 
   renderView();
@@ -994,5 +1005,186 @@ if (root && navEl) {
   layoutLoadBtn.addEventListener("click", () => {
     layoutRoot = layoutRootInput.value.trim() === "" ? openRoot : layoutRootInput.value.trim();
     void refreshLayoutBoard();
+  });
+
+  // Import (S8U.1): hand-rolled manuscript import surface over the
+  // existing S3.1/S3.8/S3.9/S3.10/S6.13 core services. File picking
+  // happens in the main process (Electron dialog); the renderer only
+  // receives the chosen path. Every action shows a visible result or
+  // a typed error; lists show an empty state; every control is a
+  // native focusable element (Tab + Enter, Alt+6 to reach this view).
+  const importSection = sections.import;
+  const importStatus = document.createElement("div");
+  importStatus.id = "import-status";
+  importStatus.textContent = "import: open a project from Projects first (Alt+3), or paste its root below.";
+  importSection.appendChild(importStatus);
+  const importRootInput = document.createElement("input");
+  importRootInput.id = "import-root";
+  importRootInput.placeholder = "Project root (directory)";
+  importRootInput.setAttribute("aria-label", "Project root");
+  importSection.appendChild(importRootInput);
+  const importLoadBtn = document.createElement("button");
+  importLoadBtn.type = "button";
+  importLoadBtn.textContent = "Load manuscripts";
+  importSection.appendChild(importLoadBtn);
+  const importTitleInput = document.createElement("input");
+  importTitleInput.id = "import-title";
+  importTitleInput.placeholder = "Manuscript title (optional)";
+  importTitleInput.setAttribute("aria-label", "Manuscript title");
+  importSection.appendChild(importTitleInput);
+  const importPickBtn = document.createElement("button");
+  importPickBtn.type = "button";
+  importPickBtn.textContent = "Choose file...";
+  importPickBtn.setAttribute("aria-label", "Choose and import a manuscript file");
+  importSection.appendChild(importPickBtn);
+  const importListEl = document.createElement("div");
+  importListEl.id = "import-list";
+  importSection.appendChild(importListEl);
+  const importDetailEl = document.createElement("div");
+  importDetailEl.id = "import-detail";
+  importSection.appendChild(importDetailEl);
+
+  let importRoot: string | null = openRoot;
+
+  function importFail(action: string, res: { code?: string; message?: string }): void {
+    importStatus.textContent = `import ${action} failed: ${res.code ?? "error"} ${res.message ?? ""}`;
+  }
+
+  function importBtn(label: string, onClick: () => Promise<void>): HTMLButtonElement {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = label;
+    btn.addEventListener("click", () => {
+      void onClick();
+    });
+    return btn;
+  }
+
+  function shortHash(hash: string): string {
+    return hash.slice(0, 8);
+  }
+
+  async function refreshImportList(): Promise<void> {
+    if (!importRoot) {
+      importListEl.textContent = "No project root selected.";
+      return;
+    }
+    const result = await win.panelforge.import.list({ root: importRoot });
+    if (!result.ok || !result.data) {
+      importFail("list", result);
+      return;
+    }
+    const manuscripts = result.data.manuscripts as any[];
+    importStatus.textContent = `import: ${manuscripts.length} manuscript(s)`;
+    importListEl.replaceChildren();
+    importDetailEl.replaceChildren();
+    if (manuscripts.length === 0) {
+      importListEl.textContent = "No manuscripts yet.";
+      return;
+    }
+    for (const record of manuscripts as any[]) {
+      const fieldset = document.createElement("fieldset");
+      fieldset.id = "import-manuscript";
+      const legend = document.createElement("legend");
+      legend.textContent = `Manuscript ${record.title} (${record.format})`;
+      fieldset.appendChild(legend);
+      const meta = document.createElement("div");
+      meta.textContent = `${record.byteSize} bytes · ${record.relativePath} · hash ${shortHash(record.contentHash)}`;
+      fieldset.appendChild(meta);
+      const verifyBtn = importBtn("Verify", async () => {
+        if (!importRoot) return;
+        const res = await win.panelforge.import.verify({ root: importRoot, manuscriptId: record.manuscriptId });
+        if (!res.ok || !res.data) {
+          importFail("verify", res);
+          return;
+        }
+        const entry = res.data as any;
+        importStatus.textContent = `verify: ${record.title} — ${entry.status} (expected ${shortHash(entry.expectedHash)}${entry.actualHash ? `, actual ${shortHash(entry.actualHash)}` : ""})`;
+      });
+      fieldset.appendChild(verifyBtn);
+      const ocrBtn = importBtn("View OCR", async () => {
+        if (!importRoot) return;
+        const res = await win.panelforge.import.ocrGet({ root: importRoot, manuscriptId: record.manuscriptId });
+        if (!res.ok) {
+          importFail("ocr", res);
+          return;
+        }
+        importDetailEl.replaceChildren();
+        const ocr = (res.data as any)?.ocr;
+        const header = document.createElement("div");
+        header.textContent = `OCR for ${record.title}`;
+        importDetailEl.appendChild(header);
+        if (!ocr) {
+          const empty = document.createElement("div");
+          empty.textContent = "No OCR text for this manuscript.";
+          importDetailEl.appendChild(empty);
+          return;
+        }
+        const info = document.createElement("div");
+        info.textContent = `${ocr.pageCount} pages · ${ocr.engine} · updated ${ocr.updatedAt}`;
+        importDetailEl.appendChild(info);
+        const area = document.createElement("textarea");
+        area.id = "import-ocr-text";
+        area.setAttribute("aria-label", "OCR text");
+        area.value = ocr.ocrText as string;
+        importDetailEl.appendChild(area);
+        importDetailEl.appendChild(
+          importBtn("Save OCR", async () => {
+            const update = await win.panelforge.import.ocrUpdate({
+              root: importRoot!,
+              manuscriptId: record.manuscriptId,
+              ocrText: area.value,
+            });
+            importStatus.textContent = update.ok
+              ? `saved OCR for ${record.title}`
+              : `import save OCR failed: ${update.code} ${update.message}`;
+          })
+        );
+      });
+      fieldset.appendChild(ocrBtn);
+      importListEl.appendChild(fieldset);
+    }
+  }
+
+  importLoadBtn.addEventListener("click", () => {
+    importRoot = importRootInput.value.trim() === "" ? openRoot : importRootInput.value.trim();
+    void refreshImportList();
+  });
+
+  importPickBtn.addEventListener("click", () => {
+    void (async () => {
+      if (!importRoot) {
+        importStatus.textContent = "import: choose a project root first (open from Projects or paste its root below)";
+        return;
+      }
+      const picked = await win.panelforge.import.pickFile();
+      if (!picked.ok || !picked.data) {
+        importFail("pick file", picked);
+        return;
+      }
+      const filePath = (picked.data as any)?.filePath as string | null;
+      const canceled = (picked.data as any)?.canceled as boolean;
+      if (canceled || !filePath) {
+        importStatus.textContent = "import: file pick cancelled";
+        return;
+      }
+      const title = importTitleInput.value.trim();
+      const res = await win.panelforge.import.importFile({
+        root: importRoot,
+        sourceAbsolutePath: filePath,
+        title: title === "" ? undefined : title,
+      });
+      if (!res.ok || !res.data) {
+        importFail("file", res);
+        return;
+      }
+      const manuscript = (res.data as any).manuscript;
+      const ocr = (res.data as any).ocr;
+      importStatus.textContent = ocr
+        ? `imported: ${manuscript.title} (${manuscript.format}) · ocr: ${ocr.pageCount} pages via ${ocr.engine}`
+        : `imported: ${manuscript.title} (${manuscript.format})`;
+      importTitleInput.value = "";
+      void refreshImportList();
+    })();
   });
 }
